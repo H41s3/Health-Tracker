@@ -9,7 +9,7 @@ interface InsightsBannerProps {
 export default function InsightsBanner({ todayMetric, isLoading }: InsightsBannerProps) {
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-r from-emerald-50 to-blue-50 rounded-xl p-4 border border-emerald-200 animate-pulse">
+      <div className="bg-gradient-to-r from-purple-50 to-red-50 rounded-xl p-4 border border-purple-200 animate-pulse">
         <div className="flex items-center gap-3">
           <div className="w-6 h-6 bg-gray-200 rounded-full" />
           <div className="h-5 w-48 bg-gray-200 rounded" />
@@ -119,22 +119,22 @@ export default function InsightsBanner({ todayMetric, isLoading }: InsightsBanne
 
   const Icon = primaryInsight.icon;
   const bgColor = primaryInsight.type === 'success' 
-    ? 'from-emerald-50 to-green-50 border-emerald-200' 
+    ? 'from-yellow-50 to-orange-50 border-yellow-200' 
     : primaryInsight.type === 'warning'
-    ? 'from-amber-50 to-yellow-50 border-amber-200'
-    : 'from-blue-50 to-indigo-50 border-blue-200';
+    ? 'from-red-50 to-orange-50 border-red-200'
+    : 'from-purple-50 to-indigo-50 border-purple-200';
 
   const textColor = primaryInsight.type === 'success' 
-    ? 'text-emerald-800' 
+    ? 'text-yellow-800' 
     : primaryInsight.type === 'warning'
-    ? 'text-amber-800'
-    : 'text-blue-800';
+    ? 'text-red-800'
+    : 'text-purple-800';
 
   const iconColor = primaryInsight.type === 'success' 
-    ? 'text-emerald-600' 
+    ? 'text-yellow-600' 
     : primaryInsight.type === 'warning'
-    ? 'text-amber-600'
-    : 'text-blue-600';
+    ? 'text-red-600'
+    : 'text-purple-600';
 
   return (
     <div className={`bg-gradient-to-r ${bgColor} rounded-xl p-4 border ${primaryInsight.type === 'success' ? 'animate-pulse' : ''}`}>
