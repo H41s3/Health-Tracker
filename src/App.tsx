@@ -18,9 +18,9 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-sky-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-yellow-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
@@ -63,7 +63,7 @@ function AppContent() {
           <div
             key={t.id}
             className={`px-4 py-3 rounded-lg shadow border text-sm bg-white ${
-              t.type === 'success' ? 'border-emerald-200 text-emerald-700' : t.type === 'error' ? 'border-red-200 text-red-700' : 'border-gray-200 text-gray-700'
+              t.type === 'success' ? 'border-yellow-200 text-purple-700' : t.type === 'error' ? 'border-red-200 text-red-700' : 'border-gray-200 text-gray-700'
             }`}
             onClick={() => remove(t.id)}
           >

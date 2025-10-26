@@ -37,7 +37,7 @@ export default function Sidebar({ currentPage, onNavigate, isOpen = false, onClo
             transition={{ duration: 0.3, delay: 0.1 }}
             className="flex items-center gap-3"
           >
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-yellow-500 rounded-2xl flex items-center justify-center shadow-lg">
               <Activity className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -60,7 +60,7 @@ export default function Sidebar({ currentPage, onNavigate, isOpen = false, onClo
                 onClick={() => onNavigate(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                   isActive
-                    ? 'bg-gradient-to-r from-purple-50 to-emerald-100 text-purple-700 shadow-sm border border-purple-200/50'
+                    ? 'bg-gradient-to-r from-purple-50 to-violet-100 text-purple-700 shadow-sm border border-purple-200/50'
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                 }`}
                 whileHover={{ scale: 1.02 }}
@@ -110,7 +110,7 @@ export default function Sidebar({ currentPage, onNavigate, isOpen = false, onClo
           >
             <div className="p-6 border-b border-slate-200/60 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-yellow-500 rounded-2xl flex items-center justify-center shadow-lg">
                   <Activity className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -139,7 +139,7 @@ export default function Sidebar({ currentPage, onNavigate, isOpen = false, onClo
                     onClick={() => onNavigate(item.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                       isActive
-                        ? 'bg-gradient-to-r from-purple-50 to-emerald-100 text-purple-700 shadow-sm border border-purple-200/50'
+                        ? 'bg-gradient-to-r from-purple-50 to-violet-100 text-purple-700 shadow-sm border border-purple-200/50'
                         : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                     }`}
                     whileHover={{ scale: 1.02 }}
