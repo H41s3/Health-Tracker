@@ -29,42 +29,52 @@
     --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   }
 
-  /* Card Components */
+  /* Card Components - Optimized for GPU */
   .card {
-    @apply bg-white rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300;
+    @apply bg-white rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-shadow duration-200;
     backdrop-filter: blur(10px);
+    will-change: transform, box-shadow;
+    transform: translateZ(0); /* Force GPU acceleration */
   }
   
   .card-elevated {
-    @apply bg-white/80 rounded-2xl border border-slate-200/40 shadow-lg hover:shadow-xl transition-all duration-300;
+    @apply bg-white/80 rounded-2xl border border-slate-200/40 shadow-lg hover:shadow-xl transition-shadow duration-200;
     backdrop-filter: blur(20px);
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
   }
   
   .card-glass {
     @apply bg-white/60 rounded-2xl border border-white/20 shadow-lg;
     backdrop-filter: blur(20px);
+    will-change: transform;
+    transform: translateZ(0);
   }
 
-  /* Button Components */
+  /* Button Components - Optimized */
   .btn-primary {
-    @apply px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5;
+    @apply px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-150 transform hover:-translate-y-0.5;
+    will-change: transform, box-shadow;
   }
   
   .btn-secondary {
-    @apply px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl shadow-sm hover:shadow-md transition-all duration-200;
+    @apply px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl shadow-sm hover:shadow-md transition-all duration-150;
+    will-change: background-color;
   }
   
   .btn-ghost {
-    @apply px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium rounded-lg transition-all duration-200;
+    @apply px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium rounded-lg transition-all duration-150;
+    will-change: background-color, color;
   }
 
   /* Input Components */
   .input-field {
-    @apply w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all duration-200 bg-white/80 backdrop-blur-sm;
+    @apply w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all duration-150 bg-white/80 backdrop-blur-sm;
   }
   
   .input-field:focus {
     @apply shadow-lg;
+    will-change: box-shadow, border-color;
   }
 
   /* Page Layout */
@@ -122,9 +132,10 @@
     @apply bg-gradient-to-br from-rose-50 to-rose-100 border-rose-200 text-rose-700;
   }
 
-  /* Progress Rings */
+  /* Progress Rings - Optimized */
   .progress-ring {
     @apply relative inline-flex items-center justify-center;
+    will-change: transform;
   }
   
   .progress-ring svg {
@@ -132,20 +143,24 @@
   }
   
   .progress-ring-circle {
-    @apply transition-all duration-500 ease-out;
+    @apply transition-all duration-300 ease-out;
+    will-change: stroke-dashoffset;
   }
 
-  /* Micro Animations */
+  /* Micro Animations - Reduced complexity */
   .animate-float {
-    animation: float 3s ease-in-out infinite;
+    animation: float 4s ease-in-out infinite;
+    will-change: transform;
   }
   
   .animate-pulse-soft {
-    animation: pulse-soft 2s ease-in-out infinite;
+    animation: pulse-soft 3s ease-in-out infinite;
+    will-change: opacity;
   }
   
   .animate-bounce-soft {
-    animation: bounce-soft 1s ease-in-out infinite;
+    animation: bounce-soft 2s ease-in-out infinite;
+    will-change: transform;
   }
 
   /* Notion-like spacing */
@@ -162,19 +177,20 @@
   }
 }
 
+/* Optimized keyframes - reduced frequency */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-4px); }
+  50% { transform: translateY(-2px); }
 }
 
 @keyframes pulse-soft {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
+  50% { opacity: 0.9; }
 }
 
 @keyframes bounce-soft {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+  50% { transform: translateY(-1px); }
 }
 
 /* Custom scrollbar */
@@ -192,4 +208,21 @@
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-slate-400;
+}
+
+/* Performance optimizations */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

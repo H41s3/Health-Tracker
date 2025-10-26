@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { memo, useMemo } from 'react';
 
 interface ProgressRingProps {
   progress: number;
@@ -10,7 +11,7 @@ interface ProgressRingProps {
   className?: string;
 }
 
-export default function ProgressRing({
+const ProgressRing = memo(function ProgressRing({
   progress,
   size = 120,
   strokeWidth = 8,
@@ -19,10 +20,9 @@ export default function ProgressRing({
   showPercentage = true,
   className = ''
 }: ProgressRingProps) {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDasharray = circumference;
-  const strokeDashoffset = circumference - (progress / 100) * circumference;
+  const radius = useMemo(() => (size - strokeWidth) / 2, [size, strokeWidth]);
+  const circumference = useMemo(() => 2 * Math.PI * radius, [radius]);
+  const strokeDashoffset = useMemo(() => circumference - (progress / 100) * circumference, [circumference, progress]);
 
   return (
     <div className={`progress-ring ${className}`} style={{ width: size, height: size }}>
@@ -45,11 +45,11 @@ export default function ProgressRing({
           stroke={color}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
-          strokeDasharray={strokeDasharray}
+          strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset }}
-          transition={{ duration: 1, ease: "easeInOut" }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
         />
       </svg>
       
@@ -59,7 +59,7 @@ export default function ProgressRing({
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            transition={{ duration: 0.2, delay: 0.1 }}
             className="text-center"
           >
             <div className="text-2xl font-bold text-slate-900">{Math.round(progress)}%</div>
@@ -68,4 +68,6 @@ export default function ProgressRing({
       )}
     </div>
   );
-}
+});
+
+export default ProgressRing;

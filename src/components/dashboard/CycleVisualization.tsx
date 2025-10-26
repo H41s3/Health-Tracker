@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Calendar, Clock, Heart } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
+import { memo, useMemo } from 'react';
 
 interface CycleVisualizationProps {
   cycles: any[];
@@ -10,12 +11,12 @@ interface CycleVisualizationProps {
   };
 }
 
-export default function CycleVisualization({ cycles, prediction }: CycleVisualizationProps) {
-  const currentDate = new Date();
+const CycleVisualization = memo(function CycleVisualization({ cycles, prediction }: CycleVisualizationProps) {
+  const currentDate = useMemo(() => new Date(), []);
   const lastCycle = cycles[0];
   
-  // Calculate cycle phase
-  const getCyclePhase = () => {
+  // Calculate cycle phase with memoization
+  const cyclePhase = useMemo(() => {
     if (!lastCycle) return { phase: 'unknown', days: 0, progress: 0 };
     
     const cycleStart = new Date(lastCycle.period_start_date);
@@ -42,9 +43,9 @@ export default function CycleVisualization({ cycles, prediction }: CycleVisualiz
     }
     
     return { phase, days: daysSinceStart, progress: Math.min(progress, 100) };
-  };
+  }, [lastCycle, currentDate, cycles]);
 
-  const { phase, days, progress } = getCyclePhase();
+  const { phase, days, progress } = cyclePhase;
   
   const phaseInfo = {
     menstrual: { 
@@ -89,12 +90,12 @@ export default function CycleVisualization({ cycles, prediction }: CycleVisualiz
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Circular Progress */}
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="card p-8 flex flex-col items-center justify-center"
-      >
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.2 }}
+          className="card p-8 flex flex-col items-center justify-center"
+        >
         <div className="relative w-48 h-48 mb-6">
           {/* Background circle */}
           <svg className="w-full h-full" viewBox="0 0 100 100">
@@ -119,7 +120,7 @@ export default function CycleVisualization({ cycles, prediction }: CycleVisualiz
               strokeDashoffset={`${2 * Math.PI * 45 * (1 - progress / 100)}`}
               initial={{ strokeDashoffset: 2 * Math.PI * 45 }}
               animate={{ strokeDashoffset: 2 * Math.PI * 45 * (1 - progress / 100) }}
-              transition={{ duration: 1, ease: "easeInOut" }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
             />
             <defs>
               <linearGradient id={`gradient-${phase}`} x1="0%" y1="0%" x2="100%" y2="100%">
@@ -134,7 +135,7 @@ export default function CycleVisualization({ cycles, prediction }: CycleVisualiz
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
               className={`p-4 rounded-full bg-gradient-to-br ${currentPhase.bgColor} shadow-lg`}
             >
               <currentPhase.icon className={`w-8 h-8 text-${phase === 'menstrual' ? 'rose' : phase === 'follicular' ? 'emerald' : phase === 'ovulation' ? 'violet' : 'orange'}-600`} />
@@ -143,7 +144,7 @@ export default function CycleVisualization({ cycles, prediction }: CycleVisualiz
               className="mt-2 text-center"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
+              transition={{ duration: 0.2, delay: 0.2 }}
             >
               <div className="text-2xl font-bold text-slate-900">{Math.round(progress)}%</div>
               <div className="text-sm text-slate-600">Complete</div>
@@ -228,4 +229,6 @@ export default function CycleVisualization({ cycles, prediction }: CycleVisualiz
       </motion.div>
     </div>
   );
-}
+});
+
+export default CycleVisualization;

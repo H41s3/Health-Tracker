@@ -1,5 +1,6 @@
 import { Activity, Droplet, Moon, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { memo, useMemo } from 'react';
 
 interface MetricCardProps {
   label: string;
@@ -10,16 +11,20 @@ interface MetricCardProps {
   isLoading?: boolean;
 }
 
-export default function MetricCard({ label, value, goal, icon: Icon, color, isLoading }: MetricCardProps) {
-  const percentage = goal ? Math.min((value / goal) * 100, 100) : 0;
-  const isGoalMet = goal ? value >= goal : false;
+const MetricCard = memo(function MetricCard({ label, value, goal, icon: Icon, color, isLoading }: MetricCardProps) {
+  const percentage = useMemo(() => goal ? Math.min((value / goal) * 100, 100) : 0, [value, goal]);
+  const isGoalMet = useMemo(() => goal ? value >= goal : false, [value, goal]);
+  const displayValue = useMemo(() => 
+    value.toFixed(label.includes('Sleep') || label.includes('Weight') ? 1 : 0), 
+    [value, label]
+  );
 
   if (isLoading) {
     return (
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.2 }}
         className="card p-6 animate-pulse"
       >
         <div className="flex items-center justify-between mb-4">
@@ -37,15 +42,15 @@ export default function MetricCard({ label, value, goal, icon: Icon, color, isLo
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -2, scale: 1.02 }}
-      transition={{ duration: 0.3 }}
+      whileHover={{ y: -2 }}
+      transition={{ duration: 0.2 }}
       className="card p-6 group"
     >
       <div className="flex items-center justify-between mb-4">
         <motion.div 
           className={`p-3 bg-gradient-to-br from-${color}-100 to-${color}-200 rounded-xl shadow-sm`}
-          whileHover={{ rotate: 5, scale: 1.1 }}
-          transition={{ duration: 0.2 }}
+          whileHover={{ rotate: 2, scale: 1.05 }}
+          transition={{ duration: 0.15 }}
         >
           <Icon className={`w-6 h-6 text-${color}-600`} />
         </motion.div>
@@ -58,7 +63,7 @@ export default function MetricCard({ label, value, goal, icon: Icon, color, isLo
             }`}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
+            transition={{ duration: 0.2, delay: 0.1 }}
           >
             {Math.round(percentage)}%
           </motion.span>
@@ -70,9 +75,9 @@ export default function MetricCard({ label, value, goal, icon: Icon, color, isLo
         className="text-3xl font-bold text-slate-900 mb-4"
         initial={{ scale: 0.8 }}
         animate={{ scale: 1 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
+        transition={{ duration: 0.2, delay: 0.05 }}
       >
-        {value.toFixed(label.includes('Sleep') || label.includes('Weight') ? 1 : 0)}
+        {displayValue}
       </motion.p>
       
       {goal && (
@@ -83,13 +88,13 @@ export default function MetricCard({ label, value, goal, icon: Icon, color, isLo
           </div>
           <div className="bg-slate-100 rounded-full h-3 overflow-hidden shadow-inner">
             <motion.div
-              className={`h-full bg-gradient-to-r from-${color}-400 to-${color}-500 rounded-full transition-all duration-700 ease-out ${
+              className={`h-full bg-gradient-to-r from-${color}-400 to-${color}-500 rounded-full transition-all duration-500 ease-out ${
                 isGoalMet ? 'shadow-lg' : ''
               }`}
               style={{ width: `${percentage}%` }}
               initial={{ width: 0 }}
               animate={{ width: `${percentage}%` }}
-              transition={{ duration: 0.8, delay: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
             />
           </div>
           {isGoalMet && (
@@ -97,7 +102,7 @@ export default function MetricCard({ label, value, goal, icon: Icon, color, isLo
               className="text-xs text-emerald-600 font-semibold text-center flex items-center justify-center gap-1"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
+              transition={{ duration: 0.3, delay: 0.4 }}
             >
               <span className="animate-bounce-soft">🎉</span>
               Goal achieved!
@@ -107,4 +112,6 @@ export default function MetricCard({ label, value, goal, icon: Icon, color, isLo
       )}
     </motion.div>
   );
-}
+});
+
+export default MetricCard;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useHealthStore } from '../stores/useHealthStore';
@@ -35,7 +35,7 @@ export default function Dashboard() {
     localStorage.setItem('dashboard:selectedDate', selectedDate);
   }, [selectedDate]);
 
-  const handleQuickLog = async (field: string, value: string) => {
+  const handleQuickLog = useCallback(async (field: string, value: string) => {
     if (!user) return;
 
     const numValue = value === '' ? null : parseFloat(value);
@@ -47,30 +47,32 @@ export default function Dashboard() {
     } catch {
       show('Failed to save. Please try again.', 'error');
     }
-  };
+  }, [user, selectedDate, addOrUpdateMetric, show]);
 
-  const todayMetric = getMetricForDate(selectedDate);
+  const todayMetric = useMemo(() => getMetricForDate(selectedDate), [getMetricForDate, selectedDate]);
 
-  const weekMetrics = metrics.slice(0, 7).reverse();
-  const chartData = weekMetrics.map((m) => {
-    const d = new Date(m.date);
-    return {
-      date: format(d, 'EEE'),
-      fullDate: format(d, 'MMM d, yyyy'),
-      steps: m.steps || 0,
-      water: (m.water_ml || 0) / 1000,
-      sleep: m.sleep_hours || 0,
-    };
-  });
+  const chartData = useMemo(() => {
+    const weekMetrics = metrics.slice(0, 7).reverse();
+    return weekMetrics.map((m) => {
+      const d = new Date(m.date);
+      return {
+        date: format(d, 'EEE'),
+        fullDate: format(d, 'MMM d, yyyy'),
+        steps: m.steps || 0,
+        water: (m.water_ml || 0) / 1000,
+        sleep: m.sleep_hours || 0,
+      };
+    });
+  }, [metrics]);
 
 
   return (
     <div className="page-container space-section">
       {/* Header */}
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.3 }}
         className="page-header"
       >
         <h1 className="page-title">Health Dashboard</h1>
@@ -79,9 +81,9 @@ export default function Dashboard() {
 
       {/* Date Selector */}
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
+        transition={{ duration: 0.3, delay: 0.05 }}
         className="mb-6"
       >
         <input
@@ -95,18 +97,18 @@ export default function Dashboard() {
 
       {/* Insights Banner */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
       >
         <InsightsBanner todayMetric={todayMetric} isLoading={loading} />
       </motion.div>
 
       {/* Metrics Grid */}
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
+        transition={{ duration: 0.3, delay: 0.15 }}
         className="grid-metrics"
       >
         <MetricCard
@@ -144,9 +146,9 @@ export default function Dashboard() {
 
       {/* Streak Widget */}
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
+        transition={{ duration: 0.3, delay: 0.2 }}
         className="grid-cards"
       >
         <StreakWidget metrics={metrics} isLoading={loading} />
@@ -154,9 +156,9 @@ export default function Dashboard() {
 
       {/* Quick Log and Weekly Chart */}
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
+        transition={{ duration: 0.3, delay: 0.25 }}
         className="grid-content"
       >
         <QuickLog
@@ -169,9 +171,9 @@ export default function Dashboard() {
 
       {/* Activity Trends */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.6 }}
+        transition={{ duration: 0.3, delay: 0.3 }}
       >
         <ActivityTrends data={chartData} isLoading={loading} />
       </motion.div>
