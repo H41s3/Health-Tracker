@@ -53,7 +53,7 @@
 
   /* Button Components - Optimized */
   .btn-primary {
-    @apply px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-150 transform hover:-translate-y-0.5;
+    @apply px-6 py-3 bg-gradient-to-r from-purple-600 via-red-500 to-yellow-500 hover:from-purple-700 hover:via-red-600 hover:to-yellow-600 text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-150 transform hover:-translate-y-0.5;
     will-change: transform, box-shadow;
   }
   
@@ -69,11 +69,11 @@
 
   /* Input Components */
   .input-field {
-    @apply w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all duration-150 bg-white/80 backdrop-blur-sm;
+    @apply w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none transition-all duration-150 bg-white/80 backdrop-blur-sm;
   }
   
   .input-field:focus {
-    @apply shadow-lg;
+    @apply shadow-lg border-purple-400;
     will-change: box-shadow, border-color;
   }
 
@@ -109,7 +109,7 @@
 
   /* Health Accent Colors */
   .accent-emerald {
-    @apply bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 text-emerald-700;
+    @apply bg-gradient-to-br from-purple-50 to-red-50 border-purple-200 text-purple-700;
   }
   
   .accent-sky {

@@ -8,10 +8,10 @@ interface PageHeaderProps {
 }
 
 const gradientConfig = {
-  dashboard: 'from-pink-100/40 via-blue-100/40 via-purple-100/40 to-rose-100/40',
-  cycle: 'from-lavender-100/40 via-coral-100/40 via-rose-100/40 to-pink-100/40',
-  goals: 'from-emerald-100/40 via-teal-100/40 via-cyan-100/40 to-sky-100/40',
-  insights: 'from-violet-100/40 via-indigo-100/40 via-blue-100/40 to-purple-100/40',
+  dashboard: 'from-purple-100/40 via-red-100/40 via-yellow-100/40 to-orange-100/40',
+  cycle: 'from-fuchsia-100/40 via-rose-100/40 via-pink-100/40 to-purple-100/40',
+  goals: 'from-red-100/40 via-yellow-100/40 via-orange-100/40 to-red-100/40',
+  insights: 'from-violet-100/40 via-purple-100/40 via-fuchsia-100/40 to-rose-100/40',
   settings: 'from-slate-100/40 via-gray-100/40 via-neutral-100/40 to-stone-100/40',
 };
 
