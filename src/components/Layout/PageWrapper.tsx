@@ -9,10 +9,7 @@ interface PageWrapperProps {
 export default function PageWrapper({ children, theme = 'dashboard' }: PageWrapperProps) {
   return (
     <div className="relative min-h-screen">
-      {/* Ambient art layer */}
-      <AmbientArt theme={theme} />
-      
-      {/* Content layer */}
+      {/* Content layer - AmbientArt disabled for performance */}
       <div className="relative z-10">
         {children}
       </div>
