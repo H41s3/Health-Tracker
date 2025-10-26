@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useCycleStore } from '../stores/useCycleStore';
-import { Calendar, Plus, Edit2, Trash2 } from 'lucide-react';
+import { Calendar, Plus, Edit2, Trash2, Sparkles } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { CycleTracking, FlowIntensity } from '../types/database';
 import CycleVisualization from '../components/dashboard/CycleVisualization';
+import PageWrapper from '../components/Layout/PageWrapper';
+import PageHeader from '../components/Layout/PageHeader';
 
 export default function CycleTracker() {
   const { user } = useAuth();
@@ -100,17 +102,15 @@ export default function CycleTracker() {
   };
 
   return (
-    <div className="page-container space-section">
-      {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="page-header"
-      >
-        <h1 className="page-title">Cycle Tracker</h1>
-        <p className="page-subtitle">Track your menstrual cycle and predict future periods</p>
-      </motion.div>
+    <PageWrapper theme="cycle">
+      <div className="page-container space-section">
+        {/* Hero Header */}
+        <PageHeader
+          title="Cycle Tracker"
+          subtitle="Track your menstrual cycle and predict future periods"
+          theme="cycle"
+          icon={<Sparkles className="w-12 h-12 text-purple-500" />}
+        />
 
       {/* Cycle Visualization */}
       <motion.div
@@ -356,6 +356,7 @@ export default function CycleTracker() {
           </div>
         )}
       </motion.div>
-    </div>
+      </div>
+    </PageWrapper>
   );
 }

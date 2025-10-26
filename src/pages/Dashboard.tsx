@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useHealthStore } from '../stores/useHealthStore';
 import { useToastStore } from '../stores/useToastStore';
-import { Activity, Droplet, Moon, TrendingUp } from 'lucide-react';
+import { Activity, Droplet, Moon, TrendingUp, Heart } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import MetricCard from '../components/dashboard/MetricCard';
 import StreakWidget from '../components/dashboard/StreakWidget';
@@ -11,6 +11,8 @@ import InsightsBanner from '../components/dashboard/InsightsBanner';
 import WeeklyChart from '../components/dashboard/WeeklyChart';
 import QuickLog from '../components/dashboard/QuickLog';
 import ActivityTrends from '../components/dashboard/ActivityTrends';
+import PageWrapper from '../components/Layout/PageWrapper';
+import PageHeader from '../components/Layout/PageHeader';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -67,17 +69,15 @@ export default function Dashboard() {
 
 
   return (
-    <div className="page-container space-section">
-      {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="page-header"
-      >
-        <h1 className="page-title">Health Dashboard</h1>
-        <p className="page-subtitle">Track your daily health metrics and progress</p>
-      </motion.div>
+    <PageWrapper theme="dashboard">
+      <div className="page-container space-section">
+        {/* Hero Header */}
+        <PageHeader
+          title="Health Dashboard"
+          subtitle="Track your daily health metrics and progress"
+          theme="dashboard"
+          icon={<Heart className="w-12 h-12 text-pink-500" />}
+        />
 
       {/* Date Selector */}
       <motion.div 
@@ -177,6 +177,7 @@ export default function Dashboard() {
       >
         <ActivityTrends data={chartData} isLoading={loading} />
       </motion.div>
-    </div>
+      </div>
+    </PageWrapper>
   );
 }

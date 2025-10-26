@@ -2,10 +2,13 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useCustomMetricsStore } from '../stores/useCustomMetricsStore';
-import { Plus, Edit2, Trash2, Activity, Target } from 'lucide-react';
+import { Plus, Edit2, Trash2, Activity, Target, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { CustomMetric, MetricType } from '../types/database';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import PageWrapper from '../components/Layout/PageWrapper';
+import PageHeader from '../components/Layout/PageHeader';
+import ProgressRing from '../components/dashboard/ProgressRing';
 
 export default function CustomMetrics() {
   const { user } = useAuth();
@@ -118,17 +121,15 @@ export default function CustomMetrics() {
   ];
 
   return (
-    <div className="page-container space-section">
-      {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="page-header"
-      >
-        <h1 className="page-title">Goals & Progress</h1>
-        <p className="page-subtitle">Track any health metric that matters to you</p>
-      </motion.div>
+    <PageWrapper theme="goals">
+      <div className="page-container space-section">
+        {/* Hero Header */}
+        <PageHeader
+          title="Goals & Progress"
+          subtitle="Track any health metric that matters to you"
+          theme="goals"
+          icon={<TrendingUp className="w-12 h-12 text-emerald-500" />}
+        />
 
       {/* Add Metric Button */}
       <motion.div 
@@ -550,6 +551,7 @@ export default function CustomMetrics() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+      </div>
+    </PageWrapper>
   );
 }

@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotesStore } from '../stores/useNotesStore';
-import { BookOpen, Plus, Edit2, Trash2, Search, Tag } from 'lucide-react';
+import { BookOpen, Plus, Edit2, Trash2, Search, Tag, Lightbulb } from 'lucide-react';
 import { format } from 'date-fns';
 import { HealthNote } from '../types/database';
+import PageWrapper from '../components/Layout/PageWrapper';
+import PageHeader from '../components/Layout/PageHeader';
 
 export default function HealthJournal() {
   const { user } = useAuth();
@@ -105,17 +107,15 @@ export default function HealthJournal() {
   });
 
   return (
-    <div className="page-container space-section">
-      {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="page-header"
-      >
-        <h1 className="page-title">Health Insights</h1>
-        <p className="page-subtitle">Document your health journey with notes and reflections</p>
-      </motion.div>
+    <PageWrapper theme="insights">
+      <div className="page-container space-section">
+        {/* Hero Header */}
+        <PageHeader
+          title="Health Insights"
+          subtitle="Document your health journey with notes and reflections"
+          theme="insights"
+          icon={<Lightbulb className="w-12 h-12 text-violet-500" />}
+        />
 
       {/* Search and Filter Controls */}
       <motion.div 
@@ -372,6 +372,7 @@ export default function HealthJournal() {
           </div>
         )}
       </motion.div>
-    </div>
+      </div>
+    </PageWrapper>
   );
 }

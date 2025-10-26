@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { User, Settings as SettingsIcon, Bell, Shield, Palette, HelpCircle } from 'lucide-react';
+import { User, Settings as SettingsIcon, Bell, Shield, HelpCircle, Cog } from 'lucide-react';
 import { Profile, Gender } from '../types/database';
+import PageWrapper from '../components/Layout/PageWrapper';
+import PageHeader from '../components/Layout/PageHeader';
 
 export default function Settings() {
   const { user } = useAuth();
@@ -22,6 +24,7 @@ export default function Settings() {
     if (user) {
       loadProfile();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadProfile = async () => {
@@ -45,7 +48,7 @@ export default function Settings() {
           height_cm: data.height_cm?.toString() || '',
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error loading profile:', error);
     } finally {
       setLoading(false);
@@ -74,8 +77,8 @@ export default function Settings() {
 
       setMessage('Profile updated successfully!');
       setTimeout(() => setMessage(''), 3000);
-    } catch (error: any) {
-      setMessage('Error updating profile: ' + error.message);
+    } catch (error) {
+      setMessage('Error updating profile: ' + (error instanceof Error ? error.message : 'An error occurred'));
     } finally {
       setSaving(false);
     }
@@ -100,17 +103,15 @@ export default function Settings() {
   }
 
   return (
-    <div className="page-container space-section">
-      {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="page-header"
-      >
-        <h1 className="page-title">Settings & Profile</h1>
-        <p className="page-subtitle">Manage your profile and preferences</p>
-      </motion.div>
+    <PageWrapper theme="settings">
+      <div className="page-container space-section">
+        {/* Hero Header */}
+        <PageHeader
+          title="Settings & Profile"
+          subtitle="Manage your profile and preferences"
+          theme="settings"
+          icon={<Cog className="w-12 h-12 text-slate-600" />}
+        />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Profile Section */}
@@ -285,6 +286,7 @@ export default function Settings() {
           </div>
         </motion.div>
       </div>
-    </div>
+      </div>
+    </PageWrapper>
   );
 }
