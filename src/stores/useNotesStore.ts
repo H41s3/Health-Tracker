@@ -1,0 +1,81 @@
+import { create } from 'zustand';
+import { supabase } from '../lib/supabase';
+import { HealthNote } from '../types/database';
+
+interface NotesState {
+  notes: HealthNote[];
+  loading: boolean;
+  error: string | null;
+  fetchNotes: (userId: string) => Promise<void>;
+  addNote: (userId: string, data: Partial<HealthNote>) => Promise<void>;
+  updateNote: (id: string, data: Partial<HealthNote>) => Promise<void>;
+  deleteNote: (id: string) => Promise<void>;
+}
+
+export const useNotesStore = create<NotesState>((set, get) => ({
+  notes: [],
+  loading: false,
+  error: null,
+
+  fetchNotes: async (userId: string) => {
+    set({ loading: true, error: null });
+    try {
+      const { data, error } = await supabase
+        .from('health_notes')
+        .select('*')
+        .eq('user_id', userId)
+        .order('date', { ascending: false });
+
+      if (error) throw error;
+      set({ notes: data || [], loading: false });
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  addNote: async (userId: string, data: Partial<HealthNote>) => {
+    try {
+      const { error } = await supabase
+        .from('health_notes')
+        .insert({ user_id: userId, ...data });
+
+      if (error) throw error;
+      await get().fetchNotes(userId);
+    } catch (error: any) {
+      set({ error: error.message });
+    }
+  },
+
+  updateNote: async (id: string, data: Partial<HealthNote>) => {
+    try {
+      const { error } = await supabase
+        .from('health_notes')
+        .update(data)
+        .eq('id', id);
+
+      if (error) throw error;
+
+      const notes = get().notes;
+      const note = notes.find((n) => n.id === id);
+      if (note) {
+        await get().fetchNotes(note.user_id);
+      }
+    } catch (error: any) {
+      set({ error: error.message });
+    }
+  },
+
+  deleteNote: async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('health_notes')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      set({ notes: get().notes.filter((n) => n.id !== id) });
+    } catch (error: any) {
+      set({ error: error.message });
+    }
+  },
+}));
