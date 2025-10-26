@@ -1,4 +1,4 @@
-import { CheckCircle, AlertCircle, TrendingUp, Droplet, Moon, Activity } from 'lucide-react';
+import { CheckCircle, AlertCircle, TrendingUp, Droplet, Activity } from 'lucide-react';
 import { HealthMetric } from '../../types/database';
 
 interface InsightsBannerProps {
