@@ -28,9 +28,15 @@ export default function Sidebar({ currentPage, onNavigate, isOpen = false, onClo
         initial={{ x: -20, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-white/80 backdrop-blur-md border-r border-slate-200/60 flex-col z-30"
+        className="hidden lg:flex fixed left-0 top-0 h-screen w-64 flex-col z-30"
+        style={{
+          background: 'rgba(255, 255, 255, 0.08)',
+          backdropFilter: 'blur(24px) saturate(180%)',
+          borderRight: '1px solid rgba(255, 255, 255, 0.15)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
+        }}
       >
-        <div className="p-6 border-b border-slate-200/60">
+        <div className="p-6" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -41,8 +47,8 @@ export default function Sidebar({ currentPage, onNavigate, isOpen = false, onClo
               <Activity className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-lg text-slate-900">Health Tracker</h1>
-              <p className="text-xs text-slate-500">Your wellness companion</p>
+              <h1 className="font-bold text-lg text-white">Health Tracker</h1>
+              <p className="text-xs text-purple-200">Your wellness companion</p>
             </div>
           </motion.div>
         </div>
@@ -60,18 +66,18 @@ export default function Sidebar({ currentPage, onNavigate, isOpen = false, onClo
                 onClick={() => onNavigate(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                   isActive
-                    ? 'bg-gradient-to-r from-purple-50 to-violet-100 text-purple-700 shadow-sm border border-purple-200/50'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-gradient-to-r from-white/20 to-purple-400/30 text-white shadow-lg border border-white/20'
+                    : 'text-purple-100 hover:bg-white/10 hover:text-white'
                 }`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <Icon className={`w-5 h-5 ${isActive ? 'text-purple-600' : ''}`} />
+                <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-purple-200'}`} />
                 <span className="font-medium">{item.label}</span>
                 {isActive && (
                   <motion.div
                     layoutId="activeIndicator"
-                    className="ml-auto w-2 h-2 bg-purple-500 rounded-full"
+                    className="ml-auto w-2 h-2 bg-white rounded-full shadow-lg"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.2 }}
@@ -82,13 +88,13 @@ export default function Sidebar({ currentPage, onNavigate, isOpen = false, onClo
           })}
         </nav>
 
-        <div className="p-4 border-t border-slate-200/60">
+        <div className="p-4" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
           <motion.button
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.4 }}
             onClick={signOut}
-            className="w-full flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all duration-200"
+            className="w-full flex items-center gap-3 px-4 py-3 text-purple-100 hover:bg-white/10 hover:text-white rounded-xl transition-all duration-200"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
@@ -106,23 +112,29 @@ export default function Sidebar({ currentPage, onNavigate, isOpen = false, onClo
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -300, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="lg:hidden fixed left-0 top-0 h-screen w-64 bg-white/90 backdrop-blur-md border-r border-slate-200/60 flex flex-col z-50"
+            className="lg:hidden fixed left-0 top-0 h-screen w-64 flex flex-col z-50"
+            style={{
+              background: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(24px) saturate(180%)',
+              borderRight: '1px solid rgba(255, 255, 255, 0.15)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+            }}
           >
-            <div className="p-6 border-b border-slate-200/60 flex items-center justify-between">
+            <div className="p-6 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-yellow-500 rounded-2xl flex items-center justify-center shadow-lg">
                   <Activity className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="font-bold text-lg text-slate-900">Health Tracker</h1>
-                  <p className="text-xs text-slate-500">Your wellness companion</p>
+                  <h1 className="font-bold text-lg text-white">Health Tracker</h1>
+                  <p className="text-xs text-purple-200">Your wellness companion</p>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 rounded-xl hover:bg-slate-100 transition-all duration-200"
+                className="p-2 rounded-xl hover:bg-white/10 transition-all duration-200"
               >
-                <X className="w-5 h-5 text-slate-600" />
+                <X className="w-5 h-5 text-purple-100" />
               </button>
             </div>
 
@@ -139,18 +151,18 @@ export default function Sidebar({ currentPage, onNavigate, isOpen = false, onClo
                     onClick={() => onNavigate(item.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                       isActive
-                        ? 'bg-gradient-to-r from-purple-50 to-violet-100 text-purple-700 shadow-sm border border-purple-200/50'
-                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                        ? 'bg-gradient-to-r from-white/20 to-purple-400/30 text-white shadow-lg border border-white/20'
+                        : 'text-purple-100 hover:bg-white/10 hover:text-white'
                     }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <Icon className={`w-5 h-5 ${isActive ? 'text-purple-600' : ''}`} />
+                    <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-purple-200'}`} />
                     <span className="font-medium">{item.label}</span>
                     {isActive && (
                       <motion.div
                         layoutId="activeIndicatorMobile"
-                        className="ml-auto w-2 h-2 bg-purple-500 rounded-full"
+                        className="ml-auto w-2 h-2 bg-white rounded-full shadow-lg"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ duration: 0.2 }}
@@ -161,13 +173,13 @@ export default function Sidebar({ currentPage, onNavigate, isOpen = false, onClo
               })}
             </nav>
 
-            <div className="p-4 border-t border-slate-200/60">
+            <div className="p-4" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
               <motion.button
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.2, delay: 0.3 }}
                 onClick={signOut}
-                className="w-full flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all duration-200"
+                className="w-full flex items-center gap-3 px-4 py-3 text-purple-100 hover:bg-white/10 hover:text-white rounded-xl transition-all duration-200"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >

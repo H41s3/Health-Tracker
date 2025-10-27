@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Activity, Droplet, Moon, TrendingUp } from 'lucide-react';
 
@@ -47,8 +47,20 @@ const metricConfig = {
   },
 };
 
-export default function WeeklyChart({ data, isLoading }: WeeklyChartProps) {
+const WeeklyChart = memo(function WeeklyChart({ data, isLoading }: WeeklyChartProps) {
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('steps');
+
+  const currentConfig = useMemo(() => metricConfig[selectedMetric], [selectedMetric]);
+  
+  const weeklyAverage = useMemo(() => {
+    if (data.length === 0) return 0;
+    return data.reduce((sum, day) => sum + (day[selectedMetric] || 0), 0) / data.length;
+  }, [data, selectedMetric]);
+  
+  const progressPercentage = useMemo(() => {
+    if (!currentConfig.goal) return 0;
+    return Math.min((weeklyAverage / currentConfig.goal) * 100, 100);
+  }, [weeklyAverage, currentConfig.goal]);
 
   if (isLoading) {
     return (
@@ -71,7 +83,6 @@ export default function WeeklyChart({ data, isLoading }: WeeklyChartProps) {
     );
   }
 
-  const currentConfig = metricConfig[selectedMetric];
   const Icon = currentConfig.icon;
 
   return (
@@ -151,24 +162,19 @@ export default function WeeklyChart({ data, isLoading }: WeeklyChartProps) {
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-600">Weekly Average</span>
             <span className="font-medium text-gray-900">
-              {currentConfig.formatter(
-                data.reduce((sum, day) => sum + (day[selectedMetric] || 0), 0) / data.length
-              )}
+              {currentConfig.formatter(weeklyAverage)}
             </span>
           </div>
           <div className="mt-2 bg-gray-200 rounded-full h-2">
             <div
               className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
-              style={{
-                width: `${Math.min(
-                  ((data.reduce((sum, day) => sum + (day[selectedMetric] || 0), 0) / data.length) / currentConfig.goal) * 100,
-                  100
-                )}%`
-              }}
+              style={{ width: `${progressPercentage}%` }}
             />
           </div>
         </div>
       )}
     </div>
   );
-}
+});
+
+export default WeeklyChart;

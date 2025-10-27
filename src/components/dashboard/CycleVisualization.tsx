@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Calendar, Clock, Heart } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { memo, useMemo } from 'react';
@@ -87,15 +86,21 @@ const CycleVisualization = memo(function CycleVisualization({ cycles, prediction
 
   const currentPhase = phaseInfo[phase as keyof typeof phaseInfo];
 
+  // Define color classes to avoid dynamic Tailwind classes
+  const phaseColors = {
+    menstrual: { text: 'text-rose-600', border: 'border-rose-200' },
+    follicular: { text: 'text-emerald-600', border: 'border-emerald-200' },
+    ovulation: { text: 'text-violet-600', border: 'border-violet-200' },
+    luteal: { text: 'text-orange-600', border: 'border-orange-200' },
+    unknown: { text: 'text-slate-600', border: 'border-slate-200' }
+  };
+  
+  const currentColor = phaseColors[phase as keyof typeof phaseColors] || phaseColors.unknown;
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Circular Progress */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.2 }}
-          className="card p-8 flex flex-col items-center justify-center"
-        >
+        <div className="card p-8 flex flex-col items-center justify-center">
         <div className="relative w-48 h-48 mb-6">
           {/* Background circle */}
           <svg className="w-full h-full" viewBox="0 0 100 100">
@@ -108,7 +113,7 @@ const CycleVisualization = memo(function CycleVisualization({ cycles, prediction
               strokeWidth="8"
             />
             {/* Progress circle */}
-            <motion.circle
+            <circle
               cx="50"
               cy="50"
               r="45"
@@ -118,9 +123,7 @@ const CycleVisualization = memo(function CycleVisualization({ cycles, prediction
               strokeLinecap="round"
               strokeDasharray={`${2 * Math.PI * 45}`}
               strokeDashoffset={`${2 * Math.PI * 45 * (1 - progress / 100)}`}
-              initial={{ strokeDashoffset: 2 * Math.PI * 45 }}
-              animate={{ strokeDashoffset: 2 * Math.PI * 45 * (1 - progress / 100) }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
+              style={{ transition: 'stroke-dashoffset 0.5s ease-out' }}
             />
             <defs>
               <linearGradient id={`gradient-${phase}`} x1="0%" y1="0%" x2="100%" y2="100%">
@@ -132,23 +135,13 @@ const CycleVisualization = memo(function CycleVisualization({ cycles, prediction
           
           {/* Center content */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.2, delay: 0.1 }}
-              className={`p-4 rounded-full bg-gradient-to-br ${currentPhase.bgColor} shadow-lg`}
-            >
-              <currentPhase.icon className={`w-8 h-8 text-${phase === 'menstrual' ? 'rose' : phase === 'follicular' ? 'emerald' : phase === 'ovulation' ? 'violet' : 'orange'}-600`} />
-            </motion.div>
-            <motion.div 
-              className="mt-2 text-center"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2, delay: 0.2 }}
-            >
+            <div className={`p-4 rounded-full bg-gradient-to-br ${currentPhase.bgColor} shadow-lg`}>
+              <currentPhase.icon className={`w-8 h-8 ${currentColor.text}`} />
+            </div>
+            <div className="mt-2 text-center">
               <div className="text-2xl font-bold text-slate-900">{Math.round(progress)}%</div>
               <div className="text-sm text-slate-600">Complete</div>
-            </motion.div>
+            </div>
           </div>
         </div>
         
@@ -159,19 +152,14 @@ const CycleVisualization = memo(function CycleVisualization({ cycles, prediction
             <p className="text-slate-500 text-xs mt-1">Day {days} of cycle</p>
           )}
         </div>
-      </motion.div>
+      </div>
 
       {/* Phase Information */}
-      <motion.div 
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="space-y-6"
-      >
+      <div className="space-y-6">
         {/* Current Phase Card */}
-        <div className={`card p-6 bg-gradient-to-br ${currentPhase.bgColor} border-${phase === 'menstrual' ? 'rose' : phase === 'follicular' ? 'emerald' : phase === 'ovulation' ? 'violet' : 'orange'}-200`}>
+        <div className={`card p-6 bg-gradient-to-br ${currentPhase.bgColor} ${currentColor.border}`}>
           <div className="flex items-center gap-3 mb-3">
-            <currentPhase.icon className={`w-6 h-6 text-${phase === 'menstrual' ? 'rose' : phase === 'follicular' ? 'emerald' : phase === 'ovulation' ? 'violet' : 'orange'}-600`} />
+            <currentPhase.icon className={`w-6 h-6 ${currentColor.text}`} />
             <h4 className="font-semibold text-slate-900">Current Phase</h4>
           </div>
           <p className="text-slate-700 text-sm">{currentPhase.description}</p>
@@ -179,12 +167,7 @@ const CycleVisualization = memo(function CycleVisualization({ cycles, prediction
 
         {/* Prediction Card */}
         {prediction && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="card p-6"
-          >
+          <div className="card p-6">
             <div className="flex items-center gap-3 mb-3">
               <Calendar className="w-6 h-6 text-violet-600" />
               <h4 className="font-semibold text-slate-900">Next Period</h4>
@@ -197,17 +180,12 @@ const CycleVisualization = memo(function CycleVisualization({ cycles, prediction
                 Based on {cycles.length} recorded cycles (avg: {Math.round(prediction.cycleLengthAvg)} days)
               </p>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Cycle Stats */}
         {cycles.length > 0 && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-            className="card p-6"
-          >
+          <div className="card p-6">
             <div className="flex items-center gap-3 mb-4">
               <Clock className="w-6 h-6 text-sky-600" />
               <h4 className="font-semibold text-slate-900">Cycle Statistics</h4>
@@ -224,9 +202,9 @@ const CycleVisualization = memo(function CycleVisualization({ cycles, prediction
                 <div className="text-sm text-slate-600">Avg Length (days)</div>
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </div>
     </div>
   );
 });

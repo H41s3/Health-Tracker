@@ -89,3 +89,76 @@ export interface Reminder {
   created_at: string;
   updated_at: string;
 }
+
+export type BirthControlType = 'pill' | 'iud' | 'implant' | 'patch' | 'ring' | 'injection' | 'condom' | 'other';
+
+export interface BirthControl {
+  id: string;
+  user_id: string;
+  type: BirthControlType;
+  brand_name: string | null;
+  start_date: string;
+  end_date: string | null;
+  reminder_time: string | null; // HH:MM format for pill reminders
+  is_active: boolean;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PillLog {
+  id: string;
+  birth_control_id: string;
+  user_id: string;
+  date: string;
+  taken: boolean;
+  taken_at: string | null; // timestamp when marked as taken
+  missed: boolean;
+  notes: string | null;
+  created_at: string;
+}
+
+export type MoodLevel = 'terrible' | 'bad' | 'okay' | 'good' | 'great';
+export type EnergyLevel = 1 | 2 | 3 | 4 | 5;
+
+export interface DailyLog {
+  id: string;
+  user_id: string;
+  date: string;
+  mood: MoodLevel | null;
+  energy_level: EnergyLevel | null;
+  sleep_quality: 'poor' | 'fair' | 'good' | 'excellent' | null;
+  exercise_minutes: number | null;
+  stress_level: EnergyLevel | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Medication {
+  id: string;
+  user_id: string;
+  name: string;
+  dosage: string | null;
+  frequency: 'daily' | 'twice_daily' | 'three_times_daily' | 'weekly' | 'as_needed';
+  time_of_day: string | null; // HH:MM format
+  start_date: string;
+  end_date: string | null;
+  is_active: boolean;
+  reminder_enabled: boolean;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MedicationLog {
+  id: string;
+  medication_id: string;
+  user_id: string;
+  date: string;
+  taken: boolean;
+  taken_at: string | null;
+  skipped: boolean;
+  notes: string | null;
+  created_at: string;
+}

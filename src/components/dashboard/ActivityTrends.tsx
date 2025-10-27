@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
 interface ActivityTrendsProps {
@@ -11,7 +12,7 @@ interface ActivityTrendsProps {
   isLoading?: boolean;
 }
 
-export default function ActivityTrends({ data, isLoading }: ActivityTrendsProps) {
+const ActivityTrends = memo(function ActivityTrends({ data, isLoading }: ActivityTrendsProps) {
   if (isLoading) {
     return (
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -85,4 +86,6 @@ export default function ActivityTrends({ data, isLoading }: ActivityTrendsProps)
       </ResponsiveContainer>
     </div>
   );
-}
+});
+
+export default ActivityTrends;

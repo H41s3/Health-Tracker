@@ -1,7 +1,6 @@
 import { ReactNode, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './Sidebar';
-import { Menu, X } from 'lucide-react';
+import { Menu } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -13,20 +12,14 @@ export default function DashboardLayout({ children, currentPage, onNavigate }: D
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen" style={{ background: 'transparent' }}>
       {/* Mobile sidebar overlay */}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-      </AnimatePresence>
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden transition-opacity duration-200"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
       
       {/* Sidebar */}
       <Sidebar 
@@ -42,31 +35,29 @@ export default function DashboardLayout({ children, currentPage, onNavigate }: D
       {/* Main content */}
       <main className="lg:ml-64">
         {/* Mobile header */}
-        <motion.div 
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="lg:hidden bg-white/80 backdrop-blur-md border-b border-slate-200/60 px-4 py-3 flex items-center justify-between"
+        <div 
+          className="lg:hidden px-4 py-3 flex items-center justify-between"
+          style={{
+            background: 'rgba(255, 255, 255, 0.08)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
+          }}
         >
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-xl hover:bg-slate-100 transition-all duration-200"
+            className="p-2 rounded-xl hover:bg-white/10 transition-colors duration-200"
           >
-            <Menu className="w-5 h-5 text-slate-600" />
+            <Menu className="w-5 h-5 text-purple-100" />
           </button>
-          <h1 className="text-lg font-semibold text-slate-900">Health Tracker</h1>
+          <h1 className="text-lg font-semibold text-white">Health Tracker</h1>
           <div className="w-9" /> {/* Spacer for centering */}
-        </motion.div>
+        </div>
         
         {/* Content */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-          className="p-4 lg:p-8"
-        >
+        <div className="p-4 lg:p-8">
           {children}
-        </motion.div>
+        </div>
       </main>
     </div>
   );

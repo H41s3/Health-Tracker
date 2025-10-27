@@ -1,5 +1,4 @@
 import { Activity, Droplet, Moon, TrendingUp } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { memo, useMemo } from 'react';
 
 interface MetricCardProps {
@@ -19,14 +18,35 @@ const MetricCard = memo(function MetricCard({ label, value, goal, icon: Icon, co
     [value, label]
   );
 
+  // Color class mappings to avoid dynamic Tailwind classes
+  const colorClasses = {
+    emerald: {
+      bg: 'bg-gradient-to-br from-emerald-100 to-emerald-200',
+      text: 'text-emerald-600',
+      bar: 'bg-gradient-to-r from-emerald-400 to-emerald-500'
+    },
+    sky: {
+      bg: 'bg-gradient-to-br from-sky-100 to-sky-200',
+      text: 'text-sky-600',
+      bar: 'bg-gradient-to-r from-sky-400 to-sky-500'
+    },
+    violet: {
+      bg: 'bg-gradient-to-br from-violet-100 to-violet-200',
+      text: 'text-violet-600',
+      bar: 'bg-gradient-to-r from-violet-400 to-violet-500'
+    },
+    orange: {
+      bg: 'bg-gradient-to-br from-orange-100 to-orange-200',
+      text: 'text-orange-600',
+      bar: 'bg-gradient-to-r from-orange-400 to-orange-500'
+    }
+  };
+
+  const colorClass = colorClasses[color];
+
   if (isLoading) {
     return (
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.2 }}
-        className="card p-6 animate-pulse"
-      >
+      <div className="card p-6 animate-pulse">
         <div className="flex items-center justify-between mb-4">
           <div className="p-3 bg-slate-100 rounded-xl w-12 h-12" />
           <div className="w-12 h-4 bg-slate-100 rounded-lg" />
@@ -34,51 +54,31 @@ const MetricCard = memo(function MetricCard({ label, value, goal, icon: Icon, co
         <div className="h-4 w-24 bg-slate-100 rounded-lg mb-3" />
         <div className="h-8 w-20 bg-slate-100 rounded-lg" />
         <div className="mt-4 bg-slate-100 rounded-full h-2 overflow-hidden" />
-      </motion.div>
+      </div>
     );
   }
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -2 }}
-      transition={{ duration: 0.2 }}
-      className="card p-6 group"
-    >
+    <div className="card p-6 group transition-transform hover:-translate-y-1 duration-200">
       <div className="flex items-center justify-between mb-4">
-        <motion.div 
-          className={`p-3 bg-gradient-to-br from-${color}-100 to-${color}-200 rounded-xl shadow-sm`}
-          whileHover={{ rotate: 2, scale: 1.05 }}
-          transition={{ duration: 0.15 }}
-        >
-          <Icon className={`w-6 h-6 text-${color}-600`} />
-        </motion.div>
+        <div className={`p-3 ${colorClass.bg} rounded-xl shadow-sm transition-transform hover:scale-105 hover:rotate-2 duration-150`}>
+          <Icon className={`w-6 h-6 ${colorClass.text}`} />
+        </div>
         {goal && (
-          <motion.span 
-            className={`text-sm font-semibold px-2 py-1 rounded-lg ${
-              isGoalMet 
-                ? 'bg-emerald-100 text-emerald-700' 
-                : 'bg-slate-100 text-slate-600'
-            }`}
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.2, delay: 0.1 }}
-          >
+          <span className={`text-sm font-semibold px-2 py-1 rounded-lg ${
+            isGoalMet 
+              ? 'bg-emerald-100 text-emerald-700' 
+              : 'bg-slate-100 text-slate-600'
+          }`}>
             {Math.round(percentage)}%
-          </motion.span>
+          </span>
         )}
       </div>
       
       <h3 className="text-sm font-medium text-slate-600 mb-2">{label}</h3>
-      <motion.p 
-        className="text-3xl font-bold text-slate-900 mb-4"
-        initial={{ scale: 0.8 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.2, delay: 0.05 }}
-      >
+      <p className="text-3xl font-bold text-slate-900 mb-4">
         {displayValue}
-      </motion.p>
+      </p>
       
       {goal && (
         <div className="space-y-3">
@@ -87,30 +87,22 @@ const MetricCard = memo(function MetricCard({ label, value, goal, icon: Icon, co
             <span>{goal.toLocaleString()}</span>
           </div>
           <div className="bg-slate-100 rounded-full h-3 overflow-hidden shadow-inner">
-            <motion.div
-              className={`h-full bg-gradient-to-r from-${color}-400 to-${color}-500 rounded-full transition-all duration-500 ease-out ${
+            <div
+              className={`h-full ${colorClass.bar} rounded-full transition-all duration-300 ease-out ${
                 isGoalMet ? 'shadow-lg' : ''
               }`}
               style={{ width: `${percentage}%` }}
-              initial={{ width: 0 }}
-              animate={{ width: `${percentage}%` }}
-              transition={{ duration: 0.6, delay: 0.2 }}
             />
           </div>
           {isGoalMet && (
-            <motion.div 
-              className="text-xs text-emerald-600 font-semibold text-center flex items-center justify-center gap-1"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.4 }}
-            >
-              <span className="animate-bounce-soft">🎉</span>
+            <div className="text-xs text-emerald-600 font-semibold text-center flex items-center justify-center gap-1">
+              <span>🎉</span>
               Goal achieved!
-            </motion.div>
+            </div>
           )}
         </div>
       )}
-    </motion.div>
+    </div>
   );
 });
 

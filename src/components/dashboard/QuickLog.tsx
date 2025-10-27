@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { HealthMetric } from '../../types/database';
 
 interface QuickLogProps {
@@ -7,7 +7,7 @@ interface QuickLogProps {
   isSaving: boolean;
 }
 
-export default function QuickLog({ todayMetric, onUpdateMetric, isSaving }: QuickLogProps) {
+const QuickLog = memo(function QuickLog({ todayMetric, onUpdateMetric, isSaving }: QuickLogProps) {
   const [quickLog, setQuickLog] = useState({
     steps: todayMetric?.steps?.toString() || '',
     water_ml: todayMetric?.water_ml?.toString() || '',
@@ -174,4 +174,6 @@ export default function QuickLog({ todayMetric, onUpdateMetric, isSaving }: Quic
       </div>
     </div>
   );
-}
+});
+
+export default QuickLog;

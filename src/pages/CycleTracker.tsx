@@ -8,6 +8,13 @@ import { CycleTracking, FlowIntensity } from '../types/database';
 import CycleVisualization from '../components/dashboard/CycleVisualization';
 import PageWrapper from '../components/Layout/PageWrapper';
 import PageHeader from '../components/Layout/PageHeader';
+import BirthControlManager from '../components/cycle/BirthControlManager';
+import DailyPillLogger from '../components/cycle/DailyPillLogger';
+import CycleCalendar from '../components/cycle/CycleCalendar';
+import DailyMoodLogger from '../components/cycle/DailyMoodLogger';
+import CycleAnalytics from '../components/cycle/CycleAnalytics';
+import MedicationTracker from '../components/cycle/MedicationTracker';
+import { symptomCategories } from '../data/symptoms';
 
 export default function CycleTracker() {
   const { user } = useAuth();
@@ -30,16 +37,7 @@ export default function CycleTracker() {
 
   const prediction = predictNextPeriod();
 
-  const symptomOptions = [
-    'Cramps',
-    'Headache',
-    'Bloating',
-    'Mood swings',
-    'Fatigue',
-    'Back pain',
-    'Breast tenderness',
-    'Nausea',
-  ];
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,13 +110,71 @@ export default function CycleTracker() {
           icon={<Sparkles className="w-12 h-12 text-purple-500" />}
         />
 
-      {/* Cycle Visualization */}
+      {/* Birth Control Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
+        <BirthControlManager />
+      </motion.div>
+
+      {/* Daily Pill Logger */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15 }}
+      >
+        <DailyPillLogger />
+      </motion.div>
+
+      {/* Daily Mood/Energy Logger */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.17 }}
+      >
+        <DailyMoodLogger />
+      </motion.div>
+
+      {/* Cycle Calendar */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <CycleCalendar 
+          cycles={cycles} 
+          onDateClick={setSelectedDate}
+          selectedDate={selectedDate}
+        />
+      </motion.div>
+
+      {/* Cycle Visualization */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.25 }}
+      >
         <CycleVisualization cycles={cycles} prediction={prediction || undefined} />
+      </motion.div>
+
+      {/* Cycle Analytics */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
+        <CycleAnalytics cycles={cycles} />
+      </motion.div>
+
+      {/* Medication Tracker */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.35 }}
+      >
+        <MedicationTracker />
       </motion.div>
 
       {/* Add Cycle Button */}
@@ -148,13 +204,13 @@ export default function CycleTracker() {
             transition={{ duration: 0.3 }}
             className="card p-8 mb-8"
           >
-            <h2 className="text-2xl font-semibold text-slate-900 mb-6">
+            <h2 className="text-2xl font-semibold text-purple-900 mb-6">
               {editingCycle ? 'Edit Cycle' : 'New Cycle Entry'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-purple-700 mb-2">
                     Period Start Date
                   </label>
                   <input
@@ -166,7 +222,7 @@ export default function CycleTracker() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-purple-700 mb-2">
                     Period End Date (Optional)
                   </label>
                   <input
@@ -180,7 +236,7 @@ export default function CycleTracker() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-3">Flow Intensity</label>
+                <label className="block text-sm font-medium text-purple-700 mb-3">Flow Intensity</label>
                 <div className="flex gap-3">
                   {(['light', 'medium', 'heavy'] as FlowIntensity[]).map((intensity) => (
                     <motion.button
@@ -188,9 +244,9 @@ export default function CycleTracker() {
                       type="button"
                       onClick={() => setFormData({ ...formData, flow_intensity: intensity })}
                       className={`flex-1 py-3 px-4 rounded-xl border-2 capitalize transition-all duration-200 ${
-                        formData.flow_intensity === intensity
+                                                  formData.flow_intensity === intensity
                           ? 'border-rose-500 bg-gradient-to-r from-rose-50 to-pink-50 text-rose-700 shadow-sm'
-                          : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                          : 'border-purple-200 hover:border-purple-300 hover:bg-purple-50 text-purple-700'
                       }`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -202,29 +258,34 @@ export default function CycleTracker() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-3">Symptoms</label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {symptomOptions.map((symptom) => (
-                    <motion.button
-                      key={symptom}
-                      type="button"
-                      onClick={() => toggleSymptom(symptom)}
-                      className={`py-2 px-3 rounded-xl border text-sm transition-all duration-200 ${
-                        formData.symptoms.includes(symptom)
-                          ? 'border-rose-500 bg-gradient-to-r from-rose-50 to-pink-50 text-rose-700 shadow-sm'
-                          : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                      }`}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      {symptom}
-                    </motion.button>
+                <label className="block text-sm font-medium text-purple-700 mb-3">Symptoms</label>
+                <div className="space-y-4">
+                  {Object.entries(symptomCategories).map(([key, category]) => (
+                    <div key={key}>
+                      <h4 className="text-xs font-semibold text-purple-600 mb-2">{category.label}</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        {category.symptoms.map((symptom) => (
+                          <button
+                            key={symptom}
+                            type="button"
+                            onClick={() => toggleSymptom(symptom)}
+                            className={`py-2 px-3 rounded-xl border text-xs transition-all duration-200 ${
+                              formData.symptoms.includes(symptom)
+                                ? 'border-rose-500 bg-gradient-to-r from-rose-50 to-pink-50 text-rose-700 shadow-sm'
+                                : 'border-purple-200 hover:border-purple-300 hover:bg-purple-50 text-purple-700'
+                            }`}
+                          >
+                            {symptom}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Notes</label>
+                <label className="block text-sm font-medium text-purple-700 mb-2">Notes</label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -264,7 +325,7 @@ export default function CycleTracker() {
         transition={{ duration: 0.5, delay: 0.3 }}
         className="card p-8"
       >
-        <h2 className="text-2xl font-semibold text-slate-900 mb-6">Cycle History</h2>
+        <h2 className="text-2xl font-semibold text-purple-900 mb-6">Cycle History</h2>
         {cycles.length === 0 ? (
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
@@ -275,7 +336,7 @@ export default function CycleTracker() {
             <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-rose-100 to-pink-100 rounded-2xl flex items-center justify-center">
               <Calendar className="w-8 h-8 text-rose-600" />
             </div>
-            <p className="text-slate-500 text-lg">No cycles recorded yet. Start tracking your cycle!</p>
+            <p className="text-purple-600 text-lg font-medium">No cycles recorded yet. Start tracking your cycle!</p>
           </motion.div>
         ) : (
           <div className="space-y-4">
@@ -290,11 +351,11 @@ export default function CycleTracker() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
-                      <span className="text-lg font-semibold text-slate-900">
+                      <span className="text-lg font-semibold text-purple-900">
                         {format(new Date(cycle.period_start_date), 'MMM dd, yyyy')}
                       </span>
                       {cycle.period_end_date && (
-                        <span className="text-sm text-slate-500">
+                        <span className="text-sm text-purple-600">
                           to {format(new Date(cycle.period_end_date), 'MMM dd, yyyy')}
                         </span>
                       )}
@@ -304,11 +365,11 @@ export default function CycleTracker() {
                         </span>
                       )}
                     </div>
-                    <div className="space-y-2 text-sm text-slate-600">
+                    <div className="space-y-2 text-sm text-purple-700">
                       {cycle.flow_intensity && (
                         <div className="flex items-center gap-2">
                           <span className="font-medium">Flow:</span>
-                          <span className="px-2 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs">
+                          <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-lg text-xs font-medium">
                             {cycle.flow_intensity}
                           </span>
                         </div>
@@ -326,7 +387,7 @@ export default function CycleTracker() {
                         </div>
                       )}
                       {cycle.notes && (
-                        <p className="text-slate-500 italic bg-slate-50 p-3 rounded-lg">
+                        <p className="text-purple-600 italic bg-purple-50 p-3 rounded-lg">
                           {cycle.notes}
                         </p>
                       )}
@@ -335,7 +396,7 @@ export default function CycleTracker() {
                   <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <motion.button
                       onClick={() => handleEdit(cycle)}
-                      className="p-2 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all duration-200"
+                      className="p-2 text-purple-600 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all duration-200"
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                     >
@@ -343,7 +404,7 @@ export default function CycleTracker() {
                     </motion.button>
                     <motion.button
                       onClick={() => handleDelete(cycle.id)}
-                      className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
+                      className="p-2 text-purple-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                     >

@@ -1,5 +1,4 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useHealthStore } from '../stores/useHealthStore';
 import { useToastStore } from '../stores/useToastStore';
@@ -80,12 +79,7 @@ export default function Dashboard() {
         />
 
       {/* Date Selector */}
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.05 }}
-        className="mb-6"
-      >
+      <div className="mb-6">
         <input
           type="date"
           value={selectedDate}
@@ -93,24 +87,15 @@ export default function Dashboard() {
           max={format(new Date(), 'yyyy-MM-dd')}
           className="input-field max-w-xs"
         />
-      </motion.div>
+      </div>
 
       {/* Insights Banner */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-      >
+      <div>
         <InsightsBanner todayMetric={todayMetric} isLoading={loading} />
-      </motion.div>
+      </div>
 
       {/* Metrics Grid */}
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.15 }}
-        className="grid-metrics"
-      >
+      <div className="grid-metrics">
         <MetricCard
           label="Steps Today"
           value={todayMetric?.steps || 0}
@@ -142,41 +127,27 @@ export default function Dashboard() {
           color="orange"
           isLoading={loading}
         />
-      </motion.div>
+      </div>
 
       {/* Streak Widget */}
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.2 }}
-        className="grid-cards"
-      >
+      <div className="grid-cards">
         <StreakWidget metrics={metrics} isLoading={loading} />
-      </motion.div>
+      </div>
 
       {/* Quick Log and Weekly Chart */}
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.25 }}
-        className="grid-content"
-      >
+      <div className="grid-content">
         <QuickLog
           todayMetric={todayMetric}
           onUpdateMetric={handleQuickLog}
           isSaving={isSaving}
         />
         <WeeklyChart data={chartData} isLoading={loading} />
-      </motion.div>
+      </div>
 
       {/* Activity Trends */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.3 }}
-      >
+      <div>
         <ActivityTrends data={chartData} isLoading={loading} />
-      </motion.div>
+      </div>
       </div>
     </PageWrapper>
   );

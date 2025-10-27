@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { Flame, Calendar } from 'lucide-react';
 import { HealthMetric } from '../../types/database';
 
@@ -6,22 +7,9 @@ interface StreakWidgetProps {
   isLoading?: boolean;
 }
 
-export default function StreakWidget({ metrics, isLoading }: StreakWidgetProps) {
-  if (isLoading) {
-    return (
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 animate-pulse">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-orange-100 rounded-lg w-10 h-10" />
-          <div className="h-5 w-24 bg-gray-100 rounded" />
-        </div>
-        <div className="h-8 w-16 bg-gray-100 rounded mb-2" />
-        <div className="h-4 w-32 bg-gray-100 rounded" />
-      </div>
-    );
-  }
-
-  // Calculate current streak
-  const calculateStreak = () => {
+const StreakWidget = memo(function StreakWidget({ metrics, isLoading }: StreakWidgetProps) {
+  // Calculate current streak with memoization
+  const { current, longest } = useMemo(() => {
     if (metrics.length === 0) return { current: 0, longest: 0 };
 
     const today = new Date();
@@ -57,9 +45,20 @@ export default function StreakWidget({ metrics, isLoading }: StreakWidgetProps) 
     }
 
     return { current: currentStreak, longest: longestStreak };
-  };
+  }, [metrics]);
 
-  const { current, longest } = calculateStreak();
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 animate-pulse">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-orange-100 rounded-lg w-10 h-10" />
+          <div className="h-5 w-24 bg-gray-100 rounded" />
+        </div>
+        <div className="h-8 w-16 bg-gray-100 rounded mb-2" />
+        <div className="h-4 w-32 bg-gray-100 rounded" />
+      </div>
+    );
+  }
 
   const getStreakMessage = () => {
     if (current === 0) return "Start your streak today!";
@@ -112,4 +111,6 @@ export default function StreakWidget({ metrics, isLoading }: StreakWidgetProps) 
       </div>
     </div>
   );
-}
+});
+
+export default StreakWidget;
