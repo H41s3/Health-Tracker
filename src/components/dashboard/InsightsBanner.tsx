@@ -137,7 +137,7 @@ export default function InsightsBanner({ todayMetric, isLoading }: InsightsBanne
     : 'text-purple-600';
 
   return (
-    <div className={`bg-gradient-to-r ${bgColor} rounded-xl p-4 border ${primaryInsight.type === 'success' ? 'animate-pulse' : ''}`}>
+    <div className={`bg-gradient-to-r ${bgColor} rounded-xl p-4 border`}>
       <div className="flex items-center gap-3">
         <div className={`p-1 bg-${primaryInsight.color}-100 rounded-full`}>
           <Icon className={`w-4 h-4 ${iconColor}`} />

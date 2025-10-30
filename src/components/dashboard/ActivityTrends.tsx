@@ -70,8 +70,9 @@ const ActivityTrends = memo(function ActivityTrends({ data, isLoading }: Activit
             stroke="#0ea5e9" 
             strokeWidth={2} 
             name="water" 
-            dot={{ fill: '#0ea5e9', strokeWidth: 2, r: 4 }}
-            activeDot={{ r: 6, stroke: '#0ea5e9', strokeWidth: 2 }}
+            dot={false}
+            activeDot={false}
+            isAnimationActive={false}
           />
           <Line 
             type="monotone" 
@@ -79,8 +80,9 @@ const ActivityTrends = memo(function ActivityTrends({ data, isLoading }: Activit
             stroke="#8b5cf6" 
             strokeWidth={2} 
             name="sleep" 
-            dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 4 }}
-            activeDot={{ r: 6, stroke: '#8b5cf6', strokeWidth: 2 }}
+            dot={false}
+            activeDot={false}
+            isAnimationActive={false}
           />
         </LineChart>
       </ResponsiveContainer>

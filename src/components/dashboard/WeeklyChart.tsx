@@ -152,6 +152,7 @@ const WeeklyChart = memo(function WeeklyChart({ data, isLoading }: WeeklyChartPr
             dataKey={selectedMetric} 
             fill={currentConfig.color} 
             radius={[8, 8, 0, 0]}
+            isAnimationActive={false}
           />
         </BarChart>
       </ResponsiveContainer>

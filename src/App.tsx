@@ -1,15 +1,17 @@
-import { useState } from 'react';
+import { useState, Suspense, lazy } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import Login from './pages/Login';
-import EmailConfirmation from './pages/EmailConfirmation';
-import Dashboard from './pages/Dashboard';
-import CycleTracker from './pages/CycleTracker';
-import CustomMetrics from './pages/CustomMetrics';
-import HealthJournal from './pages/HealthJournal';
-import Reminders from './pages/Reminders';
-import Settings from './pages/Settings';
 import DashboardLayout from './components/Layout/DashboardLayout';
 import { useToastStore } from './stores/useToastStore';
+
+// Lazy-load pages to reduce initial bundle size and improve TTI
+const Login = lazy(() => import('./pages/Login'));
+const EmailConfirmation = lazy(() => import('./pages/EmailConfirmation'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const CycleTracker = lazy(() => import('./pages/CycleTracker'));
+const CustomMetrics = lazy(() => import('./pages/CustomMetrics'));
+const HealthJournal = lazy(() => import('./pages/HealthJournal'));
+const Reminders = lazy(() => import('./pages/Reminders'));
+const Settings = lazy(() => import('./pages/Settings'));
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -33,7 +35,11 @@ function AppContent() {
   }
 
   if (!user) {
-    return <Login />;
+    return (
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
+        <Login />
+      </Suspense>
+    );
   }
 
   const renderPage = () => {
@@ -71,7 +77,9 @@ function AppContent() {
           </div>
         ))}
       </div>
-      {renderPage()}
+      <Suspense fallback={<div className="p-6">Loading…</div>}>
+        {renderPage()}
+      </Suspense>
     </DashboardLayout>
   );
 }
