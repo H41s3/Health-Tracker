@@ -2,6 +2,7 @@ import { useState, Suspense, lazy } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import DashboardLayout from './components/Layout/DashboardLayout';
 import { useToastStore } from './stores/useToastStore';
+import { usePillReminder } from './hooks/usePillReminder';
 
 // Lazy-load pages to reduce initial bundle size and improve TTI
 const Login = lazy(() => import('./pages/Login'));
@@ -17,6 +18,7 @@ function AppContent() {
   const { user, loading } = useAuth();
   const [currentPage, setCurrentPage] = useState('dashboard');
   const { toasts, remove } = useToastStore();
+  usePillReminder();
 
   if (loading) {
     return (
