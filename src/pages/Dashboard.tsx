@@ -12,6 +12,7 @@ import QuickLog from '../components/dashboard/QuickLog';
 import ActivityTrends from '../components/dashboard/ActivityTrends';
 import PageWrapper from '../components/Layout/PageWrapper';
 import PageHeader from '../components/Layout/PageHeader';
+import AppProfiler from '../utils/Profiler';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -90,64 +91,76 @@ export default function Dashboard() {
       </div>
 
       {/* Insights Banner */}
-      <div>
-        <InsightsBanner todayMetric={todayMetric} isLoading={loading} />
-      </div>
+      <AppProfiler id="InsightsBanner">
+        <div>
+          <InsightsBanner todayMetric={todayMetric} isLoading={loading} />
+        </div>
+      </AppProfiler>
 
       {/* Metrics Grid */}
-      <div className="grid-metrics">
-        <MetricCard
+      <AppProfiler id="MetricsGrid">
+        <div className="grid-metrics">
+          <MetricCard
           label="Steps Today"
           value={todayMetric?.steps || 0}
           goal={10000}
           icon={Activity}
           color="emerald"
           isLoading={loading}
-        />
-        <MetricCard
+          />
+          <MetricCard
           label="Water (ml)"
           value={todayMetric?.water_ml || 0}
           goal={2000}
           icon={Droplet}
           color="sky"
           isLoading={loading}
-        />
-        <MetricCard
+          />
+          <MetricCard
           label="Sleep (hrs)"
           value={todayMetric?.sleep_hours || 0}
           goal={8}
           icon={Moon}
           color="violet"
           isLoading={loading}
-        />
-        <MetricCard
+          />
+          <MetricCard
           label="Weight (kg)"
           value={todayMetric?.weight_kg || 0}
           icon={TrendingUp}
           color="orange"
           isLoading={loading}
-        />
-      </div>
+          />
+        </div>
+      </AppProfiler>
 
       {/* Streak Widget */}
-      <div className="grid-cards">
-        <StreakWidget metrics={metrics} isLoading={loading} />
-      </div>
+      <AppProfiler id="StreakWidget">
+        <div className="grid-cards">
+          <StreakWidget metrics={metrics} isLoading={loading} />
+        </div>
+      </AppProfiler>
 
       {/* Quick Log and Weekly Chart */}
-      <div className="grid-content">
-        <QuickLog
+      <AppProfiler id="QuickLog">
+        <div className="grid-content">
+          <QuickLog
           todayMetric={todayMetric}
           onUpdateMetric={handleQuickLog}
           isSaving={isSaving}
-        />
-        <WeeklyChart data={chartData} isLoading={loading} />
-      </div>
+          />
+          <AppProfiler id="WeeklyChart">
+            <WeeklyChart data={chartData} isLoading={loading} />
+          </AppProfiler>
+        </div>
+      </AppProfiler>
 
       {/* Activity Trends */}
-      <div>
-        <ActivityTrends data={chartData} isLoading={loading} />
-      </div>
+      <AppProfiler id="ActivityTrends">
+        <div>
+          <ActivityTrends data={chartData} isLoading={loading} />
+        </div>
+      </AppProfiler>
       </div>
     </PageWrapper>
   );
