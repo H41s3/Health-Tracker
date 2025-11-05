@@ -1,12 +1,18 @@
 import { Calendar, Clock, Heart } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { memo, useMemo } from 'react';
+import { CycleTracking } from '../../types/database';
 
 interface CycleVisualizationProps {
-  cycles: any[];
+  cycles: CycleTracking[];
   prediction?: {
-    date: Date;
-    cycleLengthAvg: number;
+    nextPeriodStart: Date;
+    nextPeriodEnd: Date;
+    fertileStart?: Date;
+    fertileEnd?: Date;
+    averageCycleLength: number;
+    stdDevDays: number;
+    confidence: 'low' | 'medium' | 'high';
   };
 }
 
@@ -174,11 +180,19 @@ const CycleVisualization = memo(function CycleVisualization({ cycles, prediction
             </div>
             <div className="space-y-2">
               <p className="text-slate-700">
-                <span className="font-medium">Expected:</span> {format(prediction.date, 'MMM dd, yyyy')}
+                <span className="font-medium">Likely window:</span> {format(prediction.nextPeriodStart, 'MMM dd')} – {format(prediction.nextPeriodEnd, 'MMM dd, yyyy')}
+                <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${prediction.confidence === 'high' ? 'bg-emerald-100 text-emerald-700' : prediction.confidence === 'low' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700'}`}>
+                  {prediction.confidence} confidence
+                </span>
               </p>
               <p className="text-slate-600 text-sm">
-                Based on {cycles.length} recorded cycles (avg: {Math.round(prediction.cycleLengthAvg)} days)
+                Based on {cycles.length} recorded cycles (avg: {Math.round(prediction.averageCycleLength)} days, sd: {prediction.stdDevDays}d)
               </p>
+              {prediction.fertileStart && prediction.fertileEnd && (
+                <p className="text-slate-600 text-sm">
+                  Fertile window: {format(prediction.fertileStart, 'MMM dd')} – {format(prediction.fertileEnd, 'MMM dd')}
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -210,3 +224,4 @@ const CycleVisualization = memo(function CycleVisualization({ cycles, prediction
 });
 
 export default CycleVisualization;
+

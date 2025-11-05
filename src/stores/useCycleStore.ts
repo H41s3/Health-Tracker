@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { CycleTracking } from '../types/database';
+import { predictNextPeriod as predictUtil, PredictionResult } from '../utils/cyclePrediction';
 
 interface CycleState {
   cycles: CycleTracking[];
@@ -10,13 +11,18 @@ interface CycleState {
   addCycle: (userId: string, data: Partial<CycleTracking>) => Promise<void>;
   updateCycle: (id: string, data: Partial<CycleTracking>) => Promise<void>;
   deleteCycle: (id: string) => Promise<void>;
-  predictNextPeriod: () => { date: Date; cycleLengthAvg: number } | null;
+  predictNextPeriod: () => (PredictionResult | null);
+  setLutealLength: (days: number | null) => void;
+  lutealLength: number | null;
 }
 
 export const useCycleStore = create<CycleState>((set, get) => ({
   cycles: [],
   loading: false,
   error: null,
+  lutealLength: null,
+
+  setLutealLength: (days: number | null) => set({ lutealLength: days }),
 
   fetchCycles: async (userId: string) => {
     set({ loading: true, error: null });
@@ -29,8 +35,9 @@ export const useCycleStore = create<CycleState>((set, get) => ({
 
       if (error) throw error;
       set({ cycles: data || [], loading: false });
-    } catch (error: any) {
-      set({ error: error.message, loading: false });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch cycles';
+      set({ error: message, loading: false });
     }
   },
 
@@ -42,8 +49,9 @@ export const useCycleStore = create<CycleState>((set, get) => ({
 
       if (error) throw error;
       await get().fetchCycles(userId);
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to add cycle';
+      set({ error: message });
     }
   },
 
@@ -61,8 +69,9 @@ export const useCycleStore = create<CycleState>((set, get) => ({
       if (cycle) {
         await get().fetchCycles(cycle.user_id);
       }
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to update cycle';
+      set({ error: message });
     }
   },
 
@@ -76,33 +85,18 @@ export const useCycleStore = create<CycleState>((set, get) => ({
       if (error) throw error;
 
       set({ cycles: get().cycles.filter((c) => c.id !== id) });
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to delete cycle';
+      set({ error: message });
     }
   },
 
   predictNextPeriod: () => {
     const cycles = get().cycles;
-    if (cycles.length < 2) return null;
-
-    const cycleLengths = cycles
-      .filter((c) => c.cycle_length_days)
-      .map((c) => c.cycle_length_days!);
-
-    if (cycleLengths.length === 0) return null;
-
-    const avgLength = Math.round(
-      cycleLengths.reduce((sum, len) => sum + len, 0) / cycleLengths.length
+    if (cycles.length < 1) return null;
+    return predictUtil(
+      cycles.map(c => ({ period_start_date: c.period_start_date, cycle_length_days: c.cycle_length_days })),
+      { lutealDays: get().lutealLength, useWeighted: true }
     );
-
-    const lastCycle = cycles[0];
-    const lastDate = new Date(lastCycle.period_start_date);
-    const predictedDate = new Date(lastDate);
-    predictedDate.setDate(predictedDate.getDate() + avgLength);
-
-    return {
-      date: predictedDate,
-      cycleLengthAvg: avgLength,
-    };
   },
 }));
