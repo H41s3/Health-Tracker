@@ -13,7 +13,8 @@
     @apply font-sans antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
     background: linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 25%, #4a1e5c 50%, #6b2d7a 75%, #8b3a8f 100%);
-    background-attachment: fixed;
+    /* Avoid fixed attachments which can cause scroll jank */
+    background-attachment: scroll;
     min-height: 100vh;
   }
   
@@ -34,13 +35,10 @@
 
   /* Card Components - 3D Notion-like Design */
   .card {
-    @apply bg-white/95 rounded-2xl border border-purple-200/30 transition-all duration-200;
-    backdrop-filter: blur(20px);
-    box-shadow: 
-      0 8px 32px rgba(139, 58, 143, 0.12),
-      0 2px 8px rgba(0, 0, 0, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    will-change: transform, box-shadow;
+    @apply bg-white rounded-2xl border border-purple-200/40 transition-all duration-150;
+    /* Removed heavy backdrop blur and reduced shadow complexity for smoother scrolling */
+    box-shadow: var(--shadow-md);
+    will-change: transform;
     transform: translateZ(0) translateY(0);
   }
   
@@ -53,13 +51,9 @@
   }
   
   .card-elevated {
-    @apply bg-gradient-to-br from-white/90 to-purple-50/80 rounded-2xl border border-purple-300/40 transition-all duration-200;
-    backdrop-filter: blur(24px);
-    box-shadow: 
-      0 12px 40px rgba(107, 45, 122, 0.18),
-      0 4px 12px rgba(0, 0, 0, 0.1),
-      inset 0 2px 0 rgba(255, 255, 255, 0.7);
-    will-change: transform, box-shadow;
+    @apply bg-gradient-to-br from-white to-purple-50 rounded-2xl border border-purple-300/40 transition-all duration-150;
+    box-shadow: var(--shadow-lg);
+    will-change: transform;
     transform: translateZ(0) translateY(0);
   }
   
@@ -72,14 +66,7 @@
   }
   
   .card-glass {
-    @apply bg-white/20 rounded-2xl border border-white/30 shadow-xl;
-    backdrop-filter: blur(32px) saturate(180%);
-    box-shadow: 
-      0 8px 32px rgba(255, 255, 255, 0.1),
-      0 2px 8px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    will-change: transform;
-    transform: translateZ(0);
+    @apply bg-white rounded-2xl border border-white/30 shadow-md;
   }
 
   /* Button Components - 3D Enhanced */

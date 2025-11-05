@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useCycleStore } from '../stores/useCycleStore';
 import { Calendar, Plus, Edit2, Trash2, Sparkles } from 'lucide-react';
@@ -17,6 +17,7 @@ import MedicationTracker from '../components/cycle/MedicationTracker';
 import { symptomCategories } from '../data/symptoms';
 
 export default function CycleTracker() {
+  const prefersReducedMotion = useReducedMotion();
   const { user } = useAuth();
   const { cycles, fetchCycles, addCycle, updateCycle, deleteCycle, predictNextPeriod } = useCycleStore();
   const [showForm, setShowForm] = useState(false);
@@ -112,36 +113,36 @@ export default function CycleTracker() {
 
       {/* Birth Control Section */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+        animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+        transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3, delay: 0.05 }}
       >
         <BirthControlManager />
       </motion.div>
 
       {/* Daily Pill Logger */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.15 }}
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+        animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+        transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3, delay: 0.07 }}
       >
         <DailyPillLogger />
       </motion.div>
 
       {/* Daily Mood/Energy Logger */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.17 }}
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+        animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+        transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3, delay: 0.08 }}
       >
         <DailyMoodLogger />
       </motion.div>
 
       {/* Cycle Calendar */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+        animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+        transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3, delay: 0.1 }}
       >
         <CycleCalendar 
           cycles={cycles} 
@@ -152,27 +153,27 @@ export default function CycleTracker() {
 
       {/* Cycle Visualization */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.25 }}
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+        animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+        transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3, delay: 0.12 }}
       >
         <CycleVisualization cycles={cycles} prediction={prediction || undefined} />
       </motion.div>
 
       {/* Cycle Analytics */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+        animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+        transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3, delay: 0.14 }}
       >
         <CycleAnalytics cycles={cycles} />
       </motion.div>
 
       {/* Medication Tracker */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.35 }}
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+        animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+        transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3, delay: 0.16 }}
       >
         <MedicationTracker />
       </motion.div>
@@ -187,8 +188,8 @@ export default function CycleTracker() {
         <motion.button
           onClick={() => setShowForm(!showForm)}
           className="btn-primary inline-flex items-center gap-2"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
+          whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
         >
           <Plus className="w-5 h-5" />
           {showForm ? 'Cancel' : 'Log New Cycle'}
@@ -197,11 +198,11 @@ export default function CycleTracker() {
 
       <AnimatePresence>
         {showForm && (
-          <motion.div 
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
+            <motion.div 
+            initial={prefersReducedMotion ? false : { opacity: 0, height: 0 }}
+            animate={prefersReducedMotion ? undefined : { opacity: 1, height: 'auto' }}
+            exit={prefersReducedMotion ? undefined : { opacity: 0, height: 0 }}
+            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2 }}
             className="card p-8 mb-8"
           >
             <h2 className="text-2xl font-semibold text-purple-900 mb-6">
@@ -299,8 +300,8 @@ export default function CycleTracker() {
                 <motion.button
                   type="submit"
                   className="btn-primary"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={prefersReducedMotion ? undefined : { scale: 1.01 }}
+                  whileTap={prefersReducedMotion ? undefined : { scale: 0.99 }}
                 >
                   {editingCycle ? 'Update' : 'Save'} Cycle
                 </motion.button>
@@ -308,8 +309,8 @@ export default function CycleTracker() {
                   type="button"
                   onClick={resetForm}
                   className="btn-secondary"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={prefersReducedMotion ? undefined : { scale: 1.01 }}
+                  whileTap={prefersReducedMotion ? undefined : { scale: 0.99 }}
                 >
                   Cancel
                 </motion.button>
@@ -343,9 +344,9 @@ export default function CycleTracker() {
             {cycles.map((cycle, index) => (
               <motion.div
                 key={cycle.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+                animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+                transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2, delay: Math.min(index * 0.05, 0.3) }}
                 className="card p-6 hover:shadow-lg transition-all duration-300 group"
               >
                 <div className="flex items-start justify-between">
@@ -397,16 +398,16 @@ export default function CycleTracker() {
                     <motion.button
                       onClick={() => handleEdit(cycle)}
                       className="p-2 text-purple-600 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all duration-200"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
+                      whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                     >
                       <Edit2 className="w-4 h-4" />
                     </motion.button>
                     <motion.button
                       onClick={() => handleDelete(cycle.id)}
                       className="p-2 text-purple-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
+                      whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                     >
                       <Trash2 className="w-4 h-4" />
                     </motion.button>
