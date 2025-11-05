@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { memo, useMemo } from 'react';
 
 interface ProgressRingProps {
@@ -20,6 +20,7 @@ const ProgressRing = memo(function ProgressRing({
   showPercentage = true,
   className = ''
 }: ProgressRingProps) {
+  const prefersReducedMotion = useReducedMotion();
   const radius = useMemo(() => (size - strokeWidth) / 2, [size, strokeWidth]);
   const circumference = useMemo(() => 2 * Math.PI * radius, [radius]);
   const strokeDashoffset = useMemo(() => circumference - (progress / 100) * circumference, [circumference, progress]);
@@ -47,9 +48,9 @@ const ProgressRing = memo(function ProgressRing({
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
-          initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          initial={prefersReducedMotion ? false : { strokeDashoffset: circumference }}
+          animate={prefersReducedMotion ? { strokeDashoffset } : { strokeDashoffset }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.35, ease: "easeOut" }}
         />
       </svg>
       
@@ -57,9 +58,9 @@ const ProgressRing = memo(function ProgressRing({
       {showPercentage && (
         <div className="absolute inset-0 flex items-center justify-center">
           <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.2, delay: 0.1 }}
+            initial={prefersReducedMotion ? false : { scale: 0.95, opacity: 0 }}
+            animate={prefersReducedMotion ? { opacity: 1 } : { scale: 1, opacity: 1 }}
+            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2, delay: 0.05 }}
             className="text-center"
           >
             <div className="text-2xl font-bold text-slate-900">{Math.round(progress)}%</div>
