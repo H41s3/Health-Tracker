@@ -30,6 +30,7 @@ coverage/
 *.seed
 *.tgz
 .parcel-cache/
+.npm-cache/
 
 logs
 *.log
