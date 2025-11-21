@@ -10,6 +10,7 @@ import InsightsBanner from '../components/dashboard/InsightsBanner';
 import WeeklyChart from '../components/dashboard/WeeklyChart';
 import QuickLog from '../components/dashboard/QuickLog';
 import ActivityTrends from '../components/dashboard/ActivityTrends';
+import TodaySummary from '../components/dashboard/TodaySummary';
 import PageWrapper from '../components/Layout/PageWrapper';
 import PageHeader from '../components/Layout/PageHeader';
 import AppProfiler from '../utils/Profiler';
@@ -53,6 +54,13 @@ export default function Dashboard() {
 
   const todayMetric = useMemo(() => getMetricForDate(selectedDate), [getMetricForDate, selectedDate]);
 
+  // Calculate previous day's metric for trend comparison
+  const previousDayMetric = useMemo(() => {
+    const prevDate = new Date(selectedDate);
+    prevDate.setDate(prevDate.getDate() - 1);
+    return getMetricForDate(format(prevDate, 'yyyy-MM-dd'));
+  }, [getMetricForDate, selectedDate]);
+
   const chartData = useMemo(() => {
     const weekMetrics = metrics.slice(0, 7).reverse();
     return weekMetrics.map((m) => {
@@ -71,24 +79,32 @@ export default function Dashboard() {
   return (
     <PageWrapper theme="dashboard">
       <div className="page-container space-section">
-        {/* Hero Header */}
-        <PageHeader
-          title="Health Dashboard"
-          subtitle="Track your daily health metrics and progress"
-          theme="dashboard"
-          icon={<Heart className="w-12 h-12 text-pink-500" />}
-        />
+        {/* Hero Header with Date Selector */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+          <PageHeader
+            title="Health Dashboard"
+            subtitle="Track your daily health metrics and progress"
+            theme="dashboard"
+            icon={<Heart className="w-12 h-12 text-pink-500" />}
+          />
+          <div className="flex-shrink-0">
+            <label className="block text-sm font-medium text-white/80 mb-2">Viewing Date</label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              max={format(new Date(), 'yyyy-MM-dd')}
+              className="input-field w-full md:w-auto shadow-lg border-2 border-white/20 hover:border-white/40 transition-colors"
+            />
+          </div>
+        </div>
 
-      {/* Date Selector */}
-      <div className="mb-6">
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          max={format(new Date(), 'yyyy-MM-dd')}
-          className="input-field max-w-xs"
-        />
-      </div>
+      {/* Today's Summary */}
+      <AppProfiler id="TodaySummary">
+        <div className="mb-6">
+          <TodaySummary todayMetric={todayMetric} isLoading={loading} />
+        </div>
+      </AppProfiler>
 
       {/* Insights Banner */}
       <AppProfiler id="InsightsBanner">
@@ -107,6 +123,7 @@ export default function Dashboard() {
           icon={Activity}
           color="emerald"
           isLoading={loading}
+          previousValue={previousDayMetric?.steps ?? undefined}
           />
           <MetricCard
           label="Water (ml)"
@@ -115,6 +132,7 @@ export default function Dashboard() {
           icon={Droplet}
           color="sky"
           isLoading={loading}
+          previousValue={previousDayMetric?.water_ml ?? undefined}
           />
           <MetricCard
           label="Sleep (hrs)"
@@ -123,6 +141,7 @@ export default function Dashboard() {
           icon={Moon}
           color="violet"
           isLoading={loading}
+          previousValue={previousDayMetric?.sleep_hours ?? undefined}
           />
           <MetricCard
           label="Weight (kg)"
@@ -130,6 +149,7 @@ export default function Dashboard() {
           icon={TrendingUp}
           color="orange"
           isLoading={loading}
+          previousValue={previousDayMetric?.weight_kg ?? undefined}
           />
         </div>
       </AppProfiler>

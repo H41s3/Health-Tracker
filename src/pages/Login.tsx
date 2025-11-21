@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Activity } from 'lucide-react';
 import EmailConfirmation from './EmailConfirmation';
+import { signUpSchema, signInSchema, resetPasswordSchema, validateForm } from '../utils/validation';
+import { getErrorMessage } from '../utils/errorHandler';
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -9,6 +11,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [resetMode, setResetMode] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
@@ -19,37 +22,54 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
     setLoading(true);
 
     try {
       if (resetMode) {
+        const validation = validateForm(resetPasswordSchema, { email });
+        if (!validation.success) {
+          setFieldErrors(validation.errors || {});
+          setLoading(false);
+          return;
+        }
+
         const { error } = await resetPassword(email);
         if (error) {
-          setError(error.message);
+          setError(getErrorMessage(error));
         } else {
           setResetSuccess(true);
         }
       } else if (isSignUp) {
-        if (!fullName.trim()) {
-          setError('Please enter your full name');
+        const validation = validateForm(signUpSchema, { email, password, fullName });
+        if (!validation.success) {
+          setFieldErrors(validation.errors || {});
           setLoading(false);
           return;
         }
+
         const { error } = await signUp(email, password, fullName);
         if (error) {
-          setError(error.message);
+          setError(getErrorMessage(error));
         } else {
           // Signup successful - show confirmation page immediately
           setShowConfirmation(true);
         }
       } else {
+        const validation = validateForm(signInSchema, { email, password });
+        if (!validation.success) {
+          setFieldErrors(validation.errors || {});
+          setLoading(false);
+          return;
+        }
+
         const { error } = await signIn(email, password);
         if (error) {
-          setError(error.message);
+          setError(getErrorMessage(error));
         }
       }
-    } catch {
-      setError('An unexpected error occurred');
+    } catch (err) {
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -58,6 +78,7 @@ export default function Login() {
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
     setError('');
+    setFieldErrors({});
     setResetMode(false);
     setResetSuccess(false);
   };
@@ -65,6 +86,7 @@ export default function Login() {
   const toggleResetMode = () => {
     setResetMode(!resetMode);
     setError('');
+    setFieldErrors({});
     setResetSuccess(false);
   };
 
@@ -115,10 +137,21 @@ export default function Login() {
                     id="fullName"
                     type="text"
                     value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
-                    required={isSignUp}
+                    onChange={(e) => {
+                      setFullName(e.target.value);
+                      if (fieldErrors.fullName) setFieldErrors({ ...fieldErrors, fullName: '' });
+                    }}
+                    className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition ${
+                      fieldErrors.fullName ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    aria-invalid={!!fieldErrors.fullName}
+                    aria-describedby={fieldErrors.fullName ? 'fullName-error' : undefined}
                   />
+                  {fieldErrors.fullName && (
+                    <p id="fullName-error" className="mt-1 text-sm text-red-600" role="alert">
+                      {fieldErrors.fullName}
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -130,10 +163,21 @@ export default function Login() {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition"
-                  required
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (fieldErrors.email) setFieldErrors({ ...fieldErrors, email: '' });
+                  }}
+                  className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition ${
+                    fieldErrors.email ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  aria-invalid={!!fieldErrors.email}
+                  aria-describedby={fieldErrors.email ? 'email-error' : undefined}
                 />
+                {fieldErrors.email && (
+                  <p id="email-error" className="mt-1 text-sm text-red-600" role="alert">
+                    {fieldErrors.email}
+                  </p>
+                )}
               </div>
 
               {!resetMode && (
@@ -145,11 +189,21 @@ export default function Login() {
                     id="password"
                     type="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
-                    required
-                    minLength={6}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (fieldErrors.password) setFieldErrors({ ...fieldErrors, password: '' });
+                    }}
+                    className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition ${
+                      fieldErrors.password ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    aria-invalid={!!fieldErrors.password}
+                    aria-describedby={fieldErrors.password ? 'password-error' : undefined}
                   />
+                  {fieldErrors.password && (
+                    <p id="password-error" className="mt-1 text-sm text-red-600" role="alert">
+                      {fieldErrors.password}
+                    </p>
+                  )}
                 </div>
               )}
 

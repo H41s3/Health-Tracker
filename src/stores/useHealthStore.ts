@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { HealthMetric } from '../types/database';
+import { getErrorMessage } from '../utils/errorHandler';
 
 interface HealthState {
   metrics: HealthMetric[];
@@ -38,8 +39,8 @@ export const useHealthStore = create<HealthState>((set, get) => ({
 
       if (error) throw error;
       set({ metrics: data || [], loading: false });
-    } catch (error: any) {
-      set({ error: error.message, loading: false });
+    } catch (error) {
+      set({ error: getErrorMessage(error), loading: false });
     }
   },
 
@@ -64,9 +65,9 @@ export const useHealthStore = create<HealthState>((set, get) => ({
 
       if (error) throw error;
       set({ isSaving: false });
-    } catch (error: any) {
+    } catch (error) {
       // revert on failure
-      set({ metrics: prevMetrics, isSaving: false, error: error.message });
+      set({ metrics: prevMetrics, isSaving: false, error: getErrorMessage(error) });
     }
   },
 

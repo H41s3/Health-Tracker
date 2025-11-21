@@ -1,6 +1,6 @@
 import { useState, memo, useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Activity, Droplet, Moon, TrendingUp } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { Activity, Droplet, Moon, TrendingUp, Target } from 'lucide-react';
 
 interface WeeklyChartProps {
   data: Array<{
@@ -62,6 +62,11 @@ const WeeklyChart = memo(function WeeklyChart({ data, isLoading }: WeeklyChartPr
     return Math.min((weeklyAverage / currentConfig.goal) * 100, 100);
   }, [weeklyAverage, currentConfig.goal]);
 
+  const daysAboveGoal = useMemo(() => {
+    if (!currentConfig.goal) return 0;
+    return data.filter(d => (d[selectedMetric] || 0) >= (currentConfig.goal || 0)).length;
+  }, [data, selectedMetric, currentConfig.goal]);
+
   if (isLoading) {
     return (
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -86,9 +91,17 @@ const WeeklyChart = memo(function WeeklyChart({ data, isLoading }: WeeklyChartPr
   const Icon = currentConfig.icon;
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">Weekly Overview</h2>
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">Weekly Overview</h2>
+          {currentConfig.goal && daysAboveGoal > 0 && (
+            <p className="text-xs text-emerald-600 flex items-center gap-1 mt-1">
+              <Target className="w-3 h-3" />
+              {daysAboveGoal} of {data.length} days hit goal
+            </p>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           <Icon className="w-4 h-4 text-gray-500" />
           <span className="text-sm text-gray-600">{currentConfig.label}</span>
@@ -148,6 +161,22 @@ const WeeklyChart = memo(function WeeklyChart({ data, isLoading }: WeeklyChartPr
               currentConfig.label,
             ]}
           />
+          {/* Goal Reference Line */}
+          {currentConfig.goal && (
+            <ReferenceLine 
+              y={currentConfig.goal} 
+              stroke="#f59e0b" 
+              strokeDasharray="5 5"
+              strokeWidth={2}
+              label={{
+                value: `Goal: ${currentConfig.formatter(currentConfig.goal)}`,
+                position: 'right',
+                fill: '#f59e0b',
+                fontSize: 12,
+                fontWeight: 600,
+              }}
+            />
+          )}
           <Bar 
             dataKey={selectedMetric} 
             fill={currentConfig.color} 

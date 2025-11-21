@@ -68,13 +68,46 @@ const StreakWidget = memo(function StreakWidget({ metrics, isLoading }: StreakWi
     return "Incredible dedication!";
   };
 
+  const getMilestone = () => {
+    if (current >= 365) return { emoji: '👑', label: 'Legend', color: 'text-yellow-500' };
+    if (current >= 180) return { emoji: '💎', label: 'Diamond', color: 'text-purple-500' };
+    if (current >= 90) return { emoji: '🏆', label: 'Champion', color: 'text-yellow-600' };
+    if (current >= 30) return { emoji: '🥇', label: 'Gold', color: 'text-yellow-500' };
+    if (current >= 14) return { emoji: '🥈', label: 'Silver', color: 'text-gray-400' };
+    if (current >= 7) return { emoji: '🥉', label: 'Bronze', color: 'text-orange-600' };
+    if (current >= 3) return { emoji: '⭐', label: 'Starter', color: 'text-blue-500' };
+    return null;
+  };
+
+  const getNextMilestone = () => {
+    if (current < 3) return { target: 3, label: 'Starter' };
+    if (current < 7) return { target: 7, label: 'Bronze' };
+    if (current < 14) return { target: 14, label: 'Silver' };
+    if (current < 30) return { target: 30, label: 'Gold' };
+    if (current < 90) return { target: 90, label: 'Champion' };
+    if (current < 180) return { target: 180, label: 'Diamond' };
+    if (current < 365) return { target: 365, label: 'Legend' };
+    return null;
+  };
+
+  const milestone = getMilestone();
+  const nextMilestone = getNextMilestone();
+
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-orange-100 rounded-lg">
-          <Flame className="w-5 h-5 text-orange-600" />
+    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-orange-100 rounded-lg">
+            <Flame className="w-5 h-5 text-orange-600" />
+          </div>
+          <h3 className="text-sm font-medium text-gray-600">Daily Streak</h3>
         </div>
-        <h3 className="text-sm font-medium text-gray-600">Daily Streak</h3>
+        {milestone && (
+          <div className={`flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-yellow-50 to-orange-50 border border-orange-200`}>
+            <span className="text-lg">{milestone.emoji}</span>
+            <span className={`text-xs font-bold ${milestone.color}`}>{milestone.label}</span>
+          </div>
+        )}
       </div>
       
       <div className="text-center">
@@ -87,24 +120,42 @@ const StreakWidget = memo(function StreakWidget({ metrics, isLoading }: StreakWi
           {getStreakMessage()}
         </div>
         
-        <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+        <div className="flex items-center justify-center gap-4 text-xs text-gray-500 mb-3">
           <div className="flex items-center gap-1">
             <Calendar className="w-3 h-3" />
             <span>Best: {longest} days</span>
           </div>
         </div>
+
+        {/* Next Milestone Progress */}
+        {nextMilestone && (
+          <div className="mb-3 p-3 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg">
+            <div className="text-xs font-medium text-gray-700 mb-2">
+              Next: {nextMilestone.label} ({nextMilestone.target - current} days to go)
+            </div>
+            <div className="w-full bg-white rounded-full h-2 overflow-hidden shadow-inner">
+              <div
+                className="h-full bg-gradient-to-r from-orange-400 to-yellow-400 transition-all duration-300"
+                style={{ width: `${(current / nextMilestone.target) * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
         
         {current > 0 && (
-          <div className="mt-3 flex justify-center">
+          <div className="flex justify-center">
             <div className="flex gap-1">
               {Array.from({ length: Math.min(current, 7) }).map((_, i) => (
                 <div
                   key={i}
-                  className={`w-2 h-2 rounded-full ${
-                    i < current ? 'bg-orange-500' : 'bg-gray-200'
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    i < current ? 'bg-orange-500 animate-pulse-soft' : 'bg-gray-200'
                   }`}
                 />
               ))}
+              {current > 7 && (
+                <span className="text-xs text-orange-600 ml-1">+{current - 7}</span>
+              )}
             </div>
           </div>
         )}

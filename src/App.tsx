@@ -3,6 +3,8 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import DashboardLayout from './components/Layout/DashboardLayout';
 import { useToastStore } from './stores/useToastStore';
 import { usePillReminder } from './hooks/usePillReminder';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { Toast } from './components/Toast';
 
 // Lazy-load pages to reduce initial bundle size and improve TTI
 const Login = lazy(() => import('./pages/Login'));
@@ -66,17 +68,13 @@ function AppContent() {
   return (
     <DashboardLayout currentPage={currentPage} onNavigate={setCurrentPage}>
       {/* Toasts */}
-      <div className="fixed z-[999] top-4 right-4 space-y-2">
-        {toasts.map((t) => (
-          <div
-            key={t.id}
-            className={`px-4 py-3 rounded-lg shadow-md border font-medium text-sm bg-white ${
-              t.type === 'success' ? 'border-purple-500 text-purple-800' : t.type === 'error' ? 'border-red-500 text-red-800' : 'border-indigo-500 text-indigo-800'
-            }`}
-            onClick={() => remove(t.id)}
-          >
-            {t.message}
-          </div>
+      <div 
+        className="fixed z-[999] top-4 right-4 space-y-2 max-w-md w-full"
+        role="region"
+        aria-label="Notifications"
+      >
+        {toasts.map((toast) => (
+          <Toast key={toast.id} toast={toast} onRemove={remove} />
         ))}
       </div>
       <Suspense fallback={<div className="p-6">Loading…</div>}>
@@ -88,9 +86,11 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

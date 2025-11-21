@@ -19,8 +19,8 @@ export const useToastStore = create<ToastState>((set, get) => ({
   show: (message: string, type: ToastType = 'info') => {
     const id = Math.random().toString(36).slice(2);
     set({ toasts: [...get().toasts, { id, message, type }] });
-    // auto-remove after 3s
-    setTimeout(() => get().remove(id), 3000);
+    // Note: Auto-dismiss is handled in Toast component
+    // Errors don't auto-dismiss, other types do after 5s
   },
   remove: (id: string) => {
     set({ toasts: get().toasts.filter((t) => t.id !== id) });

@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useBirthControlStore } from '../../stores/useBirthControlStore';
 import { useAuth } from '../../contexts/AuthContext';
-import { Check, X, AlertTriangle, Clock } from 'lucide-react';
+import { Check, X, AlertTriangle, Clock, Calendar } from 'lucide-react';
 import { format, subDays } from 'date-fns';
+import PillPackVisualization from './PillPackVisualization';
 
 export default function DailyPillLogger() {
   const { user } = useAuth();
@@ -14,7 +15,7 @@ export default function DailyPillLogger() {
     getConsecutiveMissedDays,
   } = useBirthControlStore();
 
-  const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [showPackView, setShowPackView] = useState(true);
 
   // Memoize last 7 days generation
   const last7Days = useMemo(() => 
@@ -119,11 +120,25 @@ export default function DailyPillLogger() {
         </div>
       </div>
 
-      {/* Weekly View */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h4 className="text-sm font-semibold text-gray-700">Last 7 Days</h4>
-        </div>
+      {/* View Toggle */}
+      <div className="flex items-center justify-between mb-4">
+        <h4 className="text-sm font-semibold text-gray-700">
+          {showPackView ? '28-Day Pack View' : 'Last 7 Days'}
+        </h4>
+        <button
+          onClick={() => setShowPackView(!showPackView)}
+          className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-purple-700 bg-purple-100 hover:bg-purple-200 rounded-lg transition-colors"
+        >
+          <Calendar className="w-4 h-4" />
+          {showPackView ? 'Week View' : 'Pack View'}
+        </button>
+      </div>
+
+      {/* Pill Pack or Weekly View */}
+      {showPackView ? (
+        <PillPackVisualization pillLogs={pillLogs} packSize={28} />
+      ) : (
+        <div>
         <div className="grid grid-cols-7 gap-2">
           {last7Days.map((date) => {
             const log = getLogForDate(date);
@@ -161,29 +176,30 @@ export default function DailyPillLogger() {
             );
           })}
         </div>
-      </div>
 
-      {/* Stats */}
-      <div className="mt-6 grid grid-cols-3 gap-4">
-        <div className="text-center p-3 bg-gray-50 rounded-xl">
-          <div className="text-2xl font-bold text-gray-900">
-            {stats.pillsTaken}
+        {/* Stats for Week View */}
+        <div className="mt-6 grid grid-cols-3 gap-4">
+          <div className="text-center p-3 bg-gray-50 rounded-xl">
+            <div className="text-2xl font-bold text-gray-900">
+              {stats.pillsTaken}
+            </div>
+            <div className="text-xs text-gray-600 mt-1 font-medium">Pills Taken</div>
           </div>
-          <div className="text-xs text-gray-600 mt-1 font-medium">Pills Taken</div>
-        </div>
-        <div className="text-center p-3 bg-gray-50 rounded-xl">
-          <div className="text-2xl font-bold text-gray-900">
-            {stats.pillsMissed}
+          <div className="text-center p-3 bg-gray-50 rounded-xl">
+            <div className="text-2xl font-bold text-gray-900">
+              {stats.pillsMissed}
+            </div>
+            <div className="text-xs text-gray-600 mt-1 font-medium">Pills Missed</div>
           </div>
-          <div className="text-xs text-gray-600 mt-1 font-medium">Pills Missed</div>
-        </div>
-        <div className="text-center p-3 bg-gray-50 rounded-xl">
-          <div className="text-2xl font-bold text-emerald-600">
-            {stats.adherence}%
+          <div className="text-center p-3 bg-gray-50 rounded-xl">
+            <div className="text-2xl font-bold text-emerald-600">
+              {stats.adherence}%
+            </div>
+            <div className="text-xs text-gray-600 mt-1 font-medium">Adherence</div>
           </div>
-          <div className="text-xs text-gray-600 mt-1 font-medium">Adherence</div>
         </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

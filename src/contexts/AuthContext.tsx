@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { getErrorMessage } from '../utils/errorHandler';
 
 interface AuthContextType {
   user: User | null;
@@ -53,9 +54,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (profileError) {
         console.error('Profile creation failed:', profileError);
         // Return better helpful error message
+        const errorMessage = getErrorMessage(profileError);
         return { 
           error: { 
-            message: 'Database tables not created yet. Please apply the database migration first.' 
+            message: errorMessage.includes('table') 
+              ? 'Database tables not created yet. Please apply the database migration first.'
+              : errorMessage
           } as AuthError 
         };
       }

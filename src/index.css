@@ -78,6 +78,7 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.3);
     will-change: transform, box-shadow;
     transform: translateY(0);
+    min-height: 44px; /* iOS touch target minimum */
   }
   
   .btn-primary:hover {
@@ -245,10 +246,70 @@
   @apply bg-purple-500/80;
 }
 
+/* Toast animations */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-in {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+.slide-in-from-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
 /* Performance optimizations */
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .page-container {
+    @apply px-3;
+  }
+  
+  .grid-metrics {
+    @apply grid-cols-2 gap-3;
+  }
+  
+  .grid-content {
+    @apply grid-cols-1 gap-4;
+  }
+  
+  /* Larger touch targets on mobile */
+  button, a, input[type="date"], input[type="number"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Better text readability */
+  .text-3xl {
+    @apply text-2xl;
+  }
+  
+  .text-4xl {
+    @apply text-3xl;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-title {
+    @apply text-2xl;
+  }
+  
+  .card {
+    @apply p-4;
+  }
 }
 
 /* Reduce motion for users who prefer it */
@@ -259,5 +320,18 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Remove hover effects on touch devices */
+  .card:hover {
+    transform: translateZ(0) translateY(0);
+  }
+  
+  /* Increase button sizes for touch */
+  button {
+    min-height: 48px;
   }
 }

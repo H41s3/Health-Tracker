@@ -1,4 +1,4 @@
-import { Activity, Droplet, Moon, TrendingUp } from 'lucide-react';
+import { Activity, Droplet, Moon, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { memo, useMemo } from 'react';
 
 interface MetricCardProps {
@@ -8,15 +8,35 @@ interface MetricCardProps {
   icon: typeof Activity | typeof Droplet | typeof Moon | typeof TrendingUp;
   color: 'emerald' | 'sky' | 'violet' | 'orange';
   isLoading?: boolean;
+  previousValue?: number;
 }
 
-const MetricCard = memo(function MetricCard({ label, value, goal, icon: Icon, color, isLoading }: MetricCardProps) {
+const MetricCard = memo(function MetricCard({ label, value, goal, icon: Icon, color, isLoading, previousValue }: MetricCardProps) {
   const percentage = useMemo(() => goal ? Math.min((value / goal) * 100, 100) : 0, [value, goal]);
   const isGoalMet = useMemo(() => goal ? value >= goal : false, [value, goal]);
   const displayValue = useMemo(() => 
     value.toFixed(label.includes('Sleep') || label.includes('Weight') ? 1 : 0), 
     [value, label]
   );
+
+  // Calculate change from previous value
+  const change = useMemo(() => {
+    if (!previousValue || previousValue === 0) return null;
+    const diff = value - previousValue;
+    const percentChange = (diff / previousValue) * 100;
+    return { diff, percentChange: Math.abs(percentChange) };
+  }, [value, previousValue]);
+
+  // Determine trend icon
+  const TrendIcon = useMemo(() => {
+    if (!change || Math.abs(change.diff) < 0.01) return Minus;
+    return change.diff > 0 ? TrendingUp : TrendingDown;
+  }, [change]);
+
+  const trendColor = useMemo(() => {
+    if (!change || Math.abs(change.diff) < 0.01) return 'text-gray-400';
+    return change.diff > 0 ? 'text-emerald-600' : 'text-red-600';
+  }, [change]);
 
   // Color class mappings to avoid dynamic Tailwind classes
   const colorClasses = {
@@ -59,15 +79,15 @@ const MetricCard = memo(function MetricCard({ label, value, goal, icon: Icon, co
   }
 
   return (
-    <div className="card p-6 group transition-transform hover:-translate-y-1 duration-200">
+    <div className="card p-6 group transition-all hover:-translate-y-1 hover:shadow-xl duration-200">
       <div className="flex items-center justify-between mb-4">
         <div className={`p-3 ${colorClass.bg} rounded-xl shadow-sm transition-transform hover:scale-105 hover:rotate-2 duration-150`}>
           <Icon className={`w-6 h-6 ${colorClass.text}`} />
         </div>
         {goal && (
-          <span className={`text-sm font-semibold px-2 py-1 rounded-lg ${
+          <span className={`text-sm font-semibold px-2 py-1 rounded-lg transition-all ${
             isGoalMet 
-              ? 'bg-emerald-100 text-emerald-700' 
+              ? 'bg-emerald-100 text-emerald-700 ring-2 ring-emerald-200' 
               : 'bg-slate-100 text-slate-600'
           }`}>
             {Math.round(percentage)}%
@@ -76,9 +96,17 @@ const MetricCard = memo(function MetricCard({ label, value, goal, icon: Icon, co
       </div>
       
       <h3 className="text-sm font-medium text-slate-600 mb-2">{label}</h3>
-      <p className="text-3xl font-bold text-slate-900 mb-4">
-        {displayValue}
-      </p>
+      <div className="flex items-baseline gap-2 mb-4">
+        <p className="text-3xl font-bold text-slate-900">
+          {displayValue}
+        </p>
+        {change && (
+          <div className={`flex items-center gap-0.5 text-xs font-medium ${trendColor}`}>
+            <TrendIcon className="w-3 h-3" />
+            <span>{change.percentChange.toFixed(0)}%</span>
+          </div>
+        )}
+      </div>
       
       {goal && (
         <div className="space-y-3">
@@ -95,8 +123,8 @@ const MetricCard = memo(function MetricCard({ label, value, goal, icon: Icon, co
             />
           </div>
           {isGoalMet && (
-            <div className="text-xs text-emerald-600 font-semibold text-center flex items-center justify-center gap-1">
-              <span>🎉</span>
+            <div className="text-xs text-emerald-600 font-semibold text-center flex items-center justify-center gap-1 animate-bounce-soft">
+              <span className="text-base">🎉</span>
               Goal achieved!
             </div>
           )}

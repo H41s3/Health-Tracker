@@ -62,8 +62,16 @@ const QuickLog = memo(function QuickLog({ todayMetric, onUpdateMetric, isSaving 
   }, [todayMetric]);
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100" id="quick-log">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Log</h2>
+    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow" id="quick-log">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-gray-900">Quick Log</h2>
+        {isSaving && (
+          <div className="flex items-center gap-2 text-sm text-emerald-600">
+            <div className="w-2 h-2 bg-emerald-600 rounded-full animate-pulse" />
+            Saving...
+          </div>
+        )}
+      </div>
       <div className="space-y-4">
         {/* Steps */}
         <div>
@@ -73,23 +81,33 @@ const QuickLog = memo(function QuickLog({ todayMetric, onUpdateMetric, isSaving 
             value={quickLog.steps}
             onChange={(e) => handleInputChange('steps', e.target.value)}
             placeholder="0"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none disabled:bg-gray-50"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none disabled:bg-gray-50 transition-all"
             disabled={isSaving}
           />
-          <div className="mt-2 flex gap-2">
+          <div className="mt-2 flex flex-wrap gap-2">
             <button
               onClick={() => increment('steps', 500)}
               disabled={isSaving}
-              className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+              className="flex-1 min-w-[80px] px-3 py-2 text-sm rounded-lg border-2 border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 disabled:opacity-50 transition-all font-medium text-emerald-700"
             >
-              +500
+              🚶 Walk
+              <span className="block text-xs text-emerald-600">+500</span>
             </button>
             <button
               onClick={() => increment('steps', 1000)}
               disabled={isSaving}
-              className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+              className="flex-1 min-w-[80px] px-3 py-2 text-sm rounded-lg border-2 border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 disabled:opacity-50 transition-all font-medium text-emerald-700"
             >
-              +1000
+              🏃 Jog
+              <span className="block text-xs text-emerald-600">+1k</span>
+            </button>
+            <button
+              onClick={() => increment('steps', 2500)}
+              disabled={isSaving}
+              className="flex-1 min-w-[80px] px-3 py-2 text-sm rounded-lg border-2 border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 disabled:opacity-50 transition-all font-medium text-emerald-700"
+            >
+              🏃‍♂️ Run
+              <span className="block text-xs text-emerald-600">+2.5k</span>
             </button>
           </div>
         </div>
@@ -102,23 +120,33 @@ const QuickLog = memo(function QuickLog({ todayMetric, onUpdateMetric, isSaving 
             value={quickLog.water_ml}
             onChange={(e) => handleInputChange('water_ml', e.target.value)}
             placeholder="0"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none disabled:bg-gray-50"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none disabled:bg-gray-50 transition-all"
             disabled={isSaving}
           />
-          <div className="mt-2 flex gap-2">
+          <div className="mt-2 flex flex-wrap gap-2">
             <button
               onClick={() => increment('water_ml', 250)}
               disabled={isSaving}
-              className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+              className="flex-1 min-w-[80px] px-3 py-2 text-sm rounded-lg border-2 border-sky-200 hover:bg-sky-50 hover:border-sky-300 disabled:opacity-50 transition-all font-medium text-sky-700"
             >
-              +250ml
+              💧 Glass
+              <span className="block text-xs text-sky-600">+250ml</span>
             </button>
             <button
               onClick={() => increment('water_ml', 500)}
               disabled={isSaving}
-              className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+              className="flex-1 min-w-[80px] px-3 py-2 text-sm rounded-lg border-2 border-sky-200 hover:bg-sky-50 hover:border-sky-300 disabled:opacity-50 transition-all font-medium text-sky-700"
             >
-              +500ml
+              🍶 Bottle
+              <span className="block text-xs text-sky-600">+500ml</span>
+            </button>
+            <button
+              onClick={() => increment('water_ml', 1000)}
+              disabled={isSaving}
+              className="flex-1 min-w-[80px] px-3 py-2 text-sm rounded-lg border-2 border-sky-200 hover:bg-sky-50 hover:border-sky-300 disabled:opacity-50 transition-all font-medium text-sky-700"
+            >
+              💦 Large
+              <span className="block text-xs text-sky-600">+1L</span>
             </button>
           </div>
         </div>
@@ -153,20 +181,27 @@ const QuickLog = memo(function QuickLog({ todayMetric, onUpdateMetric, isSaving 
 
         {/* Mood */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Mood (1-5)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">How are you feeling?</label>
           <div className="flex gap-2">
-            {[1, 2, 3, 4, 5].map((rating) => (
+            {[
+              { rating: 1, emoji: '😢', label: 'Bad' },
+              { rating: 2, emoji: '😕', label: 'Low' },
+              { rating: 3, emoji: '😐', label: 'Okay' },
+              { rating: 4, emoji: '😊', label: 'Good' },
+              { rating: 5, emoji: '😄', label: 'Great' },
+            ].map(({ rating, emoji, label }) => (
               <button
                 key={rating}
                 onClick={() => handleInputChange('mood_rating', rating.toString())}
                 disabled={isSaving}
-                className={`flex-1 py-2 rounded-lg border-2 transition disabled:opacity-50 ${
+                className={`flex-1 py-3 px-2 rounded-lg border-2 transition-all disabled:opacity-50 flex flex-col items-center gap-1 ${
                   quickLog.mood_rating === rating.toString()
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-purple-500 bg-purple-50 text-purple-700 scale-105 shadow-md'
+                    : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50/50'
                 }`}
               >
-                {rating}
+                <span className="text-2xl">{emoji}</span>
+                <span className="text-xs font-medium">{label}</span>
               </button>
             ))}
           </div>

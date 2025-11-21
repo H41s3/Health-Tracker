@@ -14,6 +14,9 @@ import CycleCalendar from '../components/cycle/CycleCalendar';
 import DailyMoodLogger from '../components/cycle/DailyMoodLogger';
 import CycleAnalytics from '../components/cycle/CycleAnalytics';
 import MedicationTracker from '../components/cycle/MedicationTracker';
+import CycleOverview from '../components/cycle/CycleOverview';
+import QuickSymptomPresets from '../components/cycle/QuickSymptomPresets';
+import MobileFAB from '../components/cycle/MobileFAB';
 import { symptomCategories } from '../data/symptoms';
 
 export default function CycleTracker() {
@@ -100,6 +103,27 @@ export default function CycleTracker() {
     }));
   };
 
+  const handleQuickLog = (type: 'period' | 'pill' | 'mood' | 'symptom') => {
+    switch (type) {
+      case 'period':
+        setShowForm(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        break;
+      case 'pill':
+        // Scroll to pill logger
+        document.getElementById('pill-logger')?.scrollIntoView({ behavior: 'smooth' });
+        break;
+      case 'mood':
+        // Scroll to mood logger
+        document.getElementById('mood-logger')?.scrollIntoView({ behavior: 'smooth' });
+        break;
+      case 'symptom':
+        setShowForm(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        break;
+    }
+  };
+
   return (
     <PageWrapper theme="cycle">
       <div className="page-container space-section">
@@ -110,6 +134,15 @@ export default function CycleTracker() {
           theme="cycle"
           icon={<Sparkles className="w-12 h-12 text-purple-500" />}
         />
+
+      {/* Cycle Overview Dashboard */}
+      <motion.div
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+        animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+        transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3, delay: 0.03 }}
+      >
+        <CycleOverview cycles={cycles} prediction={prediction} />
+      </motion.div>
 
       {/* Birth Control Section */}
       <motion.div
@@ -122,6 +155,7 @@ export default function CycleTracker() {
 
       {/* Daily Pill Logger */}
       <motion.div
+        id="pill-logger"
         initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
         animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
         transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3, delay: 0.07 }}
@@ -131,6 +165,7 @@ export default function CycleTracker() {
 
       {/* Daily Mood/Energy Logger */}
       <motion.div
+        id="mood-logger"
         initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
         animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
         transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3, delay: 0.08 }}
@@ -260,6 +295,22 @@ export default function CycleTracker() {
 
               <div>
                 <label className="block text-sm font-medium text-purple-700 mb-3">Symptoms</label>
+                
+                {/* Quick Symptom Presets */}
+                <div className="mb-6">
+                  <QuickSymptomPresets
+                    selectedSymptoms={formData.symptoms}
+                    onToggleSymptom={toggleSymptom}
+                    onApplyPreset={(symptoms) => {
+                      symptoms.forEach(s => {
+                        if (!formData.symptoms.includes(s)) {
+                          toggleSymptom(s);
+                        }
+                      });
+                    }}
+                  />
+                </div>
+
                 <div className="space-y-4">
                   {Object.entries(symptomCategories).map(([key, category]) => (
                     <div key={key}>
@@ -418,6 +469,9 @@ export default function CycleTracker() {
           </div>
         )}
       </motion.div>
+
+      {/* Mobile Floating Action Button */}
+      <MobileFAB onQuickLog={handleQuickLog} />
       </div>
     </PageWrapper>
   );
