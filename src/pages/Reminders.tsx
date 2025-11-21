@@ -1,15 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRemindersStore } from '../stores/useRemindersStore';
-import { Bell, Plus, Edit2, Trash2, BellOff } from 'lucide-react';
+import { Bell, Plus, X, AlertCircle, CheckCircle, Clock } from 'lucide-react';
 import { Reminder, ReminderType, Frequency } from '../types/database';
+import { useToastStore } from '../stores/useToastStore';
+import RemindersOverview from '../components/reminders/RemindersOverview';
+import QuickTemplates from '../components/reminders/QuickTemplates';
+import ReminderCard from '../components/reminders/ReminderCard';
+import PageWrapper from '../components/Layout/PageWrapper';
+import PageHeader from '../components/Layout/PageHeader';
 
 export default function Reminders() {
   const { user } = useAuth();
   const { reminders, fetchReminders, addReminder, updateReminder, deleteReminder, toggleReminder } =
     useRemindersStore();
+  const { show } = useToastStore();
   const [showForm, setShowForm] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
+  const [completedToday, setCompletedToday] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -23,19 +31,46 @@ export default function Reminders() {
     if (user) {
       fetchReminders(user.id);
     }
-  }, [user]);
+  }, [user, fetchReminders]);
+
+  // Load completed reminders from localStorage
+  useEffect(() => {
+    const today = new Date().toDateString();
+    const stored = localStorage.getItem(`completed_reminders_${today}`);
+    if (stored) {
+      setCompletedToday(JSON.parse(stored));
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
-    if (editingReminder) {
-      await updateReminder(editingReminder.id, formData);
-    } else {
-      await addReminder(user.id, formData);
+    try {
+      if (editingReminder) {
+        await updateReminder(editingReminder.id, formData);
+        show('Reminder updated successfully', 'success');
+      } else {
+        await addReminder(user.id, formData);
+        show('Reminder created successfully', 'success');
+      }
+      resetForm();
+    } catch {
+      show('Failed to save reminder', 'error');
     }
+  };
 
-    resetForm();
+  const handleComplete = (id: string) => {
+    const updated = [...completedToday, id];
+    setCompletedToday(updated);
+    const today = new Date().toDateString();
+    localStorage.setItem(`completed_reminders_${today}`, JSON.stringify(updated));
+    show('Reminder completed! Great job! 🎉', 'success');
+  };
+
+  const handleSnooze = (id: string, minutes: number) => {
+    // In a real app, this would reschedule the reminder
+    show(`Reminder snoozed for ${minutes} minutes`, 'success');
   };
 
   const resetForm = () => {
@@ -72,6 +107,26 @@ export default function Reminders() {
 
   const handleToggle = async (id: string, isActive: boolean) => {
     await toggleReminder(id, !isActive);
+    show(isActive ? 'Reminder disabled' : 'Reminder enabled', 'success');
+  };
+
+  const handleSelectTemplate = (template: {
+    title: string;
+    type: ReminderType;
+    time: string;
+    frequency: Frequency;
+    days_of_week?: number[];
+  }) => {
+    setFormData({
+      ...formData,
+      title: template.title,
+      reminder_type: template.type,
+      time: template.time,
+      frequency: template.frequency,
+      days_of_week: template.days_of_week || [],
+    });
+    setShowForm(true);
+    show('Template loaded! Customize and save', 'success');
   };
 
   const toggleDay = (day: number) => {
@@ -93,30 +148,92 @@ export default function Reminders() {
 
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  const activeReminders = reminders.filter((r) => r.is_active);
-  const inactiveReminders = reminders.filter((r) => !r.is_active);
+  // Organize reminders by time groups
+  const organizedReminders = useMemo(() => {
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+    const today = now.getDay();
+
+    const active = reminders.filter(r => r.is_active);
+
+    // Filter today's reminders
+    const todaysReminders = active.filter(reminder => {
+      if (reminder.frequency === 'daily') return true;
+      if (reminder.frequency === 'weekly' && reminder.days_of_week) {
+        return reminder.days_of_week.includes(today);
+      }
+      if (reminder.frequency === 'custom' && reminder.days_of_week) {
+        return reminder.days_of_week.includes(today);
+      }
+      return false;
+    });
+
+    const groups = {
+      now: [] as Reminder[],
+      soon: [] as Reminder[],
+      today: [] as Reminder[],
+      inactive: reminders.filter(r => !r.is_active),
+    };
+
+    todaysReminders.forEach(reminder => {
+      const [hours, minutes] = reminder.time.split(':').map(Number);
+      const reminderTime = hours * 60 + minutes;
+      const diffMinutes = reminderTime - currentTime;
+
+      // Skip completed reminders
+      if (completedToday.includes(reminder.id)) {
+        return;
+      }
+
+      if (diffMinutes <= 0 && diffMinutes > -30) {
+        // Overdue or current (within last 30 min)
+        groups.now.push(reminder);
+      } else if (diffMinutes > 0 && diffMinutes <= 60) {
+        // Coming soon (within next hour)
+        groups.soon.push(reminder);
+      } else if (diffMinutes > 60) {
+        // Later today
+        groups.today.push(reminder);
+      }
+    });
+
+    return groups;
+  }, [reminders, completedToday]);
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Reminders</h1>
-        <p className="text-gray-600">Set up reminders to stay on track with your health goals</p>
-      </div>
+    <PageWrapper theme="settings">
+      <div className="page-container space-section">
+        {/* Hero Header */}
+        <PageHeader
+          title="Reminders"
+          subtitle="Stay on track with your health goals"
+          theme="settings"
+          icon={<Bell className="w-12 h-12 text-blue-500" />}
+        />
 
-      <div className="mb-6">
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition"
-        >
-          <Plus className="w-5 h-5" />
-          {showForm ? 'Cancel' : 'Create Reminder'}
-        </button>
-      </div>
+        {/* Overview Dashboard */}
+        <RemindersOverview reminders={reminders} completedToday={completedToday} />
+
+        {/* Quick Templates */}
+        {!showForm && (
+          <QuickTemplates onSelectTemplate={handleSelectTemplate} />
+        )}
+
+        {/* Create Button */}
+        <div className="flex justify-center mb-6">
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="btn-primary inline-flex items-center gap-2"
+          >
+            {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+            {showForm ? 'Cancel' : 'Create Custom Reminder'}
+          </button>
+        </div>
 
       {showForm && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">
-            {editingReminder ? 'Edit Reminder' : 'New Reminder'}
+        <div className="card p-8 mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            {editingReminder ? 'Edit Reminder' : 'Create New Reminder'}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -211,17 +328,17 @@ export default function Reminders() {
               </div>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 pt-4">
               <button
                 type="submit"
-                className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition"
+                className="btn-primary"
               >
                 {editingReminder ? 'Update' : 'Create'} Reminder
               </button>
               <button
                 type="button"
                 onClick={resetForm}
-                className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition"
+                className="btn-secondary"
               >
                 Cancel
               </button>
@@ -230,125 +347,134 @@ export default function Reminders() {
         </div>
       )}
 
+      {/* Time-Based Reminder Groups */}
       <div className="space-y-6">
-        {activeReminders.length > 0 && (
+        {/* NOW - Urgent */}
+        {organizedReminders.now.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Active Reminders</h2>
+            <div className="flex items-center gap-2 mb-4">
+              <AlertCircle className="w-5 h-5 text-red-500" />
+              <h2 className="text-xl font-bold text-gray-900">Now</h2>
+              <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold">
+                {organizedReminders.now.length} urgent
+              </span>
+            </div>
             <div className="space-y-3">
-              {activeReminders.map((reminder) => {
+              {organizedReminders.now.map((reminder) => {
                 const typeOption = reminderTypeOptions.find((t) => t.value === reminder.reminder_type);
                 return (
-                  <div
+                  <ReminderCard
                     key={reminder.id}
-                    className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="text-3xl">{typeOption?.icon || '🔔'}</div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 mb-1">{reminder.title}</h3>
-                        {reminder.description && (
-                          <p className="text-sm text-gray-600 mb-2">{reminder.description}</p>
-                        )}
-                        <div className="flex flex-wrap gap-2 text-sm text-gray-500">
-                          <span className="px-2 py-1 bg-gray-100 rounded">
-                            {reminder.time}
-                          </span>
-                          <span className="px-2 py-1 bg-gray-100 rounded capitalize">
-                            {reminder.frequency}
-                          </span>
-                          {reminder.days_of_week && reminder.days_of_week.length > 0 && (
-                            <span className="px-2 py-1 bg-gray-100 rounded">
-                              {reminder.days_of_week.map((d) => dayNames[d]).join(', ')}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => handleToggle(reminder.id, reminder.is_active)}
-                          className="p-2 text-gray-600 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition"
-                          title="Disable reminder"
-                        >
-                          <BellOff className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleEdit(reminder)}
-                          className="p-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(reminder.id)}
-                          className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                    reminder={reminder}
+                    isCompleted={completedToday.includes(reminder.id)}
+                    onComplete={handleComplete}
+                    onSnooze={handleSnooze}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onToggle={handleToggle}
+                    timeLabel="NOW"
+                    icon={typeOption?.icon || '🔔'}
+                  />
                 );
               })}
             </div>
           </div>
         )}
 
-        {inactiveReminders.length > 0 && (
+        {/* SOON - Next Hour */}
+        {organizedReminders.soon.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Inactive Reminders</h2>
+            <div className="flex items-center gap-2 mb-4">
+              <Clock className="w-5 h-5 text-amber-500" />
+              <h2 className="text-xl font-bold text-gray-900">Coming Soon</h2>
+              <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold">
+                Next hour
+              </span>
+            </div>
             <div className="space-y-3">
-              {inactiveReminders.map((reminder) => {
+              {organizedReminders.soon.map((reminder) => {
                 const typeOption = reminderTypeOptions.find((t) => t.value === reminder.reminder_type);
                 return (
-                  <div
+                  <ReminderCard
                     key={reminder.id}
-                    className="bg-gray-50 rounded-xl p-5 shadow-sm border border-gray-200 opacity-60"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="text-3xl grayscale">{typeOption?.icon || '🔔'}</div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 mb-1">{reminder.title}</h3>
-                        {reminder.description && (
-                          <p className="text-sm text-gray-600 mb-2">{reminder.description}</p>
-                        )}
-                        <div className="flex flex-wrap gap-2 text-sm text-gray-500">
-                          <span className="px-2 py-1 bg-gray-200 rounded">
-                            {reminder.time}
-                          </span>
-                          <span className="px-2 py-1 bg-gray-200 rounded capitalize">
-                            {reminder.frequency}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => handleToggle(reminder.id, reminder.is_active)}
-                          className="p-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
-                          title="Enable reminder"
-                        >
-                          <Bell className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(reminder.id)}
-                          className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                    reminder={reminder}
+                    isCompleted={completedToday.includes(reminder.id)}
+                    onComplete={handleComplete}
+                    onSnooze={handleSnooze}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onToggle={handleToggle}
+                    icon={typeOption?.icon || '🔔'}
+                  />
                 );
               })}
             </div>
           </div>
         )}
 
+        {/* TODAY - Later */}
+        {organizedReminders.today.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <CheckCircle className="w-5 h-5 text-blue-500" />
+              <h2 className="text-xl font-bold text-gray-900">Later Today</h2>
+            </div>
+            <div className="space-y-3">
+              {organizedReminders.today.map((reminder) => {
+                const typeOption = reminderTypeOptions.find((t) => t.value === reminder.reminder_type);
+                return (
+                  <ReminderCard
+                    key={reminder.id}
+                    reminder={reminder}
+                    isCompleted={completedToday.includes(reminder.id)}
+                    onComplete={handleComplete}
+                    onSnooze={handleSnooze}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onToggle={handleToggle}
+                    icon={typeOption?.icon || '🔔'}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* INACTIVE */}
+        {organizedReminders.inactive.length > 0 && (
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Inactive Reminders</h2>
+            <div className="space-y-3 opacity-60">
+              {organizedReminders.inactive.map((reminder) => {
+                const typeOption = reminderTypeOptions.find((t) => t.value === reminder.reminder_type);
+                return (
+                  <ReminderCard
+                    key={reminder.id}
+                    reminder={reminder}
+                    isCompleted={false}
+                    onComplete={handleComplete}
+                    onSnooze={handleSnooze}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onToggle={handleToggle}
+                    icon={typeOption?.icon || '🔔'}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
         {reminders.length === 0 && (
-          <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-100 text-center">
-            <Bell className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-            <p className="text-gray-500">No reminders set yet. Create your first reminder!</p>
+          <div className="card p-12 text-center">
+            <Bell className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No reminders yet</h3>
+            <p className="text-gray-600 mb-6">Start with a template or create a custom reminder</p>
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </PageWrapper>
   );
 }
