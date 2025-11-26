@@ -6,7 +6,7 @@ A comprehensive health tracking web application designed for everyone - gym enth
 
 ## 🚀 Live Demo
 
-**Production:** [Your Netlify Site URL]
+**Production:** [https://he3lthflow.netlify.app/](https://he3lthflow.netlify.app/)
 
 > 📱 **Social Media Ready!** When you share your site URL, it displays a beautiful preview with your custom image on Facebook, Twitter, Discord, LinkedIn, and more!
 
