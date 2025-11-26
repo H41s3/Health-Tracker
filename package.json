@@ -1,8 +1,27 @@
 {
-  "name": "vite-react-typescript-starter",
+  "name": "health-tracker",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "A comprehensive health tracking web application for monitoring daily health metrics, menstrual cycles, medications, and wellness goals",
   "type": "module",
+  "author": "Health Tracker Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/H41s3/Health-Tracker.git"
+  },
+  "homepage": "https://he3lthflow.netlify.app/",
+  "keywords": [
+    "health-tracker",
+    "wellness",
+    "cycle-tracker",
+    "medication-tracker",
+    "fitness",
+    "health-dashboard",
+    "react",
+    "typescript",
+    "supabase"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",

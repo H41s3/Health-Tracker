@@ -1,14 +1,25 @@
-# Health Tracking Dashboard
+# Health Tracker 🏥
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR-SITE-ID/deploy-status)](https://app.netlify.com/sites/YOUR-SITE-NAME/deploys)
+[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://he3lthflow.netlify.app/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.3-blue)](https://reactjs.org/)
 
 A comprehensive health tracking web application designed for everyone - gym enthusiasts, women, men, and older adults. Track your daily health metrics, menstrual cycles, custom metrics, and more with a beautiful, intuitive interface.
 
-## 🚀 Live Demo
-
-**Production:** [https://he3lthflow.netlify.app/](https://he3lthflow.netlify.app/)
+**Live Demo:** [https://he3lthflow.netlify.app/](https://he3lthflow.netlify.app/)
 
 > 📱 **Social Media Ready!** When you share your site URL, it displays a beautiful preview with your custom image on Facebook, Twitter, Discord, LinkedIn, and more!
+
+## 📚 Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#key-technologies)
+- [Getting Started](#getting-started)
+- [Deployment](#-deploy-to-netlify)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
@@ -175,6 +186,47 @@ Your site is configured with Open Graph and Twitter Card meta tags for beautiful
 - **Scalable**: Modular architecture for easy feature additions
 - **Maintainable**: Well-documented, type-safe code
 
+---
+
+## Documentation
+
+Comprehensive documentation is available in the `docs/` folder:
+
+- **[Features Guide](docs/FEATURES.md)**: Detailed feature documentation
+- **[Architecture](docs/ARCHITECTURE.md)**: Technical architecture and design decisions
+- **[Contributing Guide](docs/CONTRIBUTING.md)**: How to contribute to the project
+- **[Deployment Guide](DEPLOYMENT.md)**: Deploy to Netlify instructions
+
+---
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](docs/CONTRIBUTING.md) for details.
+
+### Quick Start for Contributors
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
+
+---
+
 ## License
 
-Private project. All rights reserved.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## Acknowledgments
+
+- Built with ❤️ using React, TypeScript, and Supabase
+- Icons by [Lucide](https://lucide.dev/)
+- Styled with [Tailwind CSS](https://tailwindcss.com/)
+
+---
+
+**Made with 💜 by the Health Tracker Team**
