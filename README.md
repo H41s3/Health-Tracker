@@ -6,7 +6,9 @@ A comprehensive health tracking web application designed for everyone - gym enth
 
 ## 🚀 Live Demo
 
-**Production:** [Coming soon - Deploy to Netlify](DEPLOYMENT.md)
+**Production:** [Your Netlify Site URL]
+
+> 📱 **Social Media Ready!** When you share your site URL, it displays a beautiful preview with your custom image on Facebook, Twitter, Discord, LinkedIn, and more!
 
 ## Features
 
@@ -126,6 +128,21 @@ npm run build
 
 **Automatic Deployments:**
 Once connected to Netlify, every push to `main` branch automatically deploys your updates!
+
+### 📱 Social Media Preview
+
+Your site is configured with Open Graph and Twitter Card meta tags for beautiful link previews!
+
+**To add your custom preview image:**
+1. Create an image (1200x630px recommended)
+2. Save it as `public/og-image.png`
+3. Commit and push to GitHub
+4. See the guide: `public/OG-IMAGE-GUIDE.md`
+
+**Test your preview:**
+- Facebook: https://developers.facebook.com/tools/debug/
+- Twitter: https://cards-dev.twitter.com/validator
+- LinkedIn: https://www.linkedin.com/post-inspector/
 
 ## Key Technologies
 
