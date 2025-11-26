@@ -87,10 +87,17 @@ export function validateForm<T>(schema: z.ZodSchema<T>, data: unknown): {
   }
 
   const errors: Record<string, string> = {};
-  result.error.errors.forEach((err) => {
-    const path = err.path.join('.');
-    errors[path] = err.message;
-  });
+  
+  // Safety check: ensure errors array exists before iterating
+  if (result.error && result.error.errors) {
+    result.error.errors.forEach((err) => {
+      const path = err.path.join('.');
+      errors[path] = err.message;
+    });
+  } else {
+    // Fallback error message if error structure is unexpected
+    errors['general'] = 'Validation failed';
+  }
 
   return { success: false, errors };
 }
