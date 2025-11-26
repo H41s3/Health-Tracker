@@ -1,6 +1,12 @@
 # Health Tracking Dashboard
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/YOUR-SITE-ID/deploy-status)](https://app.netlify.com/sites/YOUR-SITE-NAME/deploys)
+
 A comprehensive health tracking web application designed for everyone - gym enthusiasts, women, men, and older adults. Track your daily health metrics, menstrual cycles, custom metrics, and more with a beautiful, intuitive interface.
+
+## 🚀 Live Demo
+
+**Production:** [Coming soon - Deploy to Netlify](DEPLOYMENT.md)
 
 ## Features
 
@@ -70,22 +76,56 @@ All tables have Row Level Security (RLS) enabled for data protection.
 
 ## Getting Started
 
-1. Install dependencies:
+### Local Development
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/H41s3/Health-Tracker.git
+cd Health-Tracker
+```
+
+2. **Install dependencies:**
 ```bash
 npm install
 ```
 
-2. Set up environment variables (see `.env` file)
+3. **Set up environment variables:**
 
-3. Run the development server:
+Copy `.env.example` to `.env` and fill in your Supabase credentials:
+```bash
+cp .env.example .env
+```
+
+Edit `.env`:
+```env
+VITE_SUPABASE_URL=your-supabase-project-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
+
+4. **Run the development server:**
 ```bash
 npm run dev
 ```
 
-4. Build for production:
+5. **Build for production:**
 ```bash
 npm run build
 ```
+
+### 🚀 Deploy to Netlify
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/H41s3/Health-Tracker)
+
+**Quick Deploy:**
+1. Click the deploy button above
+2. Connect your GitHub account
+3. Add environment variables (Supabase URL & Key)
+4. Deploy! 🎉
+
+**Detailed instructions:** See [DEPLOYMENT.md](DEPLOYMENT.md)
+
+**Automatic Deployments:**
+Once connected to Netlify, every push to `main` branch automatically deploys your updates!
 
 ## Key Technologies
 

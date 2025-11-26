@@ -1,0 +1,7 @@
+# Keep environment files private
+.env
+.env.local
+.env.*.local
+
+# But allow example file
+!.env.example
