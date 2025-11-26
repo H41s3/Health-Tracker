@@ -7,13 +7,28 @@
 
 A comprehensive health tracking web application designed for everyone - gym enthusiasts, women, men, and older adults. Track your daily health metrics, menstrual cycles, custom metrics, and more with a beautiful, intuitive interface.
 
-**Live Demo:** [https://he3lthflow.netlify.app/](https://he3lthflow.netlify.app/)
+---
+
+## 🎯 Live Preview
+
+**Try it now:** [https://he3lthflow.netlify.app/](https://he3lthflow.netlify.app/)
+
+<div align="center">
+  <a href="https://he3lthflow.netlify.app/" target="_blank">
+    <img src="https://he3lthflow.netlify.app/og-image.png" alt="Health Tracker Preview" width="100%">
+  </a>
+  <p><em>Click the image above to visit the live application</em></p>
+</div>
 
 > 📱 **Social Media Ready!** When you share your site URL, it displays a beautiful preview with your custom image on Facebook, Twitter, Discord, LinkedIn, and more!
 
+---
+
 ## 📚 Table of Contents
 
+- [Live Preview](#-live-preview)
 - [Features](#features)
+- [Screenshots](#-screenshots)
 - [Tech Stack](#key-technologies)
 - [Getting Started](#getting-started)
 - [Deployment](#-deploy-to-netlify)
@@ -41,6 +56,36 @@ A comprehensive health tracking web application designed for everyone - gym enth
 - **Authentication**: Secure email/password authentication via Supabase
 - **Type-Safe**: Full TypeScript coverage for maintainability
 - **Responsive Design**: Mobile-first, fully responsive UI
+
+---
+
+## 📸 Screenshots
+
+### Main Dashboard
+<div align="center">
+  <img src="https://he3lthflow.netlify.app/og-image.png" alt="Health Tracker Dashboard" width="800">
+  <p><em>Track your daily health metrics with beautiful visualizations</em></p>
+</div>
+
+**Key Features Shown:**
+- 📊 **Today's Summary**: Real-time goal progress with completion tracking
+- 📈 **Metric Cards**: Steps, water, sleep, weight, calories, and mood with trend indicators
+- 🎯 **Quick Log**: Fast input with preset buttons for common values
+- 🔥 **Streak Widget**: Daily logging consistency with milestone badges
+- 💡 **Insights Banner**: Personalized health recommendations
+- 📉 **Weekly Charts**: 7-day trends for all your metrics
+
+### Want to See More?
+Visit the live app to explore:
+- 🩸 **Cycle Tracker** with calendar and predictions
+- 📝 **Custom Metrics** for personalized tracking
+- 📔 **Health Journal** with tags and search
+- ⏰ **Smart Reminders** with quick templates
+- ⚙️ **Settings** and profile management
+
+👉 **[Try the Live Demo](https://he3lthflow.netlify.app/)**
+
+---
 
 ## Project Structure
 
