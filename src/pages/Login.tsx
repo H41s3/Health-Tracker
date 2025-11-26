@@ -42,6 +42,7 @@ export default function Login() {
         }
       } else if (isSignUp) {
         const validation = validateForm(signUpSchema, { email, password, fullName });
+        
         if (!validation.success) {
           setFieldErrors(validation.errors || {});
           setLoading(false);
@@ -49,6 +50,7 @@ export default function Login() {
         }
 
         const { error } = await signUp(email, password, fullName);
+        
         if (error) {
           setError(getErrorMessage(error));
         } else {
