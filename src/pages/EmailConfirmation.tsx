@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Activity, Mail, CheckCircle, Clock, ArrowLeft } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import { Activity, Mail, CheckCircle, Clock, ArrowLeft, AlertCircle } from 'lucide-react';
 
 export default function EmailConfirmation() {
   const { user } = useAuth();
   const [email, setEmail] = useState('');
   const [countdown, setCountdown] = useState(0);
+  const [resendError, setResendError] = useState('');
+  const [resendSuccess, setResendSuccess] = useState(false);
 
   useEffect(() => {
     // Get email from user or localStorage
@@ -28,10 +31,24 @@ export default function EmailConfirmation() {
   }, [user]);
 
   const handleResendEmail = async () => {
-    // This would trigger a resend email function
-    // For now, we'll just reset the countdown
-    setCountdown(60);
-    // You could add a toast notification here
+    setResendError('');
+    setResendSuccess(false);
+    
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+      });
+      
+      if (error) {
+        setResendError(error.message || 'Failed to resend email');
+      } else {
+        setResendSuccess(true);
+        setCountdown(60);
+      }
+    } catch {
+      setResendError('Failed to resend email. Please try again.');
+    }
   };
 
   const handleBackToLogin = () => {
@@ -111,6 +128,22 @@ export default function EmailConfirmation() {
               </div>
             </div>
           </div>
+
+          {resendSuccess && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 flex items-start gap-2">
+              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-green-800">
+                Confirmation email sent successfully! Please check your inbox.
+              </p>
+            </div>
+          )}
+
+          {resendError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 flex items-start gap-2">
+              <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-red-800">{resendError}</p>
+            </div>
+          )}
 
           <div className="space-y-3">
             <button

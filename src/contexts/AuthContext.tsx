@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { getErrorMessage } from '../utils/errorHandler';
 
 interface AuthContextType {
   user: User | null;
@@ -40,28 +39,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          full_name: fullName,
+        },
+      },
     });
 
     if (!error && data.user) {
       // Store email for confirmation page
       localStorage.setItem('pendingEmail', email);
       
-      try {
-        await supabase.from('profiles').insert({
-          id: data.user.id,
-          full_name: fullName,
-        });
-      } catch (profileError) {
-        console.error('Profile creation failed:', profileError);
-        // Return better helpful error message
-        const errorMessage = getErrorMessage(profileError);
-        return { 
-          error: { 
-            message: errorMessage.includes('table') 
-              ? 'Database tables not created yet. Please apply the database migration first.'
-              : errorMessage
-          } as AuthError 
-        };
+      // Only try to create profile if user is confirmed (or if email confirmation is disabled)
+      // The profile will be auto-created on first login if not created here
+      if (data.user.confirmed_at || data.session) {
+        try {
+          await supabase.from('profiles').insert({
+            id: data.user.id,
+            full_name: fullName,
+          });
+        } catch (profileError) {
+          console.error('Profile creation failed:', profileError);
+          // Don't block signup if profile creation fails - it can be created later
+        }
       }
     }
 
@@ -69,10 +69,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+
+    // If login successful, ensure profile exists
+    if (!error && data.user) {
+      try {
+        // Check if profile exists
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', data.user.id)
+          .single();
+
+        // Create profile if it doesn't exist
+        if (profileError && profileError.code === 'PGRST116') {
+          const fullName = data.user.user_metadata?.full_name || '';
+          await supabase.from('profiles').insert({
+            id: data.user.id,
+            full_name: fullName,
+          });
+        }
+      } catch (profileError) {
+        console.error('Profile check/creation failed:', profileError);
+        // Don't block login if profile operations fail
+      }
+    }
+
     return { error };
   };
 

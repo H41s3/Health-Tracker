@@ -7,11 +7,15 @@ import { AuthError } from '@supabase/supabase-js';
 const ERROR_MESSAGES: Record<string, string> = {
   // Auth errors
   'invalid_credentials': 'Invalid email or password. Please try again.',
-  'email_not_confirmed': 'Please confirm your email address before signing in.',
+  'invalid login credentials': 'Invalid email or password. Please try again.',
+  'email_not_confirmed': 'Please check your email to confirm your account before signing in.',
+  'email not confirmed': 'Please check your email to confirm your account before signing in.',
   'user_not_found': 'No account found with this email address.',
   'email_already_registered': 'An account with this email already exists.',
+  'user already registered': 'An account with this email already exists. Try signing in instead.',
   'weak_password': 'Password is too weak. Please use at least 8 characters.',
   'invalid_email': 'Please enter a valid email address.',
+  'signup disabled': 'New signups are currently disabled. Please contact support.',
   
   // Database errors
   '23505': 'This record already exists.',
@@ -109,7 +113,7 @@ export function isRetryableError(error: unknown): boolean {
     return true;
   }
   
-  if (typeof error === 'object' && 'code' in error) {
+  if (error && typeof error === 'object' && 'code' in error) {
     const pgError = error as PostgrestError;
     // 5xx errors are usually retryable
     return pgError.code?.startsWith('5') ?? false;
