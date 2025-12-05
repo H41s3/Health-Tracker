@@ -13,11 +13,8 @@ export const emailSchema = z
 
 export const passwordSchema = z
   .string()
-  .min(8, 'Password must be at least 8 characters')
-  .max(100, 'Password is too long')
-  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-  .regex(/[0-9]/, 'Password must contain at least one number');
+  .min(6, 'Password must be at least 6 characters')
+  .max(100, 'Password is too long');
 
 export const nameSchema = z
   .string()
@@ -88,16 +85,11 @@ export function validateForm<T>(schema: z.ZodSchema<T>, data: unknown): {
 
   const errors: Record<string, string> = {};
   
-  // Safety check: ensure errors array exists before iterating
-  if (result.error && result.error.errors) {
-    result.error.errors.forEach((err) => {
-      const path = err.path.join('.');
-      errors[path] = err.message;
-    });
-  } else {
-    // Fallback error message if error structure is unexpected
-    errors['general'] = 'Validation failed';
-  }
+  // Map Zod errors to field errors
+  result.error.issues.forEach((issue) => {
+    const path = issue.path.join('.');
+    errors[path] = issue.message;
+  });
 
   return { success: false, errors };
 }

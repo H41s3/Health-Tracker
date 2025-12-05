@@ -206,6 +206,11 @@ export default function Login() {
                       {fieldErrors.password}
                     </p>
                   )}
+                  {isSignUp && !fieldErrors.password && (
+                    <p className="mt-1 text-xs text-gray-500">
+                      Must be at least 6 characters
+                    </p>
+                  )}
                 </div>
               )}
 
