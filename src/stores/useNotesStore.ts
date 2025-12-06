@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { HealthNote } from '../types/database';
+import { getErrorMessage } from '../utils/errorHandler';
 
 interface NotesState {
   notes: HealthNote[];
@@ -18,6 +19,10 @@ export const useNotesStore = create<NotesState>((set, get) => ({
   error: null,
 
   fetchNotes: async (userId: string) => {
+    if (!userId) {
+      set({ error: 'User ID is required', loading: false });
+      return;
+    }
     set({ loading: true, error: null });
     try {
       const { data, error } = await supabase
@@ -28,8 +33,8 @@ export const useNotesStore = create<NotesState>((set, get) => ({
 
       if (error) throw error;
       set({ notes: data || [], loading: false });
-    } catch (error: any) {
-      set({ error: error.message, loading: false });
+    } catch (error) {
+      set({ error: getErrorMessage(error), loading: false });
     }
   },
 
@@ -41,8 +46,9 @@ export const useNotesStore = create<NotesState>((set, get) => ({
 
       if (error) throw error;
       await get().fetchNotes(userId);
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
+      throw error; // Re-throw so calling code can show toast
     }
   },
 
@@ -60,8 +66,9 @@ export const useNotesStore = create<NotesState>((set, get) => ({
       if (note) {
         await get().fetchNotes(note.user_id);
       }
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
+      throw error;
     }
   },
 
@@ -74,8 +81,9 @@ export const useNotesStore = create<NotesState>((set, get) => ({
 
       if (error) throw error;
       set({ notes: get().notes.filter((n) => n.id !== id) });
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
+      throw error;
     }
   },
 }));

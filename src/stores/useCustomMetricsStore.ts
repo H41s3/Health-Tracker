@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { CustomMetric, CustomMetricLog } from '../types/database';
+import { getErrorMessage } from '../utils/errorHandler';
 
 interface CustomMetricsState {
   metrics: CustomMetric[];
@@ -24,6 +25,10 @@ export const useCustomMetricsStore = create<CustomMetricsState>((set, get) => ({
   error: null,
 
   fetchMetrics: async (userId: string) => {
+    if (!userId) {
+      set({ error: 'User ID is required', loading: false });
+      return;
+    }
     set({ loading: true, error: null });
     try {
       const { data, error } = await supabase
@@ -34,12 +39,16 @@ export const useCustomMetricsStore = create<CustomMetricsState>((set, get) => ({
 
       if (error) throw error;
       set({ metrics: data || [], loading: false });
-    } catch (error: any) {
-      set({ error: error.message, loading: false });
+    } catch (error) {
+      set({ error: getErrorMessage(error), loading: false });
     }
   },
 
   fetchLogs: async (userId: string, metricId?: string) => {
+    if (!userId) {
+      set({ error: 'User ID is required', loading: false });
+      return;
+    }
     set({ loading: true, error: null });
     try {
       let query = supabase
@@ -56,8 +65,8 @@ export const useCustomMetricsStore = create<CustomMetricsState>((set, get) => ({
 
       if (error) throw error;
       set({ logs: data || [], loading: false });
-    } catch (error: any) {
-      set({ error: error.message, loading: false });
+    } catch (error) {
+      set({ error: getErrorMessage(error), loading: false });
     }
   },
 
@@ -69,8 +78,9 @@ export const useCustomMetricsStore = create<CustomMetricsState>((set, get) => ({
 
       if (error) throw error;
       await get().fetchMetrics(userId);
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
+      throw error;
     }
   },
 
@@ -88,8 +98,9 @@ export const useCustomMetricsStore = create<CustomMetricsState>((set, get) => ({
       if (metric) {
         await get().fetchMetrics(metric.user_id);
       }
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
+      throw error;
     }
   },
 
@@ -102,8 +113,9 @@ export const useCustomMetricsStore = create<CustomMetricsState>((set, get) => ({
 
       if (error) throw error;
       set({ metrics: get().metrics.filter((m) => m.id !== id) });
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
+      throw error;
     }
   },
 
@@ -115,8 +127,9 @@ export const useCustomMetricsStore = create<CustomMetricsState>((set, get) => ({
 
       if (error) throw error;
       await get().fetchLogs(userId, metricId);
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
+      throw error;
     }
   },
 
@@ -134,8 +147,9 @@ export const useCustomMetricsStore = create<CustomMetricsState>((set, get) => ({
       if (log) {
         await get().fetchLogs(log.user_id);
       }
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
+      throw error;
     }
   },
 
@@ -148,8 +162,9 @@ export const useCustomMetricsStore = create<CustomMetricsState>((set, get) => ({
 
       if (error) throw error;
       set({ logs: get().logs.filter((l) => l.id !== id) });
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
+      throw error;
     }
   },
 }));

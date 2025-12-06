@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { Reminder } from '../types/database';
+import { getErrorMessage } from '../utils/errorHandler';
 
 interface RemindersState {
   reminders: Reminder[];
@@ -19,6 +20,10 @@ export const useRemindersStore = create<RemindersState>((set, get) => ({
   error: null,
 
   fetchReminders: async (userId: string) => {
+    if (!userId) {
+      set({ error: 'User ID is required', loading: false });
+      return;
+    }
     set({ loading: true, error: null });
     try {
       const { data, error } = await supabase
@@ -29,8 +34,8 @@ export const useRemindersStore = create<RemindersState>((set, get) => ({
 
       if (error) throw error;
       set({ reminders: data || [], loading: false });
-    } catch (error: any) {
-      set({ error: error.message, loading: false });
+    } catch (error) {
+      set({ error: getErrorMessage(error), loading: false });
     }
   },
 
@@ -42,8 +47,9 @@ export const useRemindersStore = create<RemindersState>((set, get) => ({
 
       if (error) throw error;
       await get().fetchReminders(userId);
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
+      throw error;
     }
   },
 
@@ -61,22 +67,24 @@ export const useRemindersStore = create<RemindersState>((set, get) => ({
       if (reminder) {
         await get().fetchReminders(reminder.user_id);
       }
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
+      throw error;
     }
   },
 
   deleteReminder: async (id: string) => {
     try {
-      const { error } = await supabase
+      const { error} = await supabase
         .from('reminders')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
       set({ reminders: get().reminders.filter((r) => r.id !== id) });
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
+      throw error;
     }
   },
 
