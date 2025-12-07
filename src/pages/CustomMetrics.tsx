@@ -9,7 +9,6 @@ import { CustomMetric, MetricType } from '../types/database';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 import PageWrapper from '../components/Layout/PageWrapper';
 import PageHeader from '../components/Layout/PageHeader';
-import ProgressRing from '../components/dashboard/ProgressRing';
 
 export default function CustomMetrics() {
   const { user } = useAuth();
@@ -58,7 +57,7 @@ export default function CustomMetrics() {
         show('Metric created successfully', 'success');
       }
       resetMetricForm();
-    } catch (error) {
+    } catch {
       show('Failed to save metric. Please try again.', 'error');
     }
   };

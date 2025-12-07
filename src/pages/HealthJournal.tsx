@@ -11,13 +11,12 @@ import PageHeader from '../components/Layout/PageHeader';
 
 export default function HealthJournal() {
   const { user } = useAuth();
-  const { notes, fetchNotes, addNote, updateNote, deleteNote, loading } = useNotesStore();
+  const { notes, fetchNotes, addNote, updateNote, deleteNote } = useNotesStore();
   const { show } = useToastStore();
   const [showForm, setShowForm] = useState(false);
   const [editingNote, setEditingNote] = useState<HealthNote | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTag, setFilterTag] = useState('');
-  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     date: format(new Date(), 'yyyy-MM-dd'),
     title: '',
@@ -41,7 +40,6 @@ export default function HealthJournal() {
       return;
     }
 
-    setSaving(true);
     try {
       const noteData = {
         date: formData.date,
@@ -59,10 +57,8 @@ export default function HealthJournal() {
       }
 
       resetForm();
-    } catch (error) {
+    } catch {
       show('Failed to save note. Please try again.', 'error');
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -95,7 +91,7 @@ export default function HealthJournal() {
       try {
         await deleteNote(id);
         show('Note deleted successfully', 'success');
-      } catch (error) {
+      } catch {
         show('Failed to delete note. Please try again.', 'error');
       }
     }
