@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotesStore } from '../stores/useNotesStore';
+import { useToastStore } from '../stores/useToastStore';
 import { BookOpen, Plus, Edit2, Trash2, Search, Tag, Lightbulb } from 'lucide-react';
 import { format } from 'date-fns';
 import { HealthNote } from '../types/database';
@@ -10,11 +11,13 @@ import PageHeader from '../components/Layout/PageHeader';
 
 export default function HealthJournal() {
   const { user } = useAuth();
-  const { notes, fetchNotes, addNote, updateNote, deleteNote } = useNotesStore();
+  const { notes, fetchNotes, addNote, updateNote, deleteNote, loading } = useNotesStore();
+  const { show } = useToastStore();
   const [showForm, setShowForm] = useState(false);
   const [editingNote, setEditingNote] = useState<HealthNote | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTag, setFilterTag] = useState('');
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     date: format(new Date(), 'yyyy-MM-dd'),
     title: '',
@@ -32,21 +35,35 @@ export default function HealthJournal() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-
-    const noteData = {
-      date: formData.date,
-      title: formData.title,
-      content: formData.content,
-      tags: formData.tags,
-    };
-
-    if (editingNote) {
-      await updateNote(editingNote.id, noteData);
-    } else {
-      await addNote(user.id, noteData);
+    
+    if (!formData.title.trim()) {
+      show('Please enter a title', 'error');
+      return;
     }
 
-    resetForm();
+    setSaving(true);
+    try {
+      const noteData = {
+        date: formData.date,
+        title: formData.title,
+        content: formData.content,
+        tags: formData.tags,
+      };
+
+      if (editingNote) {
+        await updateNote(editingNote.id, noteData);
+        show('Note updated successfully', 'success');
+      } else {
+        await addNote(user.id, noteData);
+        show('Note added successfully', 'success');
+      }
+
+      resetForm();
+    } catch (error) {
+      show('Failed to save note. Please try again.', 'error');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const resetForm = () => {
@@ -75,7 +92,12 @@ export default function HealthJournal() {
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this note?')) {
-      await deleteNote(id);
+      try {
+        await deleteNote(id);
+        show('Note deleted successfully', 'success');
+      } catch (error) {
+        show('Failed to delete note. Please try again.', 'error');
+      }
     }
   };
 

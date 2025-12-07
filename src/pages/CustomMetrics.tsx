@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useCustomMetricsStore } from '../stores/useCustomMetricsStore';
+import { useToastStore } from '../stores/useToastStore';
 import { Plus, Edit2, Trash2, Activity, Target, TrendingUp } from 'lucide-react';
 import { format } from 'date-fns';
 import { CustomMetric, MetricType } from '../types/database';
@@ -14,6 +15,7 @@ export default function CustomMetrics() {
   const { user } = useAuth();
   const { metrics, logs, fetchMetrics, fetchLogs, addMetric, updateMetric, deleteMetric, addLog } =
     useCustomMetricsStore();
+  const { show } = useToastStore();
   const [showMetricForm, setShowMetricForm] = useState(false);
   const [showLogForm, setShowLogForm] = useState(false);
   const [editingMetric, setEditingMetric] = useState<CustomMetric | null>(null);
@@ -42,13 +44,23 @@ export default function CustomMetrics() {
     e.preventDefault();
     if (!user) return;
 
-    if (editingMetric) {
-      await updateMetric(editingMetric.id, metricForm);
-    } else {
-      await addMetric(user.id, metricForm);
+    if (!metricForm.metric_name.trim()) {
+      show('Please enter a metric name', 'error');
+      return;
     }
 
-    resetMetricForm();
+    try {
+      if (editingMetric) {
+        await updateMetric(editingMetric.id, metricForm);
+        show('Metric updated successfully', 'success');
+      } else {
+        await addMetric(user.id, metricForm);
+        show('Metric created successfully', 'success');
+      }
+      resetMetricForm();
+    } catch (error) {
+      show('Failed to save metric. Please try again.', 'error');
+    }
   };
 
   const resetMetricForm = () => {
