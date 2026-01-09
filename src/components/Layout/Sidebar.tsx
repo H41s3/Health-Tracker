@@ -1,6 +1,7 @@
-import { Activity, LayoutDashboard, Calendar, TrendingUp, BookOpen, Bell, Settings, LogOut, X } from 'lucide-react';
+import { LayoutDashboard, Calendar, TrendingUp, BookOpen, Bell, Settings, LogOut, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
+import BaymaxLogo from '../BaymaxLogo';
 
 interface SidebarProps {
   currentPage: string;
@@ -43,12 +44,12 @@ export default function Sidebar({ currentPage, onNavigate, isOpen = false, onClo
             transition={{ duration: 0.3, delay: 0.1 }}
             className="flex items-center gap-3"
           >
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-yellow-500 rounded-2xl flex items-center justify-center shadow-lg">
-              <Activity className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden" style={{ background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #f59e0b 100%)' }}>
+              <BaymaxLogo className="w-10 h-10" />
             </div>
             <div>
               <h1 className="font-bold text-lg text-white">Health Tracker</h1>
-              <p className="text-xs text-purple-200">Your wellness companion</p>
+              <p className="text-xs text-purple-200">Baymax is here</p>
             </div>
           </motion.div>
         </div>
@@ -122,12 +123,12 @@ export default function Sidebar({ currentPage, onNavigate, isOpen = false, onClo
           >
             <div className="p-6 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-yellow-500 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Activity className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden" style={{ background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #f59e0b 100%)' }}>
+                  <BaymaxLogo className="w-10 h-10" />
                 </div>
                 <div>
                   <h1 className="font-bold text-lg text-white">Health Tracker</h1>
-                  <p className="text-xs text-purple-200">Your wellness companion</p>
+                  <p className="text-xs text-purple-200">Baymax is here</p>
                 </div>
               </div>
               <button

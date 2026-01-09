@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Activity, Mail, CheckCircle, Clock, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Mail, CheckCircle, Clock, ArrowLeft, AlertCircle } from 'lucide-react';
+import BaymaxLogo from '../components/BaymaxLogo';
 
 export default function EmailConfirmation() {
   const { user } = useAuth();
@@ -62,8 +63,8 @@ export default function EmailConfirmation() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-yellow-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 via-pink-500 to-yellow-500 rounded-2xl mb-4">
-            <Activity className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 via-pink-500 to-yellow-500 rounded-2xl mb-4 overflow-hidden">
+            <BaymaxLogo className="w-14 h-14" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Check Your Email</h1>
           <p className="text-gray-600">We've sent you a confirmation link</p>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Activity } from 'lucide-react';
+import BaymaxLogo from '../components/BaymaxLogo';
 import EmailConfirmation from './EmailConfirmation';
 import { signUpSchema, signInSchema, resetPasswordSchema, validateForm } from '../utils/validation';
 import { getErrorMessage } from '../utils/errorHandler';
@@ -101,11 +101,11 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-yellow-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 via-pink-500 to-yellow-500 rounded-2xl mb-4">
-            <Activity className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 via-pink-500 to-yellow-500 rounded-2xl mb-4 overflow-hidden">
+            <BaymaxLogo className="w-14 h-14" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Health Tracker</h1>
-          <p className="text-gray-600">Track your health journey with ease</p>
+          <p className="text-gray-600">Your personal healthcare companion</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
