@@ -11,10 +11,14 @@ export const emailSchema = z
   .toLowerCase()
   .trim();
 
+// Stronger password requirements for better security
 export const passwordSchema = z
   .string()
-  .min(6, 'Password must be at least 6 characters')
-  .max(100, 'Password is too long');
+  .min(8, 'Password must be at least 8 characters')
+  .max(100, 'Password is too long')
+  .regex(/[a-z]/, 'Password must include a lowercase letter')
+  .regex(/[A-Z]/, 'Password must include an uppercase letter')
+  .regex(/[0-9]/, 'Password must include a number');
 
 export const nameSchema = z
   .string()
@@ -28,7 +32,11 @@ export const nameSchema = z
 export const signUpSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
+  confirmPassword: z.string().min(1, 'Please confirm your password'),
   fullName: nameSchema,
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ['confirmPassword'],
 });
 
 export const signInSchema = z.object({
@@ -39,6 +47,54 @@ export const signInSchema = z.object({
 export const resetPasswordSchema = z.object({
   email: emailSchema,
 });
+
+/**
+ * Password strength calculator
+ */
+export function getPasswordStrength(password: string): {
+  score: number; // 0-4
+  label: 'weak' | 'fair' | 'good' | 'strong';
+  color: string;
+  feedback: string[];
+} {
+  const feedback: string[] = [];
+  let score = 0;
+
+  if (password.length === 0) {
+    return { score: 0, label: 'weak', color: '#5f7e97', feedback: ['Enter a password'] };
+  }
+
+  // Length checks
+  if (password.length >= 8) score += 1;
+  else feedback.push('At least 8 characters');
+
+  if (password.length >= 12) score += 1;
+
+  // Character type checks
+  if (/[a-z]/.test(password)) score += 0.5;
+  else feedback.push('Add a lowercase letter');
+
+  if (/[A-Z]/.test(password)) score += 0.5;
+  else feedback.push('Add an uppercase letter');
+
+  if (/[0-9]/.test(password)) score += 0.5;
+  else feedback.push('Add a number');
+
+  if (/[^a-zA-Z0-9]/.test(password)) score += 0.5;
+  
+  // Cap at 4
+  score = Math.min(Math.round(score), 4);
+
+  const labels: Array<'weak' | 'fair' | 'good' | 'strong'> = ['weak', 'weak', 'fair', 'good', 'strong'];
+  const colors = ['#ff5874', '#ff5874', '#ffcb6b', '#7fdbca', '#addb67'];
+
+  return {
+    score,
+    label: labels[score],
+    color: colors[score],
+    feedback: score >= 3 ? [] : feedback,
+  };
+}
 
 /**
  * Health metrics validation
@@ -93,4 +149,3 @@ export function validateForm<T>(schema: z.ZodSchema<T>, data: unknown): {
 
   return { success: false, errors };
 }
-

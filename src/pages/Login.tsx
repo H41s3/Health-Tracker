@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import BaymaxLogo from '../components/BaymaxLogo';
 import EmailConfirmation from './EmailConfirmation';
-import { signUpSchema, signInSchema, resetPasswordSchema, validateForm } from '../utils/validation';
+import { signUpSchema, signInSchema, resetPasswordSchema, validateForm, getPasswordStrength } from '../utils/validation';
 import { getErrorMessage } from '../utils/errorHandler';
+import { Eye, EyeOff, Shield, CheckCircle, AlertCircle, Mail } from 'lucide-react';
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -16,8 +18,16 @@ export default function Login() {
   const [resetMode, setResetMode] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
 
   const { signIn, signUp, resetPassword } = useAuth();
+
+  // Calculate password strength for sign-up
+  const passwordStrength = useMemo(() => {
+    if (!isSignUp) return null;
+    return getPasswordStrength(password);
+  }, [password, isSignUp]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +51,7 @@ export default function Login() {
           setResetSuccess(true);
         }
       } else if (isSignUp) {
-        const validation = validateForm(signUpSchema, { email, password, fullName });
+        const validation = validateForm(signUpSchema, { email, password, confirmPassword, fullName });
         
         if (!validation.success) {
           setFieldErrors(validation.errors || {});
@@ -82,6 +92,8 @@ export default function Login() {
     setFieldErrors({});
     setResetMode(false);
     setResetSuccess(false);
+    setPassword('');
+    setConfirmPassword('');
   };
 
   const toggleResetMode = () => {
@@ -108,7 +120,7 @@ export default function Login() {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center px-4"
+      className="min-h-screen flex items-center justify-center px-4 py-8"
       style={{ 
         background: '#011627',
         backgroundImage: `
@@ -144,15 +156,34 @@ export default function Login() {
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
           }}
         >
-          <h2 className="text-2xl font-semibold mb-6" style={{ color: '#d6deeb' }}>
-            {resetMode ? 'Reset Password' : isSignUp ? 'Create Account' : 'Welcome Back'}
-          </h2>
+          {/* Header with security badge */}
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold" style={{ color: '#d6deeb' }}>
+              {resetMode ? 'Reset Password' : isSignUp ? 'Create Account' : 'Welcome Back'}
+            </h2>
+            {isSignUp && (
+              <div 
+                className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs"
+                style={{ background: 'rgba(127, 219, 202, 0.1)', color: '#7fdbca' }}
+              >
+                <Shield className="w-3 h-3" />
+                Secure
+              </div>
+            )}
+          </div>
 
           {resetSuccess ? (
-            <div className="text-center py-4">
-              <div className="mb-4" style={{ color: '#7fdbca' }}>
-                Password reset email sent! Check your inbox.
+            <div className="text-center py-6">
+              <div 
+                className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+                style={{ background: 'rgba(127, 219, 202, 0.15)' }}
+              >
+                <Mail className="w-8 h-8" style={{ color: '#7fdbca' }} />
               </div>
+              <h3 className="text-lg font-semibold mb-2" style={{ color: '#d6deeb' }}>Check Your Email</h3>
+              <p className="mb-4" style={{ color: '#5f7e97' }}>
+                We've sent a password reset link to <strong style={{ color: '#7fdbca' }}>{email}</strong>
+              </p>
               <button
                 onClick={() => {
                   setResetMode(false);
@@ -168,6 +199,25 @@ export default function Login() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Info banner for sign-up */}
+              {isSignUp && !resetMode && (
+                <div 
+                  className="flex items-start gap-3 p-4 rounded-xl text-sm"
+                  style={{ 
+                    background: 'rgba(130, 170, 255, 0.1)',
+                    border: '1px solid rgba(130, 170, 255, 0.2)'
+                  }}
+                >
+                  <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#82aaff' }} />
+                  <div style={{ color: '#82aaff' }}>
+                    <strong>Email verification required</strong>
+                    <p className="mt-1 opacity-80">
+                      You'll receive a confirmation email to verify your account before signing in.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {isSignUp && !resetMode && (
                 <div>
                   <label htmlFor="fullName" className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
@@ -191,6 +241,7 @@ export default function Login() {
                       e.currentTarget.style.borderColor = fieldErrors.fullName ? '#ff5874' : 'rgba(127, 219, 202, 0.2)';
                       e.currentTarget.style.boxShadow = 'none';
                     }}
+                    placeholder="Enter your full name"
                     aria-invalid={!!fieldErrors.fullName}
                     aria-describedby={fieldErrors.fullName ? 'fullName-error' : undefined}
                   />
@@ -204,7 +255,7 @@ export default function Login() {
 
               <div>
                 <label htmlFor="email" className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
-                  Email
+                  Email Address
                 </label>
                 <input
                   id="email"
@@ -224,6 +275,7 @@ export default function Login() {
                     e.currentTarget.style.borderColor = fieldErrors.email ? '#ff5874' : 'rgba(127, 219, 202, 0.2)';
                     e.currentTarget.style.boxShadow = 'none';
                   }}
+                  placeholder="you@example.com"
                   aria-invalid={!!fieldErrors.email}
                   aria-describedby={fieldErrors.email ? 'email-error' : undefined}
                 />
@@ -235,61 +287,170 @@ export default function Login() {
               </div>
 
               {!resetMode && (
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
-                    Password
-                  </label>
-                  <input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      if (fieldErrors.password) setFieldErrors({ ...fieldErrors, password: '' });
-                    }}
-                    className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
-                    style={fieldErrors.password ? inputErrorStyle : inputBaseStyle}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = '#7fdbca';
-                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
-                    }}
-                    onBlur={(e) => {
-                      e.currentTarget.style.borderColor = fieldErrors.password ? '#ff5874' : 'rgba(127, 219, 202, 0.2)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                    aria-invalid={!!fieldErrors.password}
-                    aria-describedby={fieldErrors.password ? 'password-error' : undefined}
-                  />
-                  {fieldErrors.password && (
-                    <p id="password-error" className="mt-2 text-sm" style={{ color: '#ff5874' }} role="alert">
-                      {fieldErrors.password}
-                    </p>
+                <>
+                  <div>
+                    <label htmlFor="password" className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
+                      Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          if (fieldErrors.password) setFieldErrors({ ...fieldErrors, password: '' });
+                        }}
+                        className="w-full px-4 py-3 pr-12 rounded-xl outline-none transition-all duration-200"
+                        style={fieldErrors.password ? inputErrorStyle : inputBaseStyle}
+                        onFocus={(e) => {
+                          e.currentTarget.style.borderColor = '#7fdbca';
+                          e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.style.borderColor = fieldErrors.password ? '#ff5874' : 'rgba(127, 219, 202, 0.2)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                        placeholder={isSignUp ? 'Create a strong password' : 'Enter your password'}
+                        aria-invalid={!!fieldErrors.password}
+                        aria-describedby={fieldErrors.password ? 'password-error' : undefined}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg transition-colors"
+                        style={{ color: '#5f7e97' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#7fdbca'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#5f7e97'}
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
+                    {fieldErrors.password && (
+                      <p id="password-error" className="mt-2 text-sm" style={{ color: '#ff5874' }} role="alert">
+                        {fieldErrors.password}
+                      </p>
+                    )}
+
+                    {/* Password strength indicator for sign-up */}
+                    {isSignUp && password && passwordStrength && (
+                      <div className="mt-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="flex-1 flex gap-1">
+                            {[0, 1, 2, 3].map((i) => (
+                              <div
+                                key={i}
+                                className="h-1.5 flex-1 rounded-full transition-all duration-300"
+                                style={{
+                                  background: i < passwordStrength.score 
+                                    ? passwordStrength.color 
+                                    : 'rgba(95, 126, 151, 0.3)'
+                                }}
+                              />
+                            ))}
+                          </div>
+                          <span 
+                            className="text-xs font-medium capitalize"
+                            style={{ color: passwordStrength.color }}
+                          >
+                            {passwordStrength.label}
+                          </span>
+                        </div>
+                        {passwordStrength.feedback.length > 0 && (
+                          <ul className="text-xs space-y-1" style={{ color: '#5f7e97' }}>
+                            {passwordStrength.feedback.map((tip, i) => (
+                              <li key={i} className="flex items-center gap-1">
+                                <span style={{ color: '#ffcb6b' }}>•</span> {tip}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        {passwordStrength.score >= 3 && (
+                          <div className="flex items-center gap-1 text-xs" style={{ color: '#addb67' }}>
+                            <CheckCircle className="w-3 h-3" />
+                            Password meets requirements
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Confirm Password for sign-up */}
+                  {isSignUp && (
+                    <div>
+                      <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
+                        Confirm Password
+                      </label>
+                      <div className="relative">
+                        <input
+                          id="confirmPassword"
+                          type={showConfirmPass ? 'text' : 'password'}
+                          value={confirmPassword}
+                          onChange={(e) => {
+                            setConfirmPassword(e.target.value);
+                            if (fieldErrors.confirmPassword) setFieldErrors({ ...fieldErrors, confirmPassword: '' });
+                          }}
+                          className="w-full px-4 py-3 pr-12 rounded-xl outline-none transition-all duration-200"
+                          style={fieldErrors.confirmPassword ? inputErrorStyle : inputBaseStyle}
+                          onFocus={(e) => {
+                            e.currentTarget.style.borderColor = '#7fdbca';
+                            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                          }}
+                          onBlur={(e) => {
+                            e.currentTarget.style.borderColor = fieldErrors.confirmPassword ? '#ff5874' : 'rgba(127, 219, 202, 0.2)';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                          placeholder="Re-enter your password"
+                          aria-invalid={!!fieldErrors.confirmPassword}
+                          aria-describedby={fieldErrors.confirmPassword ? 'confirmPassword-error' : undefined}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPass(!showConfirmPass)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg transition-colors"
+                          style={{ color: '#5f7e97' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#7fdbca'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#5f7e97'}
+                          aria-label={showConfirmPass ? 'Hide password' : 'Show password'}
+                        >
+                          {showConfirmPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                      </div>
+                      {fieldErrors.confirmPassword && (
+                        <p id="confirmPassword-error" className="mt-2 text-sm" style={{ color: '#ff5874' }} role="alert">
+                          {fieldErrors.confirmPassword}
+                        </p>
+                      )}
+                      {confirmPassword && password === confirmPassword && !fieldErrors.confirmPassword && (
+                        <div className="flex items-center gap-1 mt-2 text-xs" style={{ color: '#addb67' }}>
+                          <CheckCircle className="w-3 h-3" />
+                          Passwords match
+                        </div>
+                      )}
+                    </div>
                   )}
-                  {isSignUp && !fieldErrors.password && (
-                    <p className="mt-2 text-xs" style={{ color: '#5f7e97' }}>
-                      Must be at least 6 characters
-                    </p>
-                  )}
-                </div>
+                </>
               )}
 
               {error && (
                 <div 
-                  className="text-sm px-4 py-3 rounded-xl"
+                  className="flex items-start gap-3 text-sm px-4 py-3 rounded-xl"
                   style={{ 
                     background: 'rgba(255, 88, 116, 0.1)',
                     border: '1px solid rgba(255, 88, 116, 0.3)',
                     color: '#ff5874'
                   }}
                 >
-                  {error}
+                  <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <span>{error}</span>
                 </div>
               )}
 
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full font-semibold py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading || (isSignUp && passwordStrength && passwordStrength.score < 2)}
+                className="w-full font-semibold py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 style={{ 
                   background: 'linear-gradient(135deg, #7fdbca 0%, #82aaff 100%)',
                   color: '#011627',
@@ -306,10 +467,20 @@ export default function Login() {
                   e.currentTarget.style.boxShadow = '0 4px 20px rgba(127, 219, 202, 0.3)';
                 }}
               >
-                {loading ? 'Processing...' : resetMode ? 'Send Reset Link' : isSignUp ? 'Sign Up' : 'Sign In'}
+                {loading ? (
+                  <>
+                    <div 
+                      className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
+                      style={{ borderColor: '#011627', borderTopColor: 'transparent' }}
+                    />
+                    Processing...
+                  </>
+                ) : (
+                  resetMode ? 'Send Reset Link' : isSignUp ? 'Create Account' : 'Sign In'
+                )}
               </button>
 
-              {!resetMode && (
+              {!resetMode && !isSignUp && (
                 <button
                   type="button"
                   onClick={toggleResetMode}
@@ -341,6 +512,14 @@ export default function Login() {
               </button>
             </div>
           )}
+        </div>
+
+        {/* Security footer */}
+        <div className="mt-6 text-center text-xs" style={{ color: '#5f7e97' }}>
+          <div className="flex items-center justify-center gap-1">
+            <Shield className="w-3 h-3" />
+            Your data is encrypted and secure
+          </div>
         </div>
       </div>
     </div>
