@@ -24,10 +24,16 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 25%, #4a1e5c 50%, #6b2d7a 75%, #8b3a8f 100%)' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#011627' }}>
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-purple-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-purple-100 font-medium">Loading...</p>
+          <div 
+            className="w-12 h-12 border-4 rounded-full animate-spin mx-auto mb-4"
+            style={{ 
+              borderColor: 'rgba(127, 219, 202, 0.2)',
+              borderTopColor: '#7fdbca'
+            }}
+          />
+          <p className="font-medium" style={{ color: '#7fdbca' }}>Loading...</p>
         </div>
       </div>
     );

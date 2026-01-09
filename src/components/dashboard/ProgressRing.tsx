@@ -15,8 +15,8 @@ const ProgressRing = memo(function ProgressRing({
   progress,
   size = 120,
   strokeWidth = 8,
-  color = '#10b981',
-  backgroundColor = '#e2e8f0',
+  color = '#7fdbca',
+  backgroundColor = 'rgba(95, 126, 151, 0.3)',
   showPercentage = true,
   className = ''
 }: ProgressRingProps) {
@@ -63,7 +63,7 @@ const ProgressRing = memo(function ProgressRing({
             transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2, delay: 0.05 }}
             className="text-center"
           >
-            <div className="text-2xl font-bold text-slate-900">{Math.round(progress)}%</div>
+            <div className="text-2xl font-bold" style={{ color: '#d6deeb' }}>{Math.round(progress)}%</div>
           </motion.div>
         </div>
       )}

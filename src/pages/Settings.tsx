@@ -84,6 +84,12 @@ export default function Settings() {
     }
   };
 
+  const inputStyle = {
+    background: 'rgba(11, 41, 66, 0.8)',
+    border: '1px solid rgba(127, 219, 202, 0.2)',
+    color: '#d6deeb',
+  };
+
   if (loading) {
     return (
       <div className="page-container">
@@ -91,11 +97,15 @@ export default function Settings() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="card p-12 text-center"
+          className="p-12 text-center rounded-xl"
+          style={{
+            background: 'rgba(29, 59, 83, 0.6)',
+            border: '1px solid rgba(127, 219, 202, 0.1)'
+          }}
         >
           <div className="animate-pulse">
-            <div className="w-16 h-16 bg-slate-200 rounded-2xl mx-auto mb-4"></div>
-            <div className="h-4 w-32 bg-slate-200 rounded mx-auto"></div>
+            <div className="w-16 h-16 rounded-2xl mx-auto mb-4" style={{ background: 'rgba(95, 126, 151, 0.3)' }} />
+            <div className="h-4 w-32 rounded mx-auto" style={{ background: 'rgba(95, 126, 151, 0.3)' }} />
           </div>
         </motion.div>
       </div>
@@ -105,12 +115,11 @@ export default function Settings() {
   return (
     <PageWrapper theme="settings">
       <div className="page-container space-section">
-        {/* Hero Header */}
         <PageHeader
           title="Settings & Profile"
           subtitle="Manage your profile and preferences"
           theme="settings"
-          icon={<Cog className="w-12 h-12 text-slate-600" />}
+          icon={<Cog className="w-12 h-12" style={{ color: '#5f7e97' }} />}
         />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -121,53 +130,87 @@ export default function Settings() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="lg:col-span-2 space-y-6"
         >
-          <div className="card p-8">
+          <div 
+            className="p-8 rounded-xl"
+            style={{
+              background: 'rgba(29, 59, 83, 0.6)',
+              border: '1px solid rgba(127, 219, 202, 0.1)'
+            }}
+          >
             <div className="flex items-center gap-6 mb-8">
               <motion.div 
-                className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-green-100 rounded-2xl flex items-center justify-center shadow-lg"
+                className="w-20 h-20 rounded-2xl flex items-center justify-center"
+                style={{ background: 'rgba(127, 219, 202, 0.15)' }}
                 whileHover={{ scale: 1.05, rotate: 5 }}
                 transition={{ duration: 0.2 }}
               >
-                <User className="w-10 h-10 text-emerald-600" />
+                <User className="w-10 h-10" style={{ color: '#7fdbca' }} />
               </motion.div>
               <div>
-                <h2 className="text-2xl font-semibold text-slate-900 mb-1">
+                <h2 className="text-2xl font-semibold mb-1" style={{ color: '#d6deeb' }}>
                   {formData.full_name || 'User'}
                 </h2>
-                <p className="text-slate-500">{user?.email}</p>
+                <p style={{ color: '#5f7e97' }}>{user?.email}</p>
               </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>Full Name</label>
                   <input
                     type="text"
                     value={formData.full_name}
                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                    className="input-field"
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                    style={inputStyle}
                     placeholder="Enter your full name"
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#7fdbca';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Date of Birth</label>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>Date of Birth</label>
                   <input
                     type="date"
                     value={formData.date_of_birth}
                     onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
-                    className="input-field"
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                    style={inputStyle}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#7fdbca';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Gender</label>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>Gender</label>
                   <select
                     value={formData.gender}
                     onChange={(e) => setFormData({ ...formData, gender: e.target.value as Gender })}
-                    className="input-field"
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                    style={inputStyle}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#7fdbca';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   >
                     <option value="">Select...</option>
                     <option value="male">Male</option>
@@ -177,14 +220,23 @@ export default function Settings() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Height (cm)</label>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>Height (cm)</label>
                   <input
                     type="number"
                     step="0.1"
                     value={formData.height_cm}
                     onChange={(e) => setFormData({ ...formData, height_cm: e.target.value })}
-                    className="input-field"
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                    style={inputStyle}
                     placeholder="170"
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#7fdbca';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
               </div>
@@ -193,11 +245,16 @@ export default function Settings() {
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`px-4 py-3 rounded-xl text-sm font-medium ${
-                    message.includes('Error')
-                      ? 'bg-red-50 text-red-700 border border-red-200'
-                      : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                  }`}
+                  className="px-4 py-3 rounded-xl text-sm font-medium"
+                  style={message.includes('Error') ? {
+                    background: 'rgba(255, 88, 116, 0.1)',
+                    border: '1px solid rgba(255, 88, 116, 0.3)',
+                    color: '#ff5874'
+                  } : {
+                    background: 'rgba(173, 219, 103, 0.1)',
+                    border: '1px solid rgba(173, 219, 103, 0.3)',
+                    color: '#addb67'
+                  }}
                 >
                   {message}
                 </motion.div>
@@ -206,7 +263,11 @@ export default function Settings() {
               <motion.button
                 type="submit"
                 disabled={saving}
-                className="w-full btn-primary"
+                className="w-full py-3 rounded-xl font-semibold transition-all duration-200 disabled:opacity-50"
+                style={{ 
+                  background: 'linear-gradient(135deg, #7fdbca 0%, #82aaff 100%)',
+                  color: '#011627'
+                }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -224,63 +285,104 @@ export default function Settings() {
           className="space-y-6"
         >
           {/* Quick Settings */}
-          <div className="card p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Settings</h3>
+          <div 
+            className="p-6 rounded-xl"
+            style={{
+              background: 'rgba(29, 59, 83, 0.6)',
+              border: '1px solid rgba(127, 219, 202, 0.1)'
+            }}
+          >
+            <h3 className="text-lg font-semibold mb-4" style={{ color: '#d6deeb' }}>Quick Settings</h3>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+              <div 
+                className="flex items-center justify-between p-3 rounded-xl"
+                style={{ background: 'rgba(11, 41, 66, 0.5)' }}
+              >
                 <div className="flex items-center gap-3">
-                  <Bell className="w-5 h-5 text-slate-600" />
-                  <span className="text-sm font-medium text-slate-700">Notifications</span>
+                  <Bell className="w-5 h-5" style={{ color: '#5f7e97' }} />
+                  <span className="text-sm font-medium" style={{ color: '#d6deeb' }}>Notifications</span>
                 </div>
-                <div className="w-12 h-6 bg-emerald-500 rounded-full relative">
-                  <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5"></div>
+                <div 
+                  className="w-12 h-6 rounded-full relative"
+                  style={{ background: '#7fdbca' }}
+                >
+                  <div 
+                    className="w-5 h-5 rounded-full absolute right-0.5 top-0.5"
+                    style={{ background: '#011627' }}
+                  />
                 </div>
               </div>
               
-              <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+              <div 
+                className="flex items-center justify-between p-3 rounded-xl"
+                style={{ background: 'rgba(11, 41, 66, 0.5)' }}
+              >
                 <div className="flex items-center gap-3">
-                  <Shield className="w-5 h-5 text-slate-600" />
-                  <span className="text-sm font-medium text-slate-700">Privacy</span>
+                  <Shield className="w-5 h-5" style={{ color: '#5f7e97' }} />
+                  <span className="text-sm font-medium" style={{ color: '#d6deeb' }}>Privacy</span>
                 </div>
-                <div className="w-12 h-6 bg-slate-300 rounded-full relative">
-                  <div className="w-5 h-5 bg-white rounded-full absolute left-0.5 top-0.5"></div>
+                <div 
+                  className="w-12 h-6 rounded-full relative"
+                  style={{ background: 'rgba(95, 126, 151, 0.3)' }}
+                >
+                  <div 
+                    className="w-5 h-5 rounded-full absolute left-0.5 top-0.5"
+                    style={{ background: '#5f7e97' }}
+                  />
                 </div>
               </div>
             </div>
           </div>
 
           {/* App Info */}
-          <div className="card p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">About</h3>
-            <div className="space-y-3 text-sm text-slate-600">
+          <div 
+            className="p-6 rounded-xl"
+            style={{
+              background: 'rgba(29, 59, 83, 0.6)',
+              border: '1px solid rgba(127, 219, 202, 0.1)'
+            }}
+          >
+            <h3 className="text-lg font-semibold mb-4" style={{ color: '#d6deeb' }}>About</h3>
+            <div className="space-y-3 text-sm" style={{ color: '#5f7e97' }}>
               <p>
-                <span className="font-medium text-slate-900">Health Tracker</span> helps you monitor your daily health metrics,
+                <span className="font-medium" style={{ color: '#d6deeb' }}>Health Tracker</span> helps you monitor your daily health metrics,
                 track menstrual cycles, create custom trackers, journal your health journey, and set reminders.
               </p>
-              <div className="pt-3 border-t border-slate-200">
-                <p className="text-xs text-slate-500">Version 1.0.0</p>
+              <div 
+                className="pt-3"
+                style={{ borderTop: '1px solid rgba(127, 219, 202, 0.1)' }}
+              >
+                <p className="text-xs" style={{ color: '#5f7e97' }}>Version 1.0.0</p>
               </div>
             </div>
           </div>
 
           {/* Help & Support */}
-          <div className="card p-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Help & Support</h3>
+          <div 
+            className="p-6 rounded-xl"
+            style={{
+              background: 'rgba(29, 59, 83, 0.6)',
+              border: '1px solid rgba(127, 219, 202, 0.1)'
+            }}
+          >
+            <h3 className="text-lg font-semibold mb-4" style={{ color: '#d6deeb' }}>Help & Support</h3>
             <div className="space-y-3">
               <motion.button 
-                className="w-full flex items-center gap-3 p-3 text-left hover:bg-slate-50 rounded-xl transition-colors"
-                whileHover={{ x: 4 }}
+                className="w-full flex items-center gap-3 p-3 text-left rounded-xl transition-colors"
+                style={{ color: '#5f7e97' }}
+                whileHover={{ x: 4, backgroundColor: 'rgba(127, 219, 202, 0.1)' }}
               >
-                <HelpCircle className="w-5 h-5 text-slate-600" />
-                <span className="text-sm font-medium text-slate-700">Help Center</span>
+                <HelpCircle className="w-5 h-5" />
+                <span className="text-sm font-medium" style={{ color: '#d6deeb' }}>Help Center</span>
               </motion.button>
               
               <motion.button 
-                className="w-full flex items-center gap-3 p-3 text-left hover:bg-slate-50 rounded-xl transition-colors"
-                whileHover={{ x: 4 }}
+                className="w-full flex items-center gap-3 p-3 text-left rounded-xl transition-colors"
+                style={{ color: '#5f7e97' }}
+                whileHover={{ x: 4, backgroundColor: 'rgba(127, 219, 202, 0.1)' }}
               >
-                <SettingsIcon className="w-5 h-5 text-slate-600" />
-                <span className="text-sm font-medium text-slate-700">Advanced Settings</span>
+                <SettingsIcon className="w-5 h-5" />
+                <span className="text-sm font-medium" style={{ color: '#d6deeb' }}>Advanced Settings</span>
               </motion.button>
             </div>
           </div>

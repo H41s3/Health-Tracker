@@ -54,7 +54,6 @@ export default function Login() {
         if (error) {
           setError(getErrorMessage(error));
         } else {
-          // Signup successful - show confirmation page immediately
           setShowConfirmation(true);
         }
       } else {
@@ -92,30 +91,66 @@ export default function Login() {
     setResetSuccess(false);
   };
 
-  // Show confirmation page if signup was successful
   if (showConfirmation) {
     return <EmailConfirmation />;
   }
 
+  const inputBaseStyle = {
+    background: 'rgba(11, 41, 66, 0.8)',
+    border: '1px solid rgba(127, 219, 202, 0.2)',
+    color: '#d6deeb',
+  };
+
+  const inputErrorStyle = {
+    ...inputBaseStyle,
+    border: '1px solid #ff5874',
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-yellow-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full">
+    <div 
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{ 
+        background: '#011627',
+        backgroundImage: `
+          radial-gradient(ellipse at 20% 0%, rgba(130, 170, 255, 0.1) 0%, transparent 50%),
+          radial-gradient(ellipse at 80% 100%, rgba(199, 146, 234, 0.08) 0%, transparent 50%),
+          radial-gradient(ellipse at 50% 50%, rgba(127, 219, 202, 0.05) 0%, transparent 70%)
+        `
+      }}
+    >
+      <div className="max-w-md w-full animate-fade-in">
+        {/* Logo Section */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 via-pink-500 to-yellow-500 rounded-2xl mb-4 overflow-hidden">
-            <BaymaxLogo className="w-14 h-14" />
+          <div 
+            className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-4 overflow-hidden"
+            style={{ 
+              background: 'linear-gradient(135deg, #7fdbca 0%, #82aaff 50%, #c792ea 100%)',
+              boxShadow: '0 8px 32px rgba(127, 219, 202, 0.3)'
+            }}
+          >
+            <BaymaxLogo className="w-16 h-16" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Health Tracker</h1>
-          <p className="text-gray-600">Your personal healthcare companion</p>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: '#d6deeb' }}>Health Tracker</h1>
+          <p style={{ color: '#5f7e97' }}>Your personal healthcare companion</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+        {/* Card */}
+        <div 
+          className="rounded-2xl p-8"
+          style={{
+            background: 'rgba(29, 59, 83, 0.6)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(127, 219, 202, 0.1)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+          }}
+        >
+          <h2 className="text-2xl font-semibold mb-6" style={{ color: '#d6deeb' }}>
             {resetMode ? 'Reset Password' : isSignUp ? 'Create Account' : 'Welcome Back'}
           </h2>
 
           {resetSuccess ? (
             <div className="text-center py-4">
-              <div className="text-purple-600 mb-4">
+              <div className="mb-4" style={{ color: '#7fdbca' }}>
                 Password reset email sent! Check your inbox.
               </div>
               <button
@@ -123,7 +158,10 @@ export default function Login() {
                   setResetMode(false);
                   setResetSuccess(false);
                 }}
-                className="text-purple-600 hover:text-purple-700 font-medium"
+                className="font-medium transition-colors duration-200"
+                style={{ color: '#7fdbca' }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#addb67'}
+                onMouseLeave={(e) => e.currentTarget.style.color = '#7fdbca'}
               >
                 Back to login
               </button>
@@ -132,7 +170,7 @@ export default function Login() {
             <form onSubmit={handleSubmit} className="space-y-5">
               {isSignUp && !resetMode && (
                 <div>
-                  <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="fullName" className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
                     Full Name
                   </label>
                   <input
@@ -143,14 +181,21 @@ export default function Login() {
                       setFullName(e.target.value);
                       if (fieldErrors.fullName) setFieldErrors({ ...fieldErrors, fullName: '' });
                     }}
-                    className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition ${
-                      fieldErrors.fullName ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                    style={fieldErrors.fullName ? inputErrorStyle : inputBaseStyle}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#7fdbca';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = fieldErrors.fullName ? '#ff5874' : 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                     aria-invalid={!!fieldErrors.fullName}
                     aria-describedby={fieldErrors.fullName ? 'fullName-error' : undefined}
                   />
                   {fieldErrors.fullName && (
-                    <p id="fullName-error" className="mt-1 text-sm text-red-600" role="alert">
+                    <p id="fullName-error" className="mt-2 text-sm" style={{ color: '#ff5874' }} role="alert">
                       {fieldErrors.fullName}
                     </p>
                   )}
@@ -158,7 +203,7 @@ export default function Login() {
               )}
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="email" className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
                   Email
                 </label>
                 <input
@@ -169,14 +214,21 @@ export default function Login() {
                     setEmail(e.target.value);
                     if (fieldErrors.email) setFieldErrors({ ...fieldErrors, email: '' });
                   }}
-                  className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition ${
-                    fieldErrors.email ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                  style={fieldErrors.email ? inputErrorStyle : inputBaseStyle}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = '#7fdbca';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = fieldErrors.email ? '#ff5874' : 'rgba(127, 219, 202, 0.2)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                   aria-invalid={!!fieldErrors.email}
                   aria-describedby={fieldErrors.email ? 'email-error' : undefined}
                 />
                 {fieldErrors.email && (
-                  <p id="email-error" className="mt-1 text-sm text-red-600" role="alert">
+                  <p id="email-error" className="mt-2 text-sm" style={{ color: '#ff5874' }} role="alert">
                     {fieldErrors.email}
                   </p>
                 )}
@@ -184,7 +236,7 @@ export default function Login() {
 
               {!resetMode && (
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="password" className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
                     Password
                   </label>
                   <input
@@ -195,19 +247,26 @@ export default function Login() {
                       setPassword(e.target.value);
                       if (fieldErrors.password) setFieldErrors({ ...fieldErrors, password: '' });
                     }}
-                    className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition ${
-                      fieldErrors.password ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                    style={fieldErrors.password ? inputErrorStyle : inputBaseStyle}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#7fdbca';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = fieldErrors.password ? '#ff5874' : 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                     aria-invalid={!!fieldErrors.password}
                     aria-describedby={fieldErrors.password ? 'password-error' : undefined}
                   />
                   {fieldErrors.password && (
-                    <p id="password-error" className="mt-1 text-sm text-red-600" role="alert">
+                    <p id="password-error" className="mt-2 text-sm" style={{ color: '#ff5874' }} role="alert">
                       {fieldErrors.password}
                     </p>
                   )}
                   {isSignUp && !fieldErrors.password && (
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-2 text-xs" style={{ color: '#5f7e97' }}>
                       Must be at least 6 characters
                     </p>
                   )}
@@ -215,7 +274,14 @@ export default function Login() {
               )}
 
               {error && (
-                <div className="text-sm text-red-600 bg-red-50 px-4 py-2 rounded-lg">
+                <div 
+                  className="text-sm px-4 py-3 rounded-xl"
+                  style={{ 
+                    background: 'rgba(255, 88, 116, 0.1)',
+                    border: '1px solid rgba(255, 88, 116, 0.3)',
+                    color: '#ff5874'
+                  }}
+                >
                   {error}
                 </div>
               )}
@@ -223,7 +289,22 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500 hover:from-purple-600 hover:via-pink-600 hover:to-yellow-600 text-white font-medium py-2.5 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full font-semibold py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ 
+                  background: 'linear-gradient(135deg, #7fdbca 0%, #82aaff 100%)',
+                  color: '#011627',
+                  boxShadow: '0 4px 20px rgba(127, 219, 202, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 30px rgba(127, 219, 202, 0.4)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(127, 219, 202, 0.3)';
+                }}
               >
                 {loading ? 'Processing...' : resetMode ? 'Send Reset Link' : isSignUp ? 'Sign Up' : 'Sign In'}
               </button>
@@ -232,7 +313,10 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={toggleResetMode}
-                  className="w-full text-sm text-gray-600 hover:text-gray-900 transition"
+                  className="w-full text-sm transition-colors duration-200"
+                  style={{ color: '#5f7e97' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#7fdbca'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#5f7e97'}
                 >
                   Forgot password?
                 </button>
@@ -244,7 +328,10 @@ export default function Login() {
             <div className="mt-6 text-center">
               <button
                 onClick={resetMode ? toggleResetMode : toggleMode}
-                className="text-sm text-gray-600 hover:text-gray-900"
+                className="text-sm transition-colors duration-200"
+                style={{ color: '#5f7e97' }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#7fdbca'}
+                onMouseLeave={(e) => e.currentTarget.style.color = '#5f7e97'}
               >
                 {resetMode
                   ? 'Back to login'

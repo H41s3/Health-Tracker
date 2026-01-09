@@ -9,6 +9,12 @@ import { HealthNote } from '../types/database';
 import PageWrapper from '../components/Layout/PageWrapper';
 import PageHeader from '../components/Layout/PageHeader';
 
+const inputStyle = {
+  background: 'rgba(11, 41, 66, 0.8)',
+  border: '1px solid rgba(127, 219, 202, 0.2)',
+  color: '#d6deeb',
+};
+
 export default function HealthJournal() {
   const { user } = useAuth();
   const { notes, fetchNotes, addNote, updateNote, deleteNote } = useNotesStore();
@@ -127,12 +133,11 @@ export default function HealthJournal() {
   return (
     <PageWrapper theme="insights">
       <div className="page-container space-section">
-        {/* Hero Header */}
         <PageHeader
           title="Health Insights"
           subtitle="Document your health journey with notes and reflections"
           theme="insights"
-          icon={<Lightbulb className="w-12 h-12 text-violet-500" />}
+          icon={<Lightbulb className="w-12 h-12" style={{ color: '#c792ea' }} />}
         />
 
       {/* Search and Filter Controls */}
@@ -144,7 +149,11 @@ export default function HealthJournal() {
       >
         <motion.button
           onClick={() => setShowForm(!showForm)}
-          className="btn-primary inline-flex items-center justify-center gap-2"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200"
+          style={{ 
+            background: 'linear-gradient(135deg, #c792ea 0%, #82aaff 100%)',
+            color: '#011627'
+          }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -153,13 +162,22 @@ export default function HealthJournal() {
         </motion.button>
 
         <div className="flex-1 relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: '#5f7e97' }} />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search notes..."
-            className="input-field pl-12"
+            className="w-full pl-12 pr-4 py-3 rounded-xl outline-none transition-all duration-200"
+            style={inputStyle}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = '#c792ea';
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(199, 146, 234, 0.1)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           />
         </div>
 
@@ -167,7 +185,16 @@ export default function HealthJournal() {
           <select
             value={filterTag}
             onChange={(e) => setFilterTag(e.target.value)}
-            className="input-field min-w-[150px]"
+            className="min-w-[150px] px-4 py-3 rounded-xl outline-none transition-all duration-200"
+            style={inputStyle}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = '#c792ea';
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(199, 146, 234, 0.1)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
             <option value="">All Tags</option>
             {allTags.map((tag) => (
@@ -186,50 +213,81 @@ export default function HealthJournal() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="card p-8 mb-8"
+            className="p-8 mb-8 rounded-xl"
+            style={{
+              background: 'rgba(29, 59, 83, 0.6)',
+              border: '1px solid rgba(127, 219, 202, 0.1)'
+            }}
           >
-            <h2 className="text-2xl font-semibold text-slate-900 mb-6">
+            <h2 className="text-2xl font-semibold mb-6" style={{ color: '#d6deeb' }}>
               {editingNote ? 'Edit Note' : 'New Journal Entry'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Date</label>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>Date</label>
                   <input
                     type="date"
                     value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                     max={format(new Date(), 'yyyy-MM-dd')}
-                    className="input-field"
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                    style={inputStyle}
                     required
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#c792ea';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(199, 146, 234, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Title</label>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>Title</label>
                   <input
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="input-field"
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                    style={inputStyle}
                     placeholder="Give your entry a title..."
                     required
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#c792ea';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(199, 146, 234, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Content</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>Content</label>
                 <textarea
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                   rows={8}
-                  className="input-field resize-none"
+                  className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200 resize-none"
+                  style={inputStyle}
                   placeholder="Write your thoughts, observations, or health notes..."
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = '#c792ea';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(199, 146, 234, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-3">Tags</label>
+                <label className="block text-sm font-medium mb-3" style={{ color: '#5f7e97' }}>Tags</label>
                 <div className="flex gap-3 mb-3">
                   <input
                     type="text"
@@ -241,13 +299,27 @@ export default function HealthJournal() {
                         addTag();
                       }
                     }}
-                    className="flex-1 input-field"
+                    className="flex-1 px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                    style={inputStyle}
                     placeholder="Add a tag..."
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#c792ea';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(199, 146, 234, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   />
                   <motion.button
                     type="button"
                     onClick={addTag}
-                    className="btn-secondary"
+                    className="px-4 py-3 rounded-xl font-medium transition-all duration-200"
+                    style={{ 
+                      background: 'rgba(95, 126, 151, 0.2)',
+                      border: '1px solid rgba(127, 219, 202, 0.2)',
+                      color: '#d6deeb'
+                    }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -261,14 +333,19 @@ export default function HealthJournal() {
                         key={tag}
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 rounded-full text-sm font-medium"
+                        className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium"
+                        style={{ 
+                          background: 'rgba(127, 219, 202, 0.15)',
+                          color: '#7fdbca'
+                        }}
                       >
                         <Tag className="w-3 h-3" />
                         {tag}
                         <button
                           type="button"
                           onClick={() => removeTag(tag)}
-                          className="ml-1 hover:text-emerald-900 transition-colors"
+                          className="ml-1 transition-colors"
+                          style={{ color: '#7fdbca' }}
                         >
                           ×
                         </button>
@@ -281,7 +358,11 @@ export default function HealthJournal() {
               <div className="flex gap-3 pt-4">
                 <motion.button
                   type="submit"
-                  className="btn-primary"
+                  className="px-6 py-3 rounded-xl font-semibold transition-all duration-200"
+                  style={{ 
+                    background: 'linear-gradient(135deg, #c792ea 0%, #82aaff 100%)',
+                    color: '#011627'
+                  }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -290,7 +371,12 @@ export default function HealthJournal() {
                 <motion.button
                   type="button"
                   onClick={resetForm}
-                  className="btn-secondary"
+                  className="px-6 py-3 rounded-xl font-semibold transition-all duration-200"
+                  style={{ 
+                    background: 'rgba(95, 126, 151, 0.2)',
+                    border: '1px solid rgba(127, 219, 202, 0.2)',
+                    color: '#d6deeb'
+                  }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -313,15 +399,22 @@ export default function HealthJournal() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="card p-12 text-center"
+            className="p-12 text-center rounded-xl"
+            style={{
+              background: 'rgba(29, 59, 83, 0.6)',
+              border: '1px solid rgba(127, 219, 202, 0.1)'
+            }}
           >
-            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-violet-100 to-purple-100 rounded-2xl flex items-center justify-center">
-              <BookOpen className="w-8 h-8 text-violet-600" />
+            <div 
+              className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
+              style={{ background: 'rgba(199, 146, 234, 0.15)' }}
+            >
+              <BookOpen className="w-8 h-8" style={{ color: '#c792ea' }} />
             </div>
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">
+            <h3 className="text-lg font-semibold mb-2" style={{ color: '#d6deeb' }}>
               {searchQuery || filterTag ? 'No Notes Found' : 'No Journal Entries Yet'}
             </h3>
-            <p className="text-slate-500">
+            <p style={{ color: '#5f7e97' }}>
               {searchQuery || filterTag
                 ? 'Try adjusting your search or filter criteria'
                 : 'Start documenting your health journey with your first entry!'}
@@ -335,13 +428,20 @@ export default function HealthJournal() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="card p-6 group hover:shadow-lg transition-all duration-300"
+                className="p-6 group rounded-xl transition-all duration-300"
+                style={{
+                  background: 'rgba(29, 59, 83, 0.6)',
+                  border: '1px solid rgba(127, 219, 202, 0.1)'
+                }}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-xl font-semibold text-slate-900">{note.title}</h3>
-                      <span className="text-sm text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">
+                      <h3 className="text-xl font-semibold" style={{ color: '#d6deeb' }}>{note.title}</h3>
+                      <span 
+                        className="text-sm px-2 py-1 rounded-lg"
+                        style={{ background: 'rgba(95, 126, 151, 0.2)', color: '#5f7e97' }}
+                      >
                         {format(new Date(note.date), 'MMM dd, yyyy')}
                       </span>
                     </div>
@@ -350,7 +450,11 @@ export default function HealthJournal() {
                         {note.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 rounded-full text-xs font-medium"
+                            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium"
+                            style={{ 
+                              background: 'rgba(199, 146, 234, 0.15)',
+                              color: '#c792ea'
+                            }}
                           >
                             <Tag className="w-3 h-3" />
                             {tag}
@@ -362,16 +466,18 @@ export default function HealthJournal() {
                   <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <motion.button
                       onClick={() => handleEdit(note)}
-                      className="p-2 text-slate-600 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-all duration-200"
-                      whileHover={{ scale: 1.1 }}
+                      className="p-2 rounded-xl transition-all duration-200"
+                      style={{ color: '#5f7e97' }}
+                      whileHover={{ scale: 1.1, color: '#c792ea', backgroundColor: 'rgba(199, 146, 234, 0.1)' }}
                       whileTap={{ scale: 0.9 }}
                     >
                       <Edit2 className="w-4 h-4" />
                     </motion.button>
                     <motion.button
                       onClick={() => handleDelete(note.id)}
-                      className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
-                      whileHover={{ scale: 1.1 }}
+                      className="p-2 rounded-xl transition-all duration-200"
+                      style={{ color: '#5f7e97' }}
+                      whileHover={{ scale: 1.1, color: '#ff5874', backgroundColor: 'rgba(255, 88, 116, 0.1)' }}
                       whileTap={{ scale: 0.9 }}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -380,7 +486,7 @@ export default function HealthJournal() {
                 </div>
                 {note.content && (
                   <div className="prose prose-sm max-w-none">
-                    <p className="text-slate-600 whitespace-pre-wrap leading-relaxed">
+                    <p className="whitespace-pre-wrap leading-relaxed" style={{ color: '#7fdbca' }}>
                       {note.content}
                     </p>
                   </div>

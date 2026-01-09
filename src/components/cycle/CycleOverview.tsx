@@ -11,6 +11,60 @@ interface CycleOverviewProps {
 
 type CyclePhase = 'menstrual' | 'follicular' | 'ovulation' | 'luteal' | 'unknown';
 
+// Night Owl phase config
+const phaseConfig = {
+  menstrual: {
+    label: 'Menstruation',
+    emoji: '🩸',
+    color1: '#ff5874',
+    color2: '#ff6ac1',
+    bgColor: 'rgba(255, 88, 116, 0.15)',
+    textColor: '#ff6ac1',
+    description: 'Your period is here',
+    icon: Droplet,
+  },
+  follicular: {
+    label: 'Follicular Phase',
+    emoji: '🌱',
+    color1: '#ff6ac1',
+    color2: '#c792ea',
+    bgColor: 'rgba(255, 106, 193, 0.15)',
+    textColor: '#ff6ac1',
+    description: 'Building up to ovulation',
+    icon: TrendingUp,
+  },
+  ovulation: {
+    label: 'Ovulation',
+    emoji: '🌸',
+    color1: '#82aaff',
+    color2: '#c792ea',
+    bgColor: 'rgba(130, 170, 255, 0.15)',
+    textColor: '#82aaff',
+    description: 'Peak fertility window',
+    icon: Heart,
+  },
+  luteal: {
+    label: 'Luteal Phase',
+    emoji: '🌙',
+    color1: '#c792ea',
+    color2: '#82aaff',
+    bgColor: 'rgba(199, 146, 234, 0.15)',
+    textColor: '#c792ea',
+    description: 'Preparing for next cycle',
+    icon: Calendar,
+  },
+  unknown: {
+    label: 'Track Your Cycle',
+    emoji: '📊',
+    color1: '#5f7e97',
+    color2: '#7fdbca',
+    bgColor: 'rgba(95, 126, 151, 0.15)',
+    textColor: '#5f7e97',
+    description: 'Start logging to see insights',
+    icon: Calendar,
+  },
+};
+
 export default function CycleOverview({ cycles, prediction }: CycleOverviewProps) {
   const currentStatus = useMemo(() => {
     if (cycles.length === 0) {
@@ -28,15 +82,10 @@ export default function CycleOverview({ cycles, prediction }: CycleOverviewProps
     const lastPeriodStart = new Date(lastCycle.period_start_date);
     const lastPeriodEnd = lastCycle.period_end_date 
       ? new Date(lastCycle.period_end_date)
-      : new Date(lastPeriodStart.getTime() + 5 * 24 * 60 * 60 * 1000); // Assume 5 days
+      : new Date(lastPeriodStart.getTime() + 5 * 24 * 60 * 60 * 1000);
 
-    // Calculate current cycle day
     const cycleDay = differenceInDays(today, lastPeriodStart) + 1;
-
-    // Check if currently on period
     const isOnPeriod = today >= lastPeriodStart && today <= lastPeriodEnd;
-
-    // Calculate cycle phase
     let phase: CyclePhase = 'unknown';
     const avgCycleLength = prediction?.averageCycleLength || 28;
 
@@ -50,12 +99,10 @@ export default function CycleOverview({ cycles, prediction }: CycleOverviewProps
       phase = 'luteal';
     }
 
-    // Calculate days until next period
     const daysUntilPeriod = prediction 
       ? Math.max(0, differenceInDays(prediction.nextPeriodStart, today))
       : null;
 
-    // Calculate progress percentage
     const percentComplete = Math.min((cycleDay / avgCycleLength) * 100, 100);
 
     return {
@@ -68,70 +115,31 @@ export default function CycleOverview({ cycles, prediction }: CycleOverviewProps
     };
   }, [cycles, prediction]);
 
-  const phaseConfig = {
-    menstrual: {
-      label: 'Menstruation',
-      emoji: '🩸',
-      gradient: 'from-red-500 to-rose-600',
-      bg: 'from-red-50 to-rose-50',
-      text: 'text-red-700',
-      description: 'Your period is here',
-      icon: Droplet,
-    },
-    follicular: {
-      label: 'Follicular Phase',
-      emoji: '🌱',
-      gradient: 'from-pink-500 to-rose-500',
-      bg: 'from-pink-50 to-rose-50',
-      text: 'text-pink-700',
-      description: 'Building up to ovulation',
-      icon: TrendingUp,
-    },
-    ovulation: {
-      label: 'Ovulation',
-      emoji: '🌸',
-      gradient: 'from-blue-500 to-indigo-500',
-      bg: 'from-blue-50 to-indigo-50',
-      text: 'text-blue-700',
-      description: 'Peak fertility window',
-      icon: Heart,
-    },
-    luteal: {
-      label: 'Luteal Phase',
-      emoji: '🌙',
-      gradient: 'from-purple-500 to-violet-500',
-      bg: 'from-purple-50 to-violet-50',
-      text: 'text-purple-700',
-      description: 'Preparing for next cycle',
-      icon: Calendar,
-    },
-    unknown: {
-      label: 'Track Your Cycle',
-      emoji: '📊',
-      gradient: 'from-gray-400 to-gray-500',
-      bg: 'from-gray-50 to-gray-100',
-      text: 'text-gray-700',
-      description: 'Start logging to see insights',
-      icon: Calendar,
-    },
-  };
-
   const config = phaseConfig[currentStatus.phase];
   const Icon = config.icon;
 
   return (
-    <div className="card-elevated p-8 overflow-hidden relative">
+    <div 
+      className="p-8 overflow-hidden relative rounded-xl"
+      style={{
+        background: 'rgba(29, 59, 83, 0.6)',
+        border: '1px solid rgba(127, 219, 202, 0.1)'
+      }}
+    >
       {/* Background gradient */}
-      <div className="absolute inset-0 opacity-5">
-        <div className={`absolute top-0 right-0 w-96 h-96 bg-gradient-to-br ${config.gradient} rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2`} />
+      <div className="absolute inset-0 opacity-10">
+        <div 
+          className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"
+          style={{ background: `linear-gradient(135deg, ${config.color1} 0%, ${config.color2} 100%)` }}
+        />
       </div>
 
       <div className="relative">
         <div className="flex items-center gap-3 mb-6">
           <span className="text-4xl">{config.emoji}</span>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{config.label}</h2>
-            <p className="text-sm text-gray-600">{config.description}</p>
+            <h2 className="text-2xl font-bold" style={{ color: '#d6deeb' }}>{config.label}</h2>
+            <p className="text-sm" style={{ color: '#5f7e97' }}>{config.description}</p>
           </div>
         </div>
 
@@ -144,16 +152,15 @@ export default function CycleOverview({ cycles, prediction }: CycleOverviewProps
                   cx="64"
                   cy="64"
                   r="56"
-                  stroke="currentColor"
                   strokeWidth="8"
                   fill="none"
-                  className="text-gray-200"
+                  stroke="rgba(95, 126, 151, 0.3)"
                 />
                 <circle
                   cx="64"
                   cy="64"
                   r="56"
-                  stroke="url(#cycleGradient)"
+                  stroke={`url(#cycleGradient-${currentStatus.phase})`}
                   strokeWidth="8"
                   fill="none"
                   strokeLinecap="round"
@@ -162,18 +169,18 @@ export default function CycleOverview({ cycles, prediction }: CycleOverviewProps
                   className="transition-all duration-1000 ease-out"
                 />
                 <defs>
-                  <linearGradient id="cycleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" className={`text-${currentStatus.phase === 'menstrual' ? 'red' : currentStatus.phase === 'follicular' ? 'pink' : currentStatus.phase === 'ovulation' ? 'blue' : 'purple'}-500`} stopColor="currentColor" />
-                    <stop offset="100%" className={`text-${currentStatus.phase === 'menstrual' ? 'rose' : currentStatus.phase === 'follicular' ? 'rose' : currentStatus.phase === 'ovulation' ? 'indigo' : 'violet'}-600`} stopColor="currentColor" />
+                  <linearGradient id={`cycleGradient-${currentStatus.phase}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor={config.color1} />
+                    <stop offset="100%" stopColor={config.color2} />
                   </linearGradient>
                 </defs>
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-3xl font-bold text-gray-900">
+                <span className="text-3xl font-bold" style={{ color: '#d6deeb' }}>
                   Day {currentStatus.cycleDay}
                 </span>
                 {currentStatus.avgCycleLength && (
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm" style={{ color: '#5f7e97' }}>
                     of ~{currentStatus.avgCycleLength}
                   </span>
                 )}
@@ -182,64 +189,91 @@ export default function CycleOverview({ cycles, prediction }: CycleOverviewProps
           </div>
 
           {/* Next Period Countdown */}
-          <div className={`bg-gradient-to-br ${config.bg} rounded-xl p-6 border-2 border-white/50 shadow-sm`}>
+          <div 
+            className="rounded-xl p-6"
+            style={{
+              background: config.bgColor,
+              border: `1px solid ${config.textColor}30`
+            }}
+          >
             <div className="flex items-center gap-3 mb-3">
-              <div className={`p-2 bg-gradient-to-br ${config.gradient} rounded-lg`}>
-                <Calendar className="w-5 h-5 text-white" />
+              <div 
+                className="p-2 rounded-lg"
+                style={{ background: `linear-gradient(135deg, ${config.color1} 0%, ${config.color2} 100%)` }}
+              >
+                <Calendar className="w-5 h-5" style={{ color: '#011627' }} />
               </div>
-              <h3 className="font-semibold text-gray-900">Next Period</h3>
+              <h3 className="font-semibold" style={{ color: '#d6deeb' }}>Next Period</h3>
             </div>
             {currentStatus.daysUntilPeriod !== null ? (
               <>
-                <div className="text-4xl font-bold text-gray-900 mb-2">
+                <div className="text-4xl font-bold mb-2" style={{ color: '#d6deeb' }}>
                   {currentStatus.daysUntilPeriod}
-                  <span className="text-xl text-gray-600 ml-2">days</span>
+                  <span className="text-xl ml-2" style={{ color: '#5f7e97' }}>days</span>
                 </div>
                 {prediction && (
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm" style={{ color: '#5f7e97' }}>
                     Expected: {format(prediction.nextPeriodStart, 'MMM dd, yyyy')}
                   </p>
                 )}
               </>
             ) : (
-              <p className="text-gray-600">Log more cycles for predictions</p>
+              <p style={{ color: '#5f7e97' }}>Log more cycles for predictions</p>
             )}
           </div>
 
           {/* Quick Stats */}
           <div className="space-y-3">
-            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+            <div 
+              className="rounded-xl p-4"
+              style={{
+                background: 'rgba(11, 41, 66, 0.5)',
+                border: '1px solid rgba(127, 219, 202, 0.1)'
+              }}
+            >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-gray-600 font-medium">Current Status</p>
-                  <p className={`text-sm font-bold ${config.text}`}>
+                  <p className="text-xs font-medium" style={{ color: '#5f7e97' }}>Current Status</p>
+                  <p className="text-sm font-bold" style={{ color: config.textColor }}>
                     {currentStatus.isOnPeriod ? 'On Period' : config.label}
                   </p>
                 </div>
-                <Icon className={`w-6 h-6 ${config.text}`} />
+                <Icon className="w-6 h-6" style={{ color: config.textColor }} />
               </div>
             </div>
 
-            <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+            <div 
+              className="rounded-xl p-4"
+              style={{
+                background: 'rgba(11, 41, 66, 0.5)',
+                border: '1px solid rgba(127, 219, 202, 0.1)'
+              }}
+            >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-gray-600 font-medium">Cycles Tracked</p>
-                  <p className="text-sm font-bold text-gray-900">{cycles.length}</p>
+                  <p className="text-xs font-medium" style={{ color: '#5f7e97' }}>Cycles Tracked</p>
+                  <p className="text-sm font-bold" style={{ color: '#d6deeb' }}>{cycles.length}</p>
                 </div>
-                <TrendingUp className="w-6 h-6 text-emerald-600" />
+                <TrendingUp className="w-6 h-6" style={{ color: '#7fdbca' }} />
               </div>
             </div>
 
             {currentStatus.avgCycleLength && (
-              <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+              <div 
+                className="rounded-xl p-4"
+                style={{
+                  background: 'rgba(11, 41, 66, 0.5)',
+                  border: '1px solid rgba(127, 219, 202, 0.1)'
+                }}
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-gray-600 font-medium">Avg Cycle</p>
-                    <p className="text-sm font-bold text-gray-900">
+                    <p className="text-xs font-medium" style={{ color: '#5f7e97' }}>Avg Cycle</p>
+                    <p className="text-sm font-bold" style={{ color: '#d6deeb' }}>
                       {currentStatus.avgCycleLength} days
                     </p>
                   </div>
-                  <Calendar className="w-6 h-6 text-purple-600" />
+                  <Calendar className="w-6 h-6" style={{ color: '#c792ea' }} />
                 </div>
               </div>
             )}
@@ -250,13 +284,19 @@ export default function CycleOverview({ cycles, prediction }: CycleOverviewProps
         {currentStatus.phase !== 'unknown' && (
           <div className="mt-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">Cycle Progress</span>
-              <span className="text-sm text-gray-600">{Math.round(currentStatus.percentComplete)}%</span>
+              <span className="text-sm font-medium" style={{ color: '#7fdbca' }}>Cycle Progress</span>
+              <span className="text-sm" style={{ color: '#5f7e97' }}>{Math.round(currentStatus.percentComplete)}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+            <div 
+              className="w-full rounded-full h-3 overflow-hidden"
+              style={{ background: 'rgba(95, 126, 151, 0.3)' }}
+            >
               <div
-                className={`h-full bg-gradient-to-r ${config.gradient} rounded-full transition-all duration-1000 ease-out shadow-lg`}
-                style={{ width: `${currentStatus.percentComplete}%` }}
+                className="h-full rounded-full transition-all duration-1000 ease-out"
+                style={{ 
+                  width: `${currentStatus.percentComplete}%`,
+                  background: `linear-gradient(90deg, ${config.color1} 0%, ${config.color2} 100%)`
+                }}
               />
             </div>
           </div>
@@ -265,4 +305,3 @@ export default function CycleOverview({ cycles, prediction }: CycleOverviewProps
     </div>
   );
 }
-

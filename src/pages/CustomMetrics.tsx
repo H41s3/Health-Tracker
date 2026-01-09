@@ -3,12 +3,30 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useCustomMetricsStore } from '../stores/useCustomMetricsStore';
 import { useToastStore } from '../stores/useToastStore';
-import { Plus, Edit2, Trash2, Activity, Target, TrendingUp } from 'lucide-react';
+import { Plus, Edit2, Trash2, Activity, Target, TrendingUp, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { CustomMetric, MetricType } from '../types/database';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 import PageWrapper from '../components/Layout/PageWrapper';
 import PageHeader from '../components/Layout/PageHeader';
+
+// Night Owl color mapping
+const colorMap: Record<string, string> = {
+  emerald: '#7fdbca',
+  sky: '#82aaff',
+  violet: '#c792ea',
+  orange: '#f78c6c',
+  pink: '#ff6ac1',
+  cyan: '#7fdbca',
+  amber: '#ffcb6b',
+  rose: '#ff5874'
+};
+
+const inputStyle = {
+  background: 'rgba(11, 41, 66, 0.8)',
+  border: '1px solid rgba(127, 219, 202, 0.2)',
+  color: '#d6deeb',
+};
 
 export default function CustomMetrics() {
   const { user } = useAuth();
@@ -134,12 +152,11 @@ export default function CustomMetrics() {
   return (
     <PageWrapper theme="goals">
       <div className="page-container space-section">
-        {/* Hero Header */}
         <PageHeader
           title="Goals & Progress"
           subtitle="Track any health metric that matters to you"
           theme="goals"
-          icon={<TrendingUp className="w-12 h-12 text-emerald-500" />}
+          icon={<TrendingUp className="w-12 h-12" style={{ color: '#7fdbca' }} />}
         />
 
       {/* Add Metric Button */}
@@ -151,11 +168,15 @@ export default function CustomMetrics() {
       >
         <motion.button
           onClick={() => setShowMetricForm(!showMetricForm)}
-          className="btn-primary inline-flex items-center gap-2"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200"
+          style={{ 
+            background: 'linear-gradient(135deg, #7fdbca 0%, #addb67 100%)',
+            color: '#011627'
+          }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <Plus className="w-5 h-5" />
+          {showMetricForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
           {showMetricForm ? 'Cancel' : 'Create New Goal'}
         </motion.button>
       </motion.div>
@@ -167,31 +188,53 @@ export default function CustomMetrics() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="card p-8 mb-8"
+            className="p-8 mb-8 rounded-xl"
+            style={{
+              background: 'rgba(29, 59, 83, 0.6)',
+              border: '1px solid rgba(127, 219, 202, 0.1)'
+            }}
           >
-            <h2 className="text-2xl font-semibold text-slate-900 mb-6">
+            <h2 className="text-2xl font-semibold mb-6" style={{ color: '#d6deeb' }}>
               {editingMetric ? 'Edit Goal' : 'New Health Goal'}
             </h2>
             <form onSubmit={handleMetricSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Goal Name</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>Goal Name</label>
                 <input
                   type="text"
                   value={metricForm.metric_name}
                   onChange={(e) => setMetricForm({ ...metricForm, metric_name: e.target.value })}
-                  className="input-field"
+                  className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                  style={inputStyle}
                   placeholder="e.g., Blood Pressure, Protein Intake, Meditation Minutes"
                   required
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = '#7fdbca';
+                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Type</label>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>Type</label>
                   <select
                     value={metricForm.metric_type}
                     onChange={(e) => setMetricForm({ ...metricForm, metric_type: e.target.value as MetricType })}
-                    className="input-field"
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                    style={inputStyle}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#7fdbca';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   >
                     <option value="number">Number</option>
                     <option value="boolean">Yes/No</option>
@@ -201,28 +244,39 @@ export default function CustomMetrics() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Unit (Optional)</label>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>Unit (Optional)</label>
                   <input
                     type="text"
                     value={metricForm.unit}
                     onChange={(e) => setMetricForm({ ...metricForm, unit: e.target.value })}
-                    className="input-field"
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                    style={inputStyle}
                     placeholder="e.g., mg, minutes, glasses"
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#7fdbca';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-3">Color Theme</label>
+                <label className="block text-sm font-medium mb-3" style={{ color: '#5f7e97' }}>Color Theme</label>
                 <div className="flex gap-3 flex-wrap">
                   {colorOptions.map((color) => (
                     <motion.button
                       key={color}
                       type="button"
                       onClick={() => setMetricForm({ ...metricForm, color })}
-                      className={`w-12 h-12 rounded-xl bg-${color}-500 hover:ring-2 ring-${color}-300 transition-all duration-200 ${
-                        metricForm.color === color ? `ring-2 ring-${color}-300 shadow-lg` : 'hover:scale-110'
-                      }`}
+                      className="w-12 h-12 rounded-xl transition-all duration-200"
+                      style={{ 
+                        background: colorMap[color],
+                        boxShadow: metricForm.color === color ? `0 0 0 3px ${colorMap[color]}50` : 'none'
+                      }}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.95 }}
                     />
@@ -233,7 +287,11 @@ export default function CustomMetrics() {
               <div className="flex gap-3 pt-4">
                 <motion.button
                   type="submit"
-                  className="btn-primary"
+                  className="px-6 py-3 rounded-xl font-semibold transition-all duration-200"
+                  style={{ 
+                    background: 'linear-gradient(135deg, #7fdbca 0%, #addb67 100%)',
+                    color: '#011627'
+                  }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -242,7 +300,12 @@ export default function CustomMetrics() {
                 <motion.button
                   type="button"
                   onClick={resetMetricForm}
-                  className="btn-secondary"
+                  className="px-6 py-3 rounded-xl font-semibold transition-all duration-200"
+                  style={{ 
+                    background: 'rgba(95, 126, 151, 0.2)',
+                    border: '1px solid rgba(127, 219, 202, 0.2)',
+                    color: '#d6deeb'
+                  }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -259,13 +322,20 @@ export default function CustomMetrics() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="card p-12 text-center"
+          className="p-12 text-center rounded-xl"
+          style={{
+            background: 'rgba(29, 59, 83, 0.6)',
+            border: '1px solid rgba(127, 219, 202, 0.1)'
+          }}
         >
-          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-emerald-100 to-green-100 rounded-2xl flex items-center justify-center">
-            <Target className="w-8 h-8 text-emerald-600" />
+          <div 
+            className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
+            style={{ background: 'rgba(127, 219, 202, 0.15)' }}
+          >
+            <Target className="w-8 h-8" style={{ color: '#7fdbca' }} />
           </div>
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">No Goals Yet</h3>
-          <p className="text-slate-500">Create your first health goal to start tracking your progress!</p>
+          <h3 className="text-lg font-semibold mb-2" style={{ color: '#d6deeb' }}>No Goals Yet</h3>
+          <p style={{ color: '#5f7e97' }}>Create your first health goal to start tracking your progress!</p>
         </motion.div>
       ) : (
         <motion.div 
@@ -278,8 +348,8 @@ export default function CustomMetrics() {
             const metricLogs = getMetricLogs(metric.id);
             const chartData = getChartData(metric.id);
             const latestLog = metricLogs[metricLogs.length - 1];
+            const metricColor = colorMap[metric.color as keyof typeof colorMap] || '#7fdbca';
             
-            // Calculate progress for progress ring (example: if it's a scale 1-10, show progress)
             const getProgress = () => {
               if (metric.metric_type === 'scale' && latestLog) {
                 return (parseFloat(latestLog.value) / 10) * 100;
@@ -287,20 +357,10 @@ export default function CustomMetrics() {
               if (metric.metric_type === 'boolean' && latestLog) {
                 return latestLog.value === 'Yes' ? 100 : 0;
               }
-              return 0; // For other types, we'll show a different visualization
+              return 0;
             };
 
             const progress = getProgress();
-            const colorMap = {
-              emerald: '#10b981',
-              sky: '#0ea5e9',
-              violet: '#8b5cf6',
-              orange: '#f59e0b',
-              pink: '#ec4899',
-              cyan: '#06b6d4',
-              amber: '#f59e0b',
-              rose: '#f43f5e'
-            };
 
             return (
               <motion.div
@@ -308,35 +368,42 @@ export default function CustomMetrics() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="card p-6 group hover:shadow-lg transition-all duration-300"
+                className="p-6 group rounded-xl transition-all duration-300"
+                style={{
+                  background: 'rgba(29, 59, 83, 0.6)',
+                  border: '1px solid rgba(127, 219, 202, 0.1)'
+                }}
               >
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex items-center gap-3">
                     <motion.div 
-                      className={`p-3 bg-gradient-to-br from-${metric.color || 'emerald'}-100 to-${metric.color || 'emerald'}-200 rounded-xl shadow-sm`}
+                      className="p-3 rounded-xl"
+                      style={{ background: `${metricColor}20` }}
                       whileHover={{ rotate: 5, scale: 1.1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Activity className={`w-6 h-6 text-${metric.color || 'emerald'}-600`} />
+                      <Activity className="w-6 h-6" style={{ color: metricColor }} />
                     </motion.div>
                     <div>
-                      <h3 className="font-semibold text-slate-900 text-lg">{metric.metric_name}</h3>
-                      {metric.unit && <p className="text-sm text-slate-500">{metric.unit}</p>}
+                      <h3 className="font-semibold text-lg" style={{ color: '#d6deeb' }}>{metric.metric_name}</h3>
+                      {metric.unit && <p className="text-sm" style={{ color: '#5f7e97' }}>{metric.unit}</p>}
                     </div>
                   </div>
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <motion.button
                       onClick={() => handleEditMetric(metric)}
-                      className="p-2 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all duration-200"
-                      whileHover={{ scale: 1.1 }}
+                      className="p-2 rounded-xl transition-all duration-200"
+                      style={{ color: '#5f7e97' }}
+                      whileHover={{ scale: 1.1, color: '#7fdbca', backgroundColor: 'rgba(127, 219, 202, 0.1)' }}
                       whileTap={{ scale: 0.9 }}
                     >
                       <Edit2 className="w-4 h-4" />
                     </motion.button>
                     <motion.button
                       onClick={() => handleDeleteMetric(metric.id)}
-                      className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
-                      whileHover={{ scale: 1.1 }}
+                      className="p-2 rounded-xl transition-all duration-200"
+                      style={{ color: '#5f7e97' }}
+                      whileHover={{ scale: 1.1, color: '#ff5874', backgroundColor: 'rgba(255, 88, 116, 0.1)' }}
                       whileTap={{ scale: 0.9 }}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -355,7 +422,7 @@ export default function CustomMetrics() {
                             cy="40"
                             r="32"
                             fill="none"
-                            stroke="#e2e8f0"
+                            stroke="rgba(95, 126, 151, 0.3)"
                             strokeWidth="6"
                           />
                           <motion.circle
@@ -363,7 +430,7 @@ export default function CustomMetrics() {
                             cy="40"
                             r="32"
                             fill="none"
-                            stroke={colorMap[metric.color as keyof typeof colorMap] || '#10b981'}
+                            stroke={metricColor}
                             strokeWidth="6"
                             strokeLinecap="round"
                             strokeDasharray={`${2 * Math.PI * 32}`}
@@ -374,24 +441,24 @@ export default function CustomMetrics() {
                           />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-lg font-bold text-slate-900">{Math.round(progress)}%</span>
+                          <span className="text-lg font-bold" style={{ color: '#d6deeb' }}>{Math.round(progress)}%</span>
                         </div>
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-slate-900">
+                        <div className="text-2xl font-bold" style={{ color: '#d6deeb' }}>
                           {latestLog ? latestLog.value : 'N/A'}
                         </div>
-                        <div className="text-sm text-slate-500">
+                        <div className="text-sm" style={{ color: '#5f7e97' }}>
                           {latestLog ? format(new Date(latestLog.date), 'MMM dd') : 'No data'}
                         </div>
                       </div>
                     </div>
                   ) : (
                     <div>
-                      <div className="text-3xl font-bold text-slate-900 mb-1">
+                      <div className="text-3xl font-bold mb-1" style={{ color: '#d6deeb' }}>
                         {latestLog ? latestLog.value : 'N/A'}
                       </div>
-                      <div className="text-sm text-slate-500">
+                      <div className="text-sm" style={{ color: '#5f7e97' }}>
                         {latestLog ? format(new Date(latestLog.date), 'MMM dd') : 'No data'}
                       </div>
                     </div>
@@ -406,7 +473,7 @@ export default function CustomMetrics() {
                         <Line
                           type="monotone"
                           dataKey="value"
-                          stroke={colorMap[metric.color as keyof typeof colorMap] || '#10b981'}
+                          stroke={metricColor}
                           strokeWidth={3}
                           dot={false}
                         />
@@ -421,8 +488,13 @@ export default function CustomMetrics() {
                     setSelectedMetric(metric);
                     setShowLogForm(true);
                   }}
-                  className="w-full px-4 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium rounded-xl transition-all duration-200 text-sm group-hover:bg-emerald-50 group-hover:text-emerald-700"
-                  whileHover={{ scale: 1.02 }}
+                  className="w-full px-4 py-3 font-medium rounded-xl transition-all duration-200 text-sm"
+                  style={{
+                    background: 'rgba(127, 219, 202, 0.1)',
+                    border: '1px solid rgba(127, 219, 202, 0.2)',
+                    color: '#7fdbca'
+                  }}
+                  whileHover={{ scale: 1.02, backgroundColor: 'rgba(127, 219, 202, 0.2)' }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="flex items-center justify-center gap-2">
@@ -442,7 +514,8 @@ export default function CustomMetrics() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            className="fixed inset-0 flex items-center justify-center p-4 z-50"
+            style={{ background: 'rgba(1, 22, 39, 0.8)', backdropFilter: 'blur(8px)' }}
             onClick={() => {
               setShowLogForm(false);
               setSelectedMetric(null);
@@ -453,41 +526,70 @@ export default function CustomMetrics() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ duration: 0.3 }}
-              className="card p-8 max-w-md w-full"
+              className="p-8 max-w-md w-full rounded-xl"
+              style={{
+                background: '#1d3b53',
+                border: '1px solid rgba(127, 219, 202, 0.2)',
+                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
+              }}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-3 mb-6">
-                <div className={`p-2 bg-${selectedMetric.color || 'emerald'}-100 rounded-lg`}>
-                  <Activity className={`w-5 h-5 text-${selectedMetric.color || 'emerald'}-600`} />
+                <div 
+                  className="p-2 rounded-lg"
+                  style={{ background: `${colorMap[selectedMetric.color as keyof typeof colorMap] || '#7fdbca'}20` }}
+                >
+                  <Activity 
+                    className="w-5 h-5" 
+                    style={{ color: colorMap[selectedMetric.color as keyof typeof colorMap] || '#7fdbca' }} 
+                  />
                 </div>
-                <h2 className="text-xl font-semibold text-slate-900">
+                <h2 className="text-xl font-semibold" style={{ color: '#d6deeb' }}>
                   Log: {selectedMetric.metric_name}
                 </h2>
               </div>
               
               <form onSubmit={handleLogSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Date</label>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>Date</label>
                   <input
                     type="date"
                     value={logForm.date}
                     onChange={(e) => setLogForm({ ...logForm, date: e.target.value })}
                     max={format(new Date(), 'yyyy-MM-dd')}
-                    className="input-field"
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                    style={inputStyle}
                     required
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#7fdbca';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
                     Value {selectedMetric.unit && `(${selectedMetric.unit})`}
                   </label>
                   {selectedMetric.metric_type === 'boolean' ? (
                     <select
                       value={logForm.value}
                       onChange={(e) => setLogForm({ ...logForm, value: e.target.value })}
-                      className="input-field"
+                      className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                      style={inputStyle}
                       required
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = '#7fdbca';
+                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
                     >
                       <option value="">Select...</option>
                       <option value="Yes">Yes</option>
@@ -500,8 +602,17 @@ export default function CustomMetrics() {
                       max="10"
                       value={logForm.value}
                       onChange={(e) => setLogForm({ ...logForm, value: e.target.value })}
-                      className="input-field"
+                      className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                      style={inputStyle}
                       required
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = '#7fdbca';
+                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
                     />
                   ) : selectedMetric.metric_type === 'number' ? (
                     <input
@@ -509,35 +620,66 @@ export default function CustomMetrics() {
                       step="0.01"
                       value={logForm.value}
                       onChange={(e) => setLogForm({ ...logForm, value: e.target.value })}
-                      className="input-field"
+                      className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                      style={inputStyle}
                       required
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = '#7fdbca';
+                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
                     />
                   ) : (
                     <input
                       type="text"
                       value={logForm.value}
                       onChange={(e) => setLogForm({ ...logForm, value: e.target.value })}
-                      className="input-field"
+                      className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                      style={inputStyle}
                       required
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = '#7fdbca';
+                        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
                     />
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Notes (Optional)</label>
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>Notes (Optional)</label>
                   <textarea
                     value={logForm.notes}
                     onChange={(e) => setLogForm({ ...logForm, notes: e.target.value })}
                     rows={3}
-                    className="input-field resize-none"
+                    className="w-full px-4 py-3 rounded-xl outline-none transition-all duration-200 resize-none"
+                    style={inputStyle}
                     placeholder="Add any additional notes..."
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#7fdbca';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   />
                 </div>
 
                 <div className="flex gap-3 pt-4">
                   <motion.button
                     type="submit"
-                    className="flex-1 btn-primary"
+                    className="flex-1 px-6 py-3 rounded-xl font-semibold transition-all duration-200"
+                    style={{ 
+                      background: 'linear-gradient(135deg, #7fdbca 0%, #addb67 100%)',
+                      color: '#011627'
+                    }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -550,7 +692,12 @@ export default function CustomMetrics() {
                       setSelectedMetric(null);
                       setLogForm({ date: format(new Date(), 'yyyy-MM-dd'), value: '', notes: '' });
                     }}
-                    className="flex-1 btn-secondary"
+                    className="flex-1 px-6 py-3 rounded-xl font-semibold transition-all duration-200"
+                    style={{ 
+                      background: 'rgba(95, 126, 151, 0.2)',
+                      border: '1px solid rgba(127, 219, 202, 0.2)',
+                      color: '#d6deeb'
+                    }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >

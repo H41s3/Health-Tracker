@@ -9,7 +9,7 @@ interface TodaySummaryProps {
 
 const TodaySummary = memo(function TodaySummary({ todayMetric, isLoading }: TodaySummaryProps) {
   const summary = useMemo(() => {
-    if (!todayMetric) return { score: 0, goalsCompleted: 0, totalGoals: 0 };
+    if (!todayMetric) return { score: 0, goalsCompleted: 0, totalGoals: 0, goals: [] };
 
     const goals = [
       { met: (todayMetric.steps || 0) >= 10000, name: 'Steps' },
@@ -26,23 +26,29 @@ const TodaySummary = memo(function TodaySummary({ todayMetric, isLoading }: Toda
 
   if (isLoading) {
     return (
-      <div className="card-elevated p-6 animate-pulse">
-        <div className="flex items-center justify-between">
+      <div 
+        className="card-elevated p-6"
+        style={{
+          background: 'rgba(29, 59, 83, 0.6)',
+          border: '1px solid rgba(127, 219, 202, 0.1)'
+        }}
+      >
+        <div className="animate-pulse flex items-center justify-between">
           <div className="flex-1">
-            <div className="h-6 w-32 bg-gray-200 rounded mb-2" />
-            <div className="h-4 w-48 bg-gray-200 rounded" />
+            <div className="h-6 w-32 rounded mb-2" style={{ background: 'rgba(95, 126, 151, 0.3)' }} />
+            <div className="h-4 w-48 rounded" style={{ background: 'rgba(95, 126, 151, 0.2)' }} />
           </div>
-          <div className="w-20 h-20 bg-gray-200 rounded-full" />
+          <div className="w-20 h-20 rounded-full" style={{ background: 'rgba(95, 126, 151, 0.2)' }} />
         </div>
       </div>
     );
   }
 
   const getScoreColor = () => {
-    if (summary.score >= 100) return 'from-emerald-500 to-green-500';
-    if (summary.score >= 66) return 'from-blue-500 to-indigo-500';
-    if (summary.score >= 33) return 'from-amber-500 to-orange-500';
-    return 'from-slate-400 to-slate-500';
+    if (summary.score >= 100) return '#addb67';
+    if (summary.score >= 66) return '#82aaff';
+    if (summary.score >= 33) return '#ffcb6b';
+    return '#5f7e97';
   };
 
   const getScoreMessage = () => {
@@ -61,29 +67,38 @@ const TodaySummary = memo(function TodaySummary({ todayMetric, isLoading }: Toda
   const ScoreIcon = getScoreIcon();
 
   return (
-    <div className="card-elevated p-6 overflow-hidden relative">
+    <div 
+      className="card-elevated p-6 overflow-hidden relative"
+      style={{
+        background: 'rgba(29, 59, 83, 0.6)',
+        border: '1px solid rgba(127, 219, 202, 0.1)'
+      }}
+    >
       {/* Background pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute inset-0 opacity-10">
+        <div 
+          className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"
+          style={{ background: 'linear-gradient(135deg, #7fdbca 0%, #c792ea 100%)' }}
+        />
       </div>
 
       <div className="relative flex items-center justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <ScoreIcon className={`w-5 h-5 bg-gradient-to-r ${getScoreColor()} bg-clip-text text-transparent`} />
-            <h2 className="text-lg font-bold text-slate-900">Today's Progress</h2>
+            <ScoreIcon className="w-5 h-5" style={{ color: getScoreColor() }} />
+            <h2 className="text-lg font-bold" style={{ color: '#d6deeb' }}>Today's Progress</h2>
           </div>
-          <p className="text-sm text-slate-600 mb-3">
+          <p className="text-sm mb-3" style={{ color: '#5f7e97' }}>
             {getScoreMessage()}
           </p>
           <div className="flex items-center gap-2 text-sm">
-            <span className="font-semibold text-slate-700">
+            <span className="font-semibold" style={{ color: '#7fdbca' }}>
               {summary.goalsCompleted} of {summary.totalGoals} goals completed
             </span>
             {summary.goalsCompleted > 0 && (
               <div className="flex gap-1">
-                {summary.goals.filter(g => g.met).map((goal, idx) => (
-                  <span key={idx} className="text-emerald-600">✓</span>
+                {summary.goals.filter(g => g.met).map((_, idx) => (
+                  <span key={idx} style={{ color: '#addb67' }}>✓</span>
                 ))}
               </div>
             )}
@@ -97,16 +112,15 @@ const TodaySummary = memo(function TodaySummary({ todayMetric, isLoading }: Toda
               cx="48"
               cy="48"
               r="42"
-              stroke="currentColor"
+              stroke="rgba(95, 126, 151, 0.3)"
               strokeWidth="8"
               fill="none"
-              className="text-slate-200"
             />
             <circle
               cx="48"
               cy="48"
               r="42"
-              stroke="url(#scoreGradient)"
+              stroke="url(#scoreGradientNight)"
               strokeWidth="8"
               fill="none"
               strokeLinecap="round"
@@ -115,14 +129,14 @@ const TodaySummary = memo(function TodaySummary({ todayMetric, isLoading }: Toda
               className="transition-all duration-1000 ease-out"
             />
             <defs>
-              <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" className="text-purple-500" stopColor="currentColor" />
-                <stop offset="100%" className="text-pink-500" stopColor="currentColor" />
+              <linearGradient id="scoreGradientNight" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#7fdbca" />
+                <stop offset="100%" stopColor="#c792ea" />
               </linearGradient>
             </defs>
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className={`text-2xl font-bold bg-gradient-to-r ${getScoreColor()} bg-clip-text text-transparent`}>
+            <span className="text-2xl font-bold" style={{ color: getScoreColor() }}>
               {summary.score}%
             </span>
           </div>
@@ -133,4 +147,3 @@ const TodaySummary = memo(function TodaySummary({ todayMetric, isLoading }: Toda
 });
 
 export default TodaySummary;
-

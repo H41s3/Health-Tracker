@@ -16,11 +16,59 @@ interface CycleVisualizationProps {
   };
 }
 
+// Night Owl phase colors
+const phaseConfig = {
+  menstrual: { 
+    label: 'Menstrual Phase', 
+    color1: '#ff6ac1',
+    color2: '#ff5874',
+    bgColor: 'rgba(255, 106, 193, 0.15)',
+    textColor: '#ff6ac1',
+    icon: Heart,
+    description: 'Your period is active'
+  },
+  follicular: { 
+    label: 'Follicular Phase', 
+    color1: '#7fdbca',
+    color2: '#addb67',
+    bgColor: 'rgba(127, 219, 202, 0.15)',
+    textColor: '#7fdbca',
+    icon: Calendar,
+    description: 'Preparing for ovulation'
+  },
+  ovulation: { 
+    label: 'Ovulation', 
+    color1: '#c792ea',
+    color2: '#82aaff',
+    bgColor: 'rgba(199, 146, 234, 0.15)',
+    textColor: '#c792ea',
+    icon: Heart,
+    description: 'Most fertile period'
+  },
+  luteal: { 
+    label: 'Luteal Phase', 
+    color1: '#f78c6c',
+    color2: '#ffcb6b',
+    bgColor: 'rgba(247, 140, 108, 0.15)',
+    textColor: '#f78c6c',
+    icon: Clock,
+    description: 'Post-ovulation phase'
+  },
+  unknown: { 
+    label: 'Track Your Cycle', 
+    color1: '#5f7e97',
+    color2: '#7fdbca',
+    bgColor: 'rgba(95, 126, 151, 0.15)',
+    textColor: '#5f7e97',
+    icon: Calendar,
+    description: 'Start logging to see your cycle'
+  }
+};
+
 const CycleVisualization = memo(function CycleVisualization({ cycles, prediction }: CycleVisualizationProps) {
   const currentDate = useMemo(() => new Date(), []);
   const lastCycle = cycles[0];
   
-  // Calculate cycle phase with memoization
   const cyclePhase = useMemo(() => {
     if (!lastCycle) return { phase: 'unknown', days: 0, progress: 0 };
     
@@ -51,74 +99,28 @@ const CycleVisualization = memo(function CycleVisualization({ cycles, prediction
   }, [lastCycle, currentDate, cycles]);
 
   const { phase, days, progress } = cyclePhase;
-  
-  const phaseInfo = {
-    menstrual: { 
-      label: 'Menstrual Phase', 
-      color: 'from-rose-400 to-pink-500', 
-      bgColor: 'from-rose-50 to-pink-100',
-      icon: Heart,
-      description: 'Your period is active'
-    },
-    follicular: { 
-      label: 'Follicular Phase', 
-      color: 'from-emerald-400 to-green-500', 
-      bgColor: 'from-emerald-50 to-green-100',
-      icon: Calendar,
-      description: 'Preparing for ovulation'
-    },
-    ovulation: { 
-      label: 'Ovulation', 
-      color: 'from-violet-400 to-purple-500', 
-      bgColor: 'from-violet-50 to-purple-100',
-      icon: Heart,
-      description: 'Most fertile period'
-    },
-    luteal: { 
-      label: 'Luteal Phase', 
-      color: 'from-orange-400 to-amber-500', 
-      bgColor: 'from-orange-50 to-amber-100',
-      icon: Clock,
-      description: 'Post-ovulation phase'
-    },
-    unknown: { 
-      label: 'Track Your Cycle', 
-      color: 'from-slate-400 to-gray-500', 
-      bgColor: 'from-slate-50 to-gray-100',
-      icon: Calendar,
-      description: 'Start logging to see your cycle'
-    }
-  };
-
-  const currentPhase = phaseInfo[phase as keyof typeof phaseInfo];
-
-  // Define color classes to avoid dynamic Tailwind classes
-  const phaseColors = {
-    menstrual: { text: 'text-rose-600', border: 'border-rose-200' },
-    follicular: { text: 'text-emerald-600', border: 'border-emerald-200' },
-    ovulation: { text: 'text-violet-600', border: 'border-violet-200' },
-    luteal: { text: 'text-orange-600', border: 'border-orange-200' },
-    unknown: { text: 'text-slate-600', border: 'border-slate-200' }
-  };
-  
-  const currentColor = phaseColors[phase as keyof typeof phaseColors] || phaseColors.unknown;
+  const currentPhase = phaseConfig[phase as keyof typeof phaseConfig] || phaseConfig.unknown;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Circular Progress */}
-        <div className="card p-8 flex flex-col items-center justify-center">
+      <div 
+        className="p-8 flex flex-col items-center justify-center rounded-xl"
+        style={{
+          background: 'rgba(29, 59, 83, 0.6)',
+          border: '1px solid rgba(127, 219, 202, 0.1)'
+        }}
+      >
         <div className="relative w-48 h-48 mb-6">
-          {/* Background circle */}
           <svg className="w-full h-full" viewBox="0 0 100 100">
             <circle
               cx="50"
               cy="50"
               r="45"
               fill="none"
-              stroke="#e2e8f0"
+              stroke="rgba(95, 126, 151, 0.3)"
               strokeWidth="8"
             />
-            {/* Progress circle */}
             <circle
               cx="50"
               cy="50"
@@ -133,29 +135,31 @@ const CycleVisualization = memo(function CycleVisualization({ cycles, prediction
             />
             <defs>
               <linearGradient id={`gradient-${phase}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor={phase === 'menstrual' ? '#f43f5e' : phase === 'follicular' ? '#10b981' : phase === 'ovulation' ? '#8b5cf6' : '#f59e0b'} />
-                <stop offset="100%" stopColor={phase === 'menstrual' ? '#ec4899' : phase === 'follicular' ? '#059669' : phase === 'ovulation' ? '#7c3aed' : '#d97706'} />
+                <stop offset="0%" stopColor={currentPhase.color1} />
+                <stop offset="100%" stopColor={currentPhase.color2} />
               </linearGradient>
             </defs>
           </svg>
           
-          {/* Center content */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className={`p-4 rounded-full bg-gradient-to-br ${currentPhase.bgColor} shadow-lg`}>
-              <currentPhase.icon className={`w-8 h-8 ${currentColor.text}`} />
+            <div 
+              className="p-4 rounded-full shadow-lg"
+              style={{ background: currentPhase.bgColor }}
+            >
+              <currentPhase.icon className="w-8 h-8" style={{ color: currentPhase.textColor }} />
             </div>
             <div className="mt-2 text-center">
-              <div className="text-2xl font-bold text-slate-900">{Math.round(progress)}%</div>
-              <div className="text-sm text-slate-600">Complete</div>
+              <div className="text-2xl font-bold" style={{ color: '#d6deeb' }}>{Math.round(progress)}%</div>
+              <div className="text-sm" style={{ color: '#5f7e97' }}>Complete</div>
             </div>
           </div>
         </div>
         
         <div className="text-center">
-          <h3 className="text-xl font-semibold text-slate-900 mb-1">{currentPhase.label}</h3>
-          <p className="text-slate-600 text-sm">{currentPhase.description}</p>
+          <h3 className="text-xl font-semibold mb-1" style={{ color: '#d6deeb' }}>{currentPhase.label}</h3>
+          <p className="text-sm" style={{ color: '#5f7e97' }}>{currentPhase.description}</p>
           {days > 0 && (
-            <p className="text-slate-500 text-xs mt-1">Day {days} of cycle</p>
+            <p className="text-xs mt-1" style={{ color: '#5f7e97' }}>Day {days} of cycle</p>
           )}
         </div>
       </div>
@@ -163,33 +167,60 @@ const CycleVisualization = memo(function CycleVisualization({ cycles, prediction
       {/* Phase Information */}
       <div className="space-y-6">
         {/* Current Phase Card */}
-        <div className={`card p-6 bg-gradient-to-br ${currentPhase.bgColor} ${currentColor.border}`}>
+        <div 
+          className="p-6 rounded-xl"
+          style={{
+            background: currentPhase.bgColor,
+            border: `1px solid ${currentPhase.textColor}30`
+          }}
+        >
           <div className="flex items-center gap-3 mb-3">
-            <currentPhase.icon className={`w-6 h-6 ${currentColor.text}`} />
-            <h4 className="font-semibold text-slate-900">Current Phase</h4>
+            <currentPhase.icon className="w-6 h-6" style={{ color: currentPhase.textColor }} />
+            <h4 className="font-semibold" style={{ color: '#d6deeb' }}>Current Phase</h4>
           </div>
-          <p className="text-slate-700 text-sm">{currentPhase.description}</p>
+          <p className="text-sm" style={{ color: '#7fdbca' }}>{currentPhase.description}</p>
         </div>
 
         {/* Prediction Card */}
         {prediction && (
-          <div className="card p-6">
+          <div 
+            className="p-6 rounded-xl"
+            style={{
+              background: 'rgba(29, 59, 83, 0.6)',
+              border: '1px solid rgba(127, 219, 202, 0.1)'
+            }}
+          >
             <div className="flex items-center gap-3 mb-3">
-              <Calendar className="w-6 h-6 text-violet-600" />
-              <h4 className="font-semibold text-slate-900">Next Period</h4>
+              <Calendar className="w-6 h-6" style={{ color: '#c792ea' }} />
+              <h4 className="font-semibold" style={{ color: '#d6deeb' }}>Next Period</h4>
             </div>
             <div className="space-y-2">
-              <p className="text-slate-700">
-                <span className="font-medium">Likely window:</span> {format(prediction.nextPeriodStart, 'MMM dd')} – {format(prediction.nextPeriodEnd, 'MMM dd, yyyy')}
-                <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${prediction.confidence === 'high' ? 'bg-emerald-100 text-emerald-700' : prediction.confidence === 'low' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700'}`}>
+              <p style={{ color: '#d6deeb' }}>
+                <span className="font-medium">Likely window:</span>{' '}
+                {format(prediction.nextPeriodStart, 'MMM dd')} – {format(prediction.nextPeriodEnd, 'MMM dd, yyyy')}
+                <span 
+                  className="ml-2 text-xs px-2 py-0.5 rounded-full"
+                  style={{
+                    background: prediction.confidence === 'high' 
+                      ? 'rgba(173, 219, 103, 0.2)' 
+                      : prediction.confidence === 'low' 
+                      ? 'rgba(255, 203, 107, 0.2)' 
+                      : 'rgba(95, 126, 151, 0.2)',
+                    color: prediction.confidence === 'high' 
+                      ? '#addb67' 
+                      : prediction.confidence === 'low' 
+                      ? '#ffcb6b' 
+                      : '#5f7e97'
+                  }}
+                >
                   {prediction.confidence} confidence
                 </span>
               </p>
-              <p className="text-slate-600 text-sm">
+              <p className="text-sm" style={{ color: '#5f7e97' }}>
                 Based on {cycles.length} recorded cycles (avg: {Math.round(prediction.averageCycleLength)} days, sd: {prediction.stdDevDays}d)
               </p>
               {prediction.fertileStart && prediction.fertileEnd && (
-                <p className="text-slate-600 text-sm">
+                <p className="text-sm" style={{ color: '#5f7e97' }}>
                   Fertile window: {format(prediction.fertileStart, 'MMM dd')} – {format(prediction.fertileEnd, 'MMM dd')}
                 </p>
               )}
@@ -199,21 +230,27 @@ const CycleVisualization = memo(function CycleVisualization({ cycles, prediction
 
         {/* Cycle Stats */}
         {cycles.length > 0 && (
-          <div className="card p-6">
+          <div 
+            className="p-6 rounded-xl"
+            style={{
+              background: 'rgba(29, 59, 83, 0.6)',
+              border: '1px solid rgba(127, 219, 202, 0.1)'
+            }}
+          >
             <div className="flex items-center gap-3 mb-4">
-              <Clock className="w-6 h-6 text-sky-600" />
-              <h4 className="font-semibold text-slate-900">Cycle Statistics</h4>
+              <Clock className="w-6 h-6" style={{ color: '#82aaff' }} />
+              <h4 className="font-semibold" style={{ color: '#d6deeb' }}>Cycle Statistics</h4>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-slate-900">{cycles.length}</div>
-                <div className="text-sm text-slate-600">Cycles Tracked</div>
+                <div className="text-2xl font-bold" style={{ color: '#d6deeb' }}>{cycles.length}</div>
+                <div className="text-sm" style={{ color: '#5f7e97' }}>Cycles Tracked</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-slate-900">
+                <div className="text-2xl font-bold" style={{ color: '#d6deeb' }}>
                   {Math.round(cycles.reduce((sum, cycle) => sum + (cycle.cycle_length_days || 28), 0) / cycles.length)}
                 </div>
-                <div className="text-sm text-slate-600">Avg Length (days)</div>
+                <div className="text-sm" style={{ color: '#5f7e97' }}>Avg Length (days)</div>
               </div>
             </div>
           </div>
@@ -224,4 +261,3 @@ const CycleVisualization = memo(function CycleVisualization({ cycles, prediction
 });
 
 export default CycleVisualization;
-

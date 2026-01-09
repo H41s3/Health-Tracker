@@ -8,7 +8,6 @@ interface StreakWidgetProps {
 }
 
 const StreakWidget = memo(function StreakWidget({ metrics, isLoading }: StreakWidgetProps) {
-  // Calculate current streak with memoization
   const { current, longest } = useMemo(() => {
     if (metrics.length === 0) return { current: 0, longest: 0 };
 
@@ -21,7 +20,6 @@ const StreakWidget = memo(function StreakWidget({ metrics, isLoading }: StreakWi
     let longestStreak = 0;
     let tempStreak = 0;
 
-    // Calculate current streak
     for (let i = 0; i < sortedMetrics.length; i++) {
       const metricDate = new Date(sortedMetrics[i].date);
       const expectedDate = new Date(today);
@@ -34,7 +32,6 @@ const StreakWidget = memo(function StreakWidget({ metrics, isLoading }: StreakWi
       }
     }
 
-    // Calculate longest streak
     for (let i = 0; i < sortedMetrics.length; i++) {
       if (i === 0 || new Date(sortedMetrics[i].date).getTime() === new Date(sortedMetrics[i - 1].date).getTime() - 24 * 60 * 60 * 1000) {
         tempStreak++;
@@ -49,13 +46,21 @@ const StreakWidget = memo(function StreakWidget({ metrics, isLoading }: StreakWi
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 animate-pulse">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-orange-100 rounded-lg w-10 h-10" />
-          <div className="h-5 w-24 bg-gray-100 rounded" />
+      <div 
+        className="rounded-xl p-6"
+        style={{
+          background: 'rgba(29, 59, 83, 0.6)',
+          border: '1px solid rgba(127, 219, 202, 0.1)'
+        }}
+      >
+        <div className="animate-pulse">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg w-10 h-10" style={{ background: 'rgba(247, 140, 108, 0.2)' }} />
+            <div className="h-5 w-24 rounded" style={{ background: 'rgba(95, 126, 151, 0.3)' }} />
+          </div>
+          <div className="h-8 w-16 rounded mb-2" style={{ background: 'rgba(95, 126, 151, 0.3)' }} />
+          <div className="h-4 w-32 rounded" style={{ background: 'rgba(95, 126, 151, 0.2)' }} />
         </div>
-        <div className="h-8 w-16 bg-gray-100 rounded mb-2" />
-        <div className="h-4 w-32 bg-gray-100 rounded" />
       </div>
     );
   }
@@ -69,13 +74,13 @@ const StreakWidget = memo(function StreakWidget({ metrics, isLoading }: StreakWi
   };
 
   const getMilestone = () => {
-    if (current >= 365) return { emoji: '👑', label: 'Legend', color: 'text-yellow-500' };
-    if (current >= 180) return { emoji: '💎', label: 'Diamond', color: 'text-purple-500' };
-    if (current >= 90) return { emoji: '🏆', label: 'Champion', color: 'text-yellow-600' };
-    if (current >= 30) return { emoji: '🥇', label: 'Gold', color: 'text-yellow-500' };
-    if (current >= 14) return { emoji: '🥈', label: 'Silver', color: 'text-gray-400' };
-    if (current >= 7) return { emoji: '🥉', label: 'Bronze', color: 'text-orange-600' };
-    if (current >= 3) return { emoji: '⭐', label: 'Starter', color: 'text-blue-500' };
+    if (current >= 365) return { emoji: '👑', label: 'Legend', color: '#ffcb6b' };
+    if (current >= 180) return { emoji: '💎', label: 'Diamond', color: '#c792ea' };
+    if (current >= 90) return { emoji: '🏆', label: 'Champion', color: '#ffcb6b' };
+    if (current >= 30) return { emoji: '🥇', label: 'Gold', color: '#ffcb6b' };
+    if (current >= 14) return { emoji: '🥈', label: 'Silver', color: '#7fdbca' };
+    if (current >= 7) return { emoji: '🥉', label: 'Bronze', color: '#f78c6c' };
+    if (current >= 3) return { emoji: '⭐', label: 'Starter', color: '#82aaff' };
     return null;
   };
 
@@ -94,49 +99,72 @@ const StreakWidget = memo(function StreakWidget({ metrics, isLoading }: StreakWi
   const nextMilestone = getNextMilestone();
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+    <div 
+      className="rounded-xl p-6 transition-all duration-300"
+      style={{
+        background: 'rgba(29, 59, 83, 0.6)',
+        border: '1px solid rgba(127, 219, 202, 0.1)'
+      }}
+    >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-orange-100 rounded-lg">
-            <Flame className="w-5 h-5 text-orange-600" />
+          <div 
+            className="p-2 rounded-lg"
+            style={{ background: 'rgba(247, 140, 108, 0.15)' }}
+          >
+            <Flame className="w-5 h-5" style={{ color: '#f78c6c' }} />
           </div>
-          <h3 className="text-sm font-medium text-gray-600">Daily Streak</h3>
+          <h3 className="text-sm font-medium" style={{ color: '#5f7e97' }}>Daily Streak</h3>
         </div>
         {milestone && (
-          <div className={`flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-yellow-50 to-orange-50 border border-orange-200`}>
+          <div 
+            className="flex items-center gap-1 px-3 py-1 rounded-full"
+            style={{
+              background: 'rgba(247, 140, 108, 0.1)',
+              border: '1px solid rgba(247, 140, 108, 0.2)'
+            }}
+          >
             <span className="text-lg">{milestone.emoji}</span>
-            <span className={`text-xs font-bold ${milestone.color}`}>{milestone.label}</span>
+            <span className="text-xs font-bold" style={{ color: milestone.color }}>{milestone.label}</span>
           </div>
         )}
       </div>
       
       <div className="text-center">
-        <div className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="text-3xl font-bold mb-2" style={{ color: '#d6deeb' }}>
           {current}
-          <span className="text-lg text-gray-500 ml-1">days</span>
+          <span className="text-lg ml-1" style={{ color: '#5f7e97' }}>days</span>
         </div>
         
-        <div className="text-sm text-gray-600 mb-3">
+        <div className="text-sm mb-3" style={{ color: '#5f7e97' }}>
           {getStreakMessage()}
         </div>
         
-        <div className="flex items-center justify-center gap-4 text-xs text-gray-500 mb-3">
+        <div className="flex items-center justify-center gap-4 text-xs mb-3" style={{ color: '#5f7e97' }}>
           <div className="flex items-center gap-1">
             <Calendar className="w-3 h-3" />
             <span>Best: {longest} days</span>
           </div>
         </div>
 
-        {/* Next Milestone Progress */}
         {nextMilestone && (
-          <div className="mb-3 p-3 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg">
-            <div className="text-xs font-medium text-gray-700 mb-2">
+          <div 
+            className="mb-3 p-3 rounded-lg"
+            style={{ background: 'rgba(247, 140, 108, 0.1)' }}
+          >
+            <div className="text-xs font-medium mb-2" style={{ color: '#f78c6c' }}>
               Next: {nextMilestone.label} ({nextMilestone.target - current} days to go)
             </div>
-            <div className="w-full bg-white rounded-full h-2 overflow-hidden shadow-inner">
+            <div 
+              className="w-full rounded-full h-2 overflow-hidden"
+              style={{ background: 'rgba(95, 126, 151, 0.3)' }}
+            >
               <div
-                className="h-full bg-gradient-to-r from-orange-400 to-yellow-400 transition-all duration-300"
-                style={{ width: `${(current / nextMilestone.target) * 100}%` }}
+                className="h-full transition-all duration-500"
+                style={{ 
+                  width: `${(current / nextMilestone.target) * 100}%`,
+                  background: 'linear-gradient(90deg, #f78c6c 0%, #ffcb6b 100%)'
+                }}
               />
             </div>
           </div>
@@ -148,13 +176,12 @@ const StreakWidget = memo(function StreakWidget({ metrics, isLoading }: StreakWi
               {Array.from({ length: Math.min(current, 7) }).map((_, i) => (
                 <div
                   key={i}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    i < current ? 'bg-orange-500 animate-pulse-soft' : 'bg-gray-200'
-                  }`}
+                  className="w-2 h-2 rounded-full animate-pulse-soft"
+                  style={{ background: '#f78c6c' }}
                 />
               ))}
               {current > 7 && (
-                <span className="text-xs text-orange-600 ml-1">+{current - 7}</span>
+                <span className="text-xs ml-1" style={{ color: '#f78c6c' }}>+{current - 7}</span>
               )}
             </div>
           </div>

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Clock, CheckCircle2, TrendingUp, Flame } from 'lucide-react';
 import { Reminder } from '../../types/database';
-import { format, isToday, parseISO, differenceInMinutes } from 'date-fns';
+import { format } from 'date-fns';
 
 interface RemindersOverviewProps {
   reminders: Reminder[];
@@ -13,7 +13,6 @@ export default function RemindersOverview({ reminders, completedToday }: Reminde
     const active = reminders.filter(r => r.is_active);
     const today = new Date();
     
-    // Get today's reminders
     const todaysReminders = active.filter(reminder => {
       if (reminder.frequency === 'daily') return true;
       if (reminder.frequency === 'weekly' && reminder.days_of_week) {
@@ -29,7 +28,6 @@ export default function RemindersOverview({ reminders, completedToday }: Reminde
     const completed = completedToday.length;
     const completionRate = totalToday > 0 ? Math.round((completed / totalToday) * 100) : 0;
 
-    // Find next reminder
     const now = new Date();
     const currentTime = now.getHours() * 60 + now.getMinutes();
     
@@ -43,9 +41,7 @@ export default function RemindersOverview({ reminders, completedToday }: Reminde
       .sort((a, b) => a.minutesFromNow - b.minutesFromNow);
 
     const nextReminder = upcomingReminders[0] || null;
-
-    // Calculate streak (mock for now - would need completion history)
-    const streak = 7; // This would come from actual completion data
+    const streak = 7;
 
     return {
       totalToday,
@@ -65,14 +61,23 @@ export default function RemindersOverview({ reminders, completedToday }: Reminde
   };
 
   return (
-    <div className="card-elevated p-6 mb-6">
+    <div 
+      className="p-6 mb-6 rounded-xl"
+      style={{
+        background: 'rgba(29, 59, 83, 0.6)',
+        border: '1px solid rgba(127, 219, 202, 0.1)'
+      }}
+    >
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl">
-          <Clock className="w-6 h-6 text-blue-600" />
+        <div 
+          className="p-2 rounded-xl"
+          style={{ background: 'rgba(130, 170, 255, 0.15)' }}
+        >
+          <Clock className="w-6 h-6" style={{ color: '#82aaff' }} />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Today's Schedule</h2>
-          <p className="text-sm text-gray-600">
+          <h2 className="text-xl font-bold" style={{ color: '#d6deeb' }}>Today's Schedule</h2>
+          <p className="text-sm" style={{ color: '#5f7e97' }}>
             {format(new Date(), 'EEEE, MMMM d')}
           </p>
         </div>
@@ -80,96 +85,138 @@ export default function RemindersOverview({ reminders, completedToday }: Reminde
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {/* Completion Rate */}
-        <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-4 border border-emerald-200">
+        <div 
+          className="rounded-xl p-4"
+          style={{
+            background: 'rgba(173, 219, 103, 0.1)',
+            border: '1px solid rgba(173, 219, 103, 0.2)'
+          }}
+        >
           <div className="flex items-center justify-between mb-2">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-            <span className="text-xs font-medium text-emerald-700">Today</span>
+            <CheckCircle2 className="w-5 h-5" style={{ color: '#addb67' }} />
+            <span className="text-xs font-medium" style={{ color: '#addb67' }}>Today</span>
           </div>
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold" style={{ color: '#d6deeb' }}>
             {stats.completed}/{stats.totalToday}
           </div>
-          <div className="text-xs text-gray-600 mt-1">Completed</div>
-          <div className="mt-2 bg-white rounded-full h-2 overflow-hidden">
+          <div className="text-xs mt-1" style={{ color: '#5f7e97' }}>Completed</div>
+          <div 
+            className="mt-2 rounded-full h-2 overflow-hidden"
+            style={{ background: 'rgba(95, 126, 151, 0.3)' }}
+          >
             <div
-              className="h-full bg-gradient-to-r from-emerald-500 to-green-500 transition-all duration-500"
-              style={{ width: `${stats.completionRate}%` }}
+              className="h-full transition-all duration-500"
+              style={{ 
+                width: `${stats.completionRate}%`,
+                background: 'linear-gradient(90deg, #7fdbca 0%, #addb67 100%)'
+              }}
             />
           </div>
         </div>
 
         {/* Next Reminder */}
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+        <div 
+          className="rounded-xl p-4"
+          style={{
+            background: 'rgba(130, 170, 255, 0.1)',
+            border: '1px solid rgba(130, 170, 255, 0.2)'
+          }}
+        >
           <div className="flex items-center justify-between mb-2">
-            <Clock className="w-5 h-5 text-blue-600" />
-            <span className="text-xs font-medium text-blue-700">Next Up</span>
+            <Clock className="w-5 h-5" style={{ color: '#82aaff' }} />
+            <span className="text-xs font-medium" style={{ color: '#82aaff' }}>Next Up</span>
           </div>
           {stats.nextReminder ? (
             <>
-              <div className="text-2xl font-bold text-gray-900">
+              <div className="text-2xl font-bold" style={{ color: '#d6deeb' }}>
                 {getTimeUntilNext(stats.nextReminder.minutesFromNow)}
               </div>
-              <div className="text-xs text-gray-600 mt-1 truncate">
+              <div className="text-xs mt-1 truncate" style={{ color: '#5f7e97' }}>
                 {stats.nextReminder.title}
               </div>
             </>
           ) : (
             <>
-              <div className="text-2xl font-bold text-gray-900">—</div>
-              <div className="text-xs text-gray-600 mt-1">All done!</div>
+              <div className="text-2xl font-bold" style={{ color: '#d6deeb' }}>—</div>
+              <div className="text-xs mt-1" style={{ color: '#5f7e97' }}>All done!</div>
             </>
           )}
         </div>
 
         {/* Upcoming Soon */}
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-200">
+        <div 
+          className="rounded-xl p-4"
+          style={{
+            background: 'rgba(255, 203, 107, 0.1)',
+            border: '1px solid rgba(255, 203, 107, 0.2)'
+          }}
+        >
           <div className="flex items-center justify-between mb-2">
-            <TrendingUp className="w-5 h-5 text-amber-600" />
-            <span className="text-xs font-medium text-amber-700">Soon</span>
+            <TrendingUp className="w-5 h-5" style={{ color: '#ffcb6b' }} />
+            <span className="text-xs font-medium" style={{ color: '#ffcb6b' }}>Soon</span>
           </div>
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold" style={{ color: '#d6deeb' }}>
             {stats.upcomingSoon}
           </div>
-          <div className="text-xs text-gray-600 mt-1">Next hour</div>
+          <div className="text-xs mt-1" style={{ color: '#5f7e97' }}>Next hour</div>
         </div>
 
         {/* Streak */}
-        <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 border border-orange-200">
+        <div 
+          className="rounded-xl p-4"
+          style={{
+            background: 'rgba(247, 140, 108, 0.1)',
+            border: '1px solid rgba(247, 140, 108, 0.2)'
+          }}
+        >
           <div className="flex items-center justify-between mb-2">
-            <Flame className="w-5 h-5 text-orange-600" />
-            <span className="text-xs font-medium text-orange-700">Streak</span>
+            <Flame className="w-5 h-5" style={{ color: '#f78c6c' }} />
+            <span className="text-xs font-medium" style={{ color: '#f78c6c' }}>Streak</span>
           </div>
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold" style={{ color: '#d6deeb' }}>
             {stats.streak}
           </div>
-          <div className="text-xs text-gray-600 mt-1">Days</div>
+          <div className="text-xs mt-1" style={{ color: '#5f7e97' }}>Days</div>
         </div>
       </div>
 
       {/* Progress Message */}
       {stats.completionRate === 100 ? (
-        <div className="bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-lg p-3 text-center">
-          <div className="flex items-center justify-center gap-2">
+        <div 
+          className="rounded-lg p-3 text-center"
+          style={{ background: 'linear-gradient(135deg, #7fdbca 0%, #addb67 100%)' }}
+        >
+          <div className="flex items-center justify-center gap-2" style={{ color: '#011627' }}>
             <span className="text-xl">🎉</span>
             <span className="font-semibold">Perfect day! All reminders completed!</span>
           </div>
         </div>
       ) : stats.completionRate >= 75 ? (
-        <div className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg p-3 text-center">
-          <div className="flex items-center justify-center gap-2">
+        <div 
+          className="rounded-lg p-3 text-center"
+          style={{ background: 'linear-gradient(135deg, #82aaff 0%, #c792ea 100%)' }}
+        >
+          <div className="flex items-center justify-center gap-2" style={{ color: '#011627' }}>
             <span className="text-xl">💪</span>
             <span className="font-semibold">Great progress! Keep it up!</span>
           </div>
         </div>
       ) : stats.completionRate >= 50 ? (
-        <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg p-3 text-center">
-          <div className="flex items-center justify-center gap-2">
+        <div 
+          className="rounded-lg p-3 text-center"
+          style={{ background: 'linear-gradient(135deg, #ffcb6b 0%, #f78c6c 100%)' }}
+        >
+          <div className="flex items-center justify-center gap-2" style={{ color: '#011627' }}>
             <span className="text-xl">👍</span>
             <span className="font-semibold">You're doing well! Stay consistent!</span>
           </div>
         </div>
       ) : (
-        <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg p-3 text-center">
-          <div className="flex items-center justify-center gap-2">
+        <div 
+          className="rounded-lg p-3 text-center"
+          style={{ background: 'linear-gradient(135deg, #c792ea 0%, #ff6ac1 100%)' }}
+        >
+          <div className="flex items-center justify-center gap-2" style={{ color: '#011627' }}>
             <span className="text-xl">✨</span>
             <span className="font-semibold">Let's make today count! You've got this!</span>
           </div>
@@ -178,4 +225,3 @@ export default function RemindersOverview({ reminders, completedToday }: Reminde
     </div>
   );
 }
-

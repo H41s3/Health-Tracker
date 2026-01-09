@@ -24,13 +24,10 @@ export default function CycleCalendar({ cycles, onDateClick, selectedDate }: Cyc
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
 
-  // Calculate fertility window and ovulation
   const calculateFertility = (periodStartDate: Date, avgCycleLength: number) => {
-    // Ovulation typically occurs 14 days before next period
     const ovulationDay = new Date(periodStartDate);
     ovulationDay.setDate(ovulationDay.getDate() + avgCycleLength - 14);
     
-    // Fertile window: 5 days before ovulation + ovulation day + 1 day after
     const fertileStart = new Date(ovulationDay);
     fertileStart.setDate(fertileStart.getDate() - 5);
     
@@ -40,7 +37,6 @@ export default function CycleCalendar({ cycles, onDateClick, selectedDate }: Cyc
     return { ovulationDay, fertileStart, fertileEnd };
   };
 
-  // Predict next period
   const predictNextPeriod = useMemo(() => {
     if (cycles.length < 2) return null;
     
@@ -62,7 +58,6 @@ export default function CycleCalendar({ cycles, onDateClick, selectedDate }: Cyc
     return { date: predictedDate, avgLength };
   }, [cycles]);
 
-  // Get day info for a specific date - memoize expensive calculation
   const getDayInfo = useCallback((date: Date): DayInfo => {
     const info: DayInfo = {
       isPeriod: false,
@@ -73,7 +68,6 @@ export default function CycleCalendar({ cycles, onDateClick, selectedDate }: Cyc
       hasSymptoms: false,
     };
 
-    // Check if date is in any period
     for (const cycle of cycles) {
       const startDate = new Date(cycle.period_start_date);
       const endDate = cycle.period_end_date ? new Date(cycle.period_end_date) : startDate;
@@ -87,7 +81,6 @@ export default function CycleCalendar({ cycles, onDateClick, selectedDate }: Cyc
       }
     }
 
-    // Calculate fertility for current cycle
     if (cycles.length > 0 && predictNextPeriod) {
       const lastCycle = cycles[0];
       const cycleStart = new Date(lastCycle.period_start_date);
@@ -105,11 +98,10 @@ export default function CycleCalendar({ cycles, onDateClick, selectedDate }: Cyc
       }
     }
 
-    // Check if predicted period
     if (predictNextPeriod) {
       const predictedStart = predictNextPeriod.date;
       const predictedEnd = new Date(predictedStart);
-      predictedEnd.setDate(predictedEnd.getDate() + 5); // Assume 5-day period
+      predictedEnd.setDate(predictedEnd.getDate() + 5);
       
       if (date >= predictedStart && date <= predictedEnd && !info.isPeriod) {
         info.isPredicted = true;
@@ -119,13 +111,11 @@ export default function CycleCalendar({ cycles, onDateClick, selectedDate }: Cyc
     return info;
   }, [cycles, predictNextPeriod]);
 
-  // Generate calendar days
   const calendarDays = useMemo(() => {
     const start = startOfMonth(currentMonth);
     const end = endOfMonth(currentMonth);
     const days = eachDayOfInterval({ start, end });
     
-    // Add days from previous month to fill first week
     const firstDayOfWeek = start.getDay();
     const prevMonthDays = [];
     for (let i = firstDayOfWeek - 1; i >= 0; i--) {
@@ -134,7 +124,6 @@ export default function CycleCalendar({ cycles, onDateClick, selectedDate }: Cyc
       prevMonthDays.push(day);
     }
     
-    // Add days from next month to fill last week
     const lastDayOfWeek = end.getDay();
     const nextMonthDays = [];
     for (let i = 1; i < 7 - lastDayOfWeek; i++) {
@@ -148,11 +137,9 @@ export default function CycleCalendar({ cycles, onDateClick, selectedDate }: Cyc
 
   const weekDays = useMemo(() => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], []);
 
-  // Memoize month navigation handlers
   const handlePrevMonth = useCallback(() => setCurrentMonth(subMonths(currentMonth, 1)), [currentMonth]);
   const handleNextMonth = useCallback(() => setCurrentMonth(addMonths(currentMonth, 1)), [currentMonth]);
 
-  // Get cycle details for tooltip
   const getCycleDetails = useCallback((date: Date) => {
     const cycle = cycles.find(c => {
       const startDate = new Date(c.period_start_date);
@@ -176,25 +163,37 @@ export default function CycleCalendar({ cycles, onDateClick, selectedDate }: Cyc
   }, []);
 
   return (
-    <div className="card p-6">
+    <div 
+      className="p-6 rounded-xl"
+      style={{
+        background: 'rgba(29, 59, 83, 0.6)',
+        border: '1px solid rgba(127, 219, 202, 0.1)'
+      }}
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-gray-900">Cycle Calendar</h3>
+        <h3 className="text-xl font-semibold" style={{ color: '#d6deeb' }}>Cycle Calendar</h3>
         <div className="flex items-center gap-2">
           <button
             onClick={handlePrevMonth}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 rounded-lg transition-colors"
+            style={{ color: '#5f7e97' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(127, 219, 202, 0.1)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
           >
-            <ChevronLeft className="w-5 h-5 text-gray-700" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <span className="text-gray-900 font-semibold min-w-[140px] text-center">
+          <span className="font-semibold min-w-[140px] text-center" style={{ color: '#d6deeb' }}>
             {format(currentMonth, 'MMMM yyyy')}
           </span>
           <button
             onClick={handleNextMonth}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 rounded-lg transition-colors"
+            style={{ color: '#5f7e97' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(127, 219, 202, 0.1)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
           >
-            <ChevronRight className="w-5 h-5 text-gray-700" />
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -202,27 +201,30 @@ export default function CycleCalendar({ cycles, onDateClick, selectedDate }: Cyc
       {/* Legend */}
       <div className="flex flex-wrap gap-3 mb-4 text-xs">
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-rose-500 rounded-full"></div>
-          <span className="text-gray-700 font-medium">Period</span>
+          <div className="w-3 h-3 rounded-full" style={{ background: '#ff5874' }} />
+          <span className="font-medium" style={{ color: '#d6deeb' }}>Period</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
-          <span className="text-gray-700 font-medium">Fertile</span>
+          <div className="w-3 h-3 rounded-full" style={{ background: '#7fdbca' }} />
+          <span className="font-medium" style={{ color: '#d6deeb' }}>Fertile</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-          <span className="text-gray-700 font-medium">Ovulation</span>
+          <div className="w-3 h-3 rounded-full" style={{ background: '#82aaff' }} />
+          <span className="font-medium" style={{ color: '#d6deeb' }}>Ovulation</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-purple-400 rounded-full border-2 border-purple-300 border-dashed"></div>
-          <span className="text-gray-700 font-medium">Predicted</span>
+          <div 
+            className="w-3 h-3 rounded-full border-2 border-dashed"
+            style={{ background: 'rgba(199, 146, 234, 0.3)', borderColor: '#c792ea' }}
+          />
+          <span className="font-medium" style={{ color: '#d6deeb' }}>Predicted</span>
         </div>
       </div>
 
       {/* Week days */}
       <div className="grid grid-cols-7 gap-2 mb-2">
         {weekDays.map(day => (
-          <div key={day} className="text-center text-xs font-semibold text-gray-700 py-2">
+          <div key={day} className="text-center text-xs font-semibold py-2" style={{ color: '#5f7e97' }}>
             {day}
           </div>
         ))}
@@ -236,37 +238,48 @@ export default function CycleCalendar({ cycles, onDateClick, selectedDate }: Cyc
           const isToday = isSameDay(day, new Date());
           const isSelected = selectedDate && isSameDay(day, selectedDate);
 
+          let bgStyle: React.CSSProperties = {};
+          if (dayInfo.isPeriod) {
+            bgStyle = { background: 'rgba(255, 88, 116, 0.3)' };
+          } else if (dayInfo.isOvulation) {
+            bgStyle = { background: 'rgba(130, 170, 255, 0.3)' };
+          } else if (dayInfo.isFertile) {
+            bgStyle = { background: 'rgba(127, 219, 202, 0.2)' };
+          } else if (dayInfo.isPredicted) {
+            bgStyle = { 
+              background: 'rgba(199, 146, 234, 0.2)', 
+              border: '2px dashed #c792ea' 
+            };
+          }
+
           return (
             <button
               key={index}
               onClick={() => onDateClick(day)}
               onMouseEnter={(e) => handleMouseEnter(day, e)}
               onMouseLeave={handleMouseLeave}
-              className={`
-                aspect-square p-2 rounded-xl transition-all duration-200 relative
-                ${!isCurrentMonth ? 'opacity-30' : ''}
-                ${isToday ? 'ring-2 ring-purple-400 animate-pulse-soft' : ''}
-                ${isSelected ? 'bg-purple-500/40 ring-2 ring-purple-300 scale-105' : 'hover:bg-gray-100 hover:scale-105'}
-                ${dayInfo.isPeriod ? 'bg-rose-500/30 hover:bg-rose-500/40' : ''}
-                ${dayInfo.isFertile && !dayInfo.isPeriod ? 'bg-emerald-500/20 hover:bg-emerald-500/30' : ''}
-                ${dayInfo.isOvulation ? 'bg-blue-500/30 hover:bg-blue-500/40' : ''}
-                ${dayInfo.isPredicted ? 'bg-purple-400/20 border-2 border-dashed border-purple-300' : ''}
-              `}
+              className="aspect-square p-2 rounded-xl transition-all duration-200 relative"
+              style={{
+                ...bgStyle,
+                opacity: isCurrentMonth ? 1 : 0.3,
+                boxShadow: isToday ? '0 0 0 2px #c792ea' : isSelected ? '0 0 0 2px #7fdbca, 0 0 0 4px rgba(127, 219, 202, 0.2)' : 'none',
+                transform: isSelected ? 'scale(1.05)' : 'scale(1)'
+              }}
             >
-              <div className="text-sm font-medium text-gray-900">
+              <div className="text-sm font-medium" style={{ color: '#d6deeb' }}>
                 {format(day, 'd')}
               </div>
               
               {/* Indicators */}
               <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
                 {dayInfo.isPeriod && (
-                  <Circle className="w-1.5 h-1.5 fill-rose-500 text-rose-500" />
+                  <Circle className="w-1.5 h-1.5" style={{ fill: '#ff5874', color: '#ff5874' }} />
                 )}
                 {dayInfo.isOvulation && (
-                  <Circle className="w-1.5 h-1.5 fill-blue-500 text-blue-500" />
+                  <Circle className="w-1.5 h-1.5" style={{ fill: '#82aaff', color: '#82aaff' }} />
                 )}
                 {dayInfo.hasSymptoms && (
-                  <Circle className="w-1.5 h-1.5 fill-yellow-500 text-yellow-500" />
+                  <Circle className="w-1.5 h-1.5" style={{ fill: '#ffcb6b', color: '#ffcb6b' }} />
                 )}
               </div>
             </button>
@@ -284,8 +297,14 @@ export default function CycleCalendar({ cycles, onDateClick, selectedDate }: Cyc
             transform: 'translate(-50%, -100%)',
           }}
         >
-          <div className="bg-gray-900 text-white rounded-lg shadow-2xl p-3 max-w-xs mb-2 animate-in">
-            <div className="font-semibold mb-1">{format(hoveredDate, 'MMMM dd, yyyy')}</div>
+          <div 
+            className="rounded-lg shadow-2xl p-3 max-w-xs mb-2"
+            style={{
+              background: '#1d3b53',
+              border: '1px solid rgba(127, 219, 202, 0.2)'
+            }}
+          >
+            <div className="font-semibold mb-1" style={{ color: '#d6deeb' }}>{format(hoveredDate, 'MMMM dd, yyyy')}</div>
             {(() => {
               const dayInfo = getDayInfo(hoveredDate);
               const cycleDetails = getCycleDetails(hoveredDate);
@@ -293,53 +312,57 @@ export default function CycleCalendar({ cycles, onDateClick, selectedDate }: Cyc
                 <div className="text-xs space-y-1">
                   {dayInfo.isPeriod && (
                     <div className="flex items-center gap-1">
-                      <Circle className="w-3 h-3 fill-rose-500 text-rose-500" />
-                      <span>Period Day</span>
+                      <Circle className="w-3 h-3" style={{ fill: '#ff5874', color: '#ff5874' }} />
+                      <span style={{ color: '#d6deeb' }}>Period Day</span>
                       {dayInfo.flowIntensity && (
-                        <span className="text-rose-300">({dayInfo.flowIntensity} flow)</span>
+                        <span style={{ color: '#ff6ac1' }}>({dayInfo.flowIntensity} flow)</span>
                       )}
                     </div>
                   )}
                   {dayInfo.isOvulation && (
                     <div className="flex items-center gap-1">
-                      <Circle className="w-3 h-3 fill-blue-500 text-blue-500" />
-                      <span>Ovulation Day</span>
+                      <Circle className="w-3 h-3" style={{ fill: '#82aaff', color: '#82aaff' }} />
+                      <span style={{ color: '#d6deeb' }}>Ovulation Day</span>
                     </div>
                   )}
                   {dayInfo.isFertile && !dayInfo.isPeriod && (
                     <div className="flex items-center gap-1">
-                      <Circle className="w-3 h-3 fill-emerald-500 text-emerald-500" />
-                      <span>Fertile Window</span>
+                      <Circle className="w-3 h-3" style={{ fill: '#7fdbca', color: '#7fdbca' }} />
+                      <span style={{ color: '#d6deeb' }}>Fertile Window</span>
                     </div>
                   )}
                   {dayInfo.isPredicted && (
                     <div className="flex items-center gap-1">
-                      <Circle className="w-3 h-3 fill-purple-400 text-purple-400" />
-                      <span>Predicted Period</span>
+                      <Circle className="w-3 h-3" style={{ fill: '#c792ea', color: '#c792ea' }} />
+                      <span style={{ color: '#d6deeb' }}>Predicted Period</span>
                     </div>
                   )}
                   {cycleDetails?.symptoms && cycleDetails.symptoms.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-gray-700">
-                      <div className="font-medium mb-1">Symptoms:</div>
+                    <div className="mt-2 pt-2" style={{ borderTop: '1px solid rgba(127, 219, 202, 0.2)' }}>
+                      <div className="font-medium mb-1" style={{ color: '#7fdbca' }}>Symptoms:</div>
                       <div className="flex flex-wrap gap-1">
                         {cycleDetails.symptoms.slice(0, 3).map((symptom) => (
-                          <span key={symptom} className="px-2 py-0.5 bg-violet-500/30 rounded text-xs">
+                          <span 
+                            key={symptom} 
+                            className="px-2 py-0.5 rounded text-xs"
+                            style={{ background: 'rgba(199, 146, 234, 0.3)', color: '#c792ea' }}
+                          >
                             {symptom}
                           </span>
                         ))}
                         {cycleDetails.symptoms.length > 3 && (
-                          <span className="text-gray-400">+{cycleDetails.symptoms.length - 3} more</span>
+                          <span style={{ color: '#5f7e97' }}>+{cycleDetails.symptoms.length - 3} more</span>
                         )}
                       </div>
                     </div>
                   )}
                   {cycleDetails?.notes && (
-                    <div className="mt-2 pt-2 border-t border-gray-700">
-                      <div className="italic text-gray-300">&quot;{cycleDetails.notes.slice(0, 60)}{cycleDetails.notes.length > 60 ? '...' : ''}&quot;</div>
+                    <div className="mt-2 pt-2" style={{ borderTop: '1px solid rgba(127, 219, 202, 0.2)' }}>
+                      <div className="italic" style={{ color: '#5f7e97' }}>&quot;{cycleDetails.notes.slice(0, 60)}{cycleDetails.notes.length > 60 ? '...' : ''}&quot;</div>
                     </div>
                   )}
                   {!dayInfo.isPeriod && !dayInfo.isFertile && !dayInfo.isOvulation && !dayInfo.isPredicted && (
-                    <div className="text-gray-400">No cycle data</div>
+                    <div style={{ color: '#5f7e97' }}>No cycle data</div>
                   )}
                 </div>
               );

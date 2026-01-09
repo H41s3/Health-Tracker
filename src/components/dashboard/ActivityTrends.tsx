@@ -15,23 +15,39 @@ interface ActivityTrendsProps {
 const ActivityTrends = memo(function ActivityTrends({ data, isLoading }: ActivityTrendsProps) {
   if (isLoading) {
     return (
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-        <div className="h-6 w-32 bg-gray-100 rounded mb-4 animate-pulse" />
-        <div className="h-[250px] rounded-lg bg-gray-100 animate-pulse" />
+      <div 
+        className="rounded-xl p-6"
+        style={{
+          background: 'rgba(29, 59, 83, 0.6)',
+          border: '1px solid rgba(127, 219, 202, 0.1)'
+        }}
+      >
+        <div className="h-6 w-32 rounded mb-4 animate-pulse" style={{ background: 'rgba(95, 126, 151, 0.3)' }} />
+        <div className="h-[250px] rounded-lg animate-pulse" style={{ background: 'rgba(95, 126, 151, 0.2)' }} />
       </div>
     );
   }
 
   if (data.length === 0) {
     return (
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Activity Trends</h2>
-        <div className="h-[250px] flex flex-col items-center justify-center text-center text-gray-500">
+      <div 
+        className="rounded-xl p-6"
+        style={{
+          background: 'rgba(29, 59, 83, 0.6)',
+          border: '1px solid rgba(127, 219, 202, 0.1)'
+        }}
+      >
+        <h2 className="text-lg font-semibold mb-4" style={{ color: '#d6deeb' }}>Activity Trends</h2>
+        <div className="h-[250px] flex flex-col items-center justify-center text-center" style={{ color: '#5f7e97' }}>
           <div className="mb-2 font-medium">No trends yet</div>
           <div className="mb-4 text-sm">Add a few days of data to see water and sleep trends.</div>
           <button
             onClick={() => document.getElementById('quick-log')?.scrollIntoView({ behavior: 'smooth' })}
-            className="px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition"
+            className="px-4 py-2 rounded-lg transition-all duration-200"
+            style={{ 
+              background: 'linear-gradient(135deg, #7fdbca 0%, #82aaff 100%)',
+              color: '#011627'
+            }}
           >
             Log today's data
           </button>
@@ -41,22 +57,38 @@ const ActivityTrends = memo(function ActivityTrends({ data, isLoading }: Activit
   }
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">Activity Trends</h2>
+    <div 
+      className="rounded-xl p-6"
+      style={{
+        background: 'rgba(29, 59, 83, 0.6)',
+        border: '1px solid rgba(127, 219, 202, 0.1)'
+      }}
+    >
+      <h2 className="text-lg font-semibold mb-4" style={{ color: '#d6deeb' }}>Activity Trends</h2>
       <ResponsiveContainer width="100%" height={250}>
         <LineChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-          <XAxis dataKey="date" stroke="#6b7280" tickMargin={8} />
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(127, 219, 202, 0.1)" />
+          <XAxis 
+            dataKey="date" 
+            stroke="#5f7e97" 
+            tickMargin={8}
+            tick={{ fill: '#5f7e97', fontSize: 12 }}
+          />
           <YAxis
-            stroke="#6b7280"
+            stroke="#5f7e97"
+            tick={{ fill: '#5f7e97', fontSize: 12 }}
             tickFormatter={(v) => `${v}`}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: 'white',
-              border: '1px solid #e5e7eb',
-              borderRadius: '8px',
+              backgroundColor: '#1d3b53',
+              border: '1px solid rgba(127, 219, 202, 0.2)',
+              borderRadius: '12px',
+              color: '#d6deeb',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
             }}
+            labelStyle={{ color: '#7fdbca' }}
+            itemStyle={{ color: '#d6deeb' }}
             labelFormatter={(_, items) => items?.[0]?.payload?.fullDate || ''}
             formatter={(value, name) => {
               if (name === 'water') return [`${Number(value).toFixed(1)} L`, 'Water'];
@@ -67,21 +99,21 @@ const ActivityTrends = memo(function ActivityTrends({ data, isLoading }: Activit
           <Line 
             type="monotone" 
             dataKey="water" 
-            stroke="#0ea5e9" 
+            stroke="#82aaff" 
             strokeWidth={2} 
             name="water" 
             dot={false}
-            activeDot={false}
+            activeDot={{ fill: '#82aaff', stroke: '#1d3b53', strokeWidth: 2 }}
             isAnimationActive={false}
           />
           <Line 
             type="monotone" 
             dataKey="sleep" 
-            stroke="#8b5cf6" 
+            stroke="#c792ea" 
             strokeWidth={2} 
             name="sleep" 
             dot={false}
-            activeDot={false}
+            activeDot={{ fill: '#c792ea', stroke: '#1d3b53', strokeWidth: 2 }}
             isAnimationActive={false}
           />
         </LineChart>
