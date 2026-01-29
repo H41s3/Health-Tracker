@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useHealthStore } from '../stores/useHealthStore';
+import { useGoalsStore } from '../stores/useGoalsStore';
 import { useToastStore } from '../stores/useToastStore';
 import { Activity, Droplet, Moon, TrendingUp, Heart } from 'lucide-react';
 import { format, subDays } from 'date-fns';
@@ -18,6 +19,7 @@ import AppProfiler from '../utils/Profiler';
 export default function Dashboard() {
   const { user } = useAuth();
   const { metrics, fetchMetrics, addOrUpdateMetric, getMetricForDate, loading, isSaving } = useHealthStore();
+  const { goals, fetchGoals } = useGoalsStore();
   const { show } = useToastStore();
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
 
@@ -25,8 +27,9 @@ export default function Dashboard() {
     if (user) {
       const startDate = format(subDays(new Date(), 30), 'yyyy-MM-dd');
       fetchMetrics(user.id, startDate);
+      fetchGoals(user.id);
     }
-  }, [user, fetchMetrics]);
+  }, [user, fetchMetrics, fetchGoals]);
 
 
   // persist last-selected date
@@ -102,7 +105,7 @@ export default function Dashboard() {
       {/* Today's Summary */}
       <AppProfiler id="TodaySummary">
         <div className="mb-6">
-          <TodaySummary todayMetric={todayMetric} isLoading={loading} />
+          <TodaySummary todayMetric={todayMetric} goals={goals} isLoading={loading} />
         </div>
       </AppProfiler>
 
@@ -119,7 +122,7 @@ export default function Dashboard() {
           <MetricCard
           label="Steps Today"
           value={todayMetric?.steps || 0}
-          goal={10000}
+          goal={goals.steps}
           icon={Activity}
           color="emerald"
           isLoading={loading}
@@ -128,7 +131,7 @@ export default function Dashboard() {
           <MetricCard
           label="Water (ml)"
           value={todayMetric?.water_ml || 0}
-          goal={2000}
+          goal={goals.water_ml}
           icon={Droplet}
           color="sky"
           isLoading={loading}
@@ -137,7 +140,7 @@ export default function Dashboard() {
           <MetricCard
           label="Sleep (hrs)"
           value={todayMetric?.sleep_hours || 0}
-          goal={8}
+          goal={goals.sleep_hours}
           icon={Moon}
           color="violet"
           isLoading={loading}
@@ -170,7 +173,7 @@ export default function Dashboard() {
           isSaving={isSaving}
           />
           <AppProfiler id="WeeklyChart">
-            <WeeklyChart data={chartData} isLoading={loading} />
+            <WeeklyChart data={chartData} goals={goals} isLoading={loading} />
           </AppProfiler>
         </div>
       </AppProfiler>

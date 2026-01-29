@@ -2,30 +2,48 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { User, Settings as SettingsIcon, Bell, Shield, HelpCircle, Cog } from 'lucide-react';
-import { Profile, Gender } from '../types/database';
+import { User, Settings as SettingsIcon, Bell, Shield, HelpCircle, Cog, Target, Footprints, Droplet, Moon } from 'lucide-react';
+import { Profile, Gender, DEFAULT_GOALS } from '../types/database';
+import { useGoalsStore } from '../stores/useGoalsStore';
 import PageWrapper from '../components/Layout/PageWrapper';
 import PageHeader from '../components/Layout/PageHeader';
 
 export default function Settings() {
   const { user } = useAuth();
+  const { goals, fetchGoals, updateGoals, saving: savingGoals } = useGoalsStore();
   const [, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [goalsMessage, setGoalsMessage] = useState('');
   const [formData, setFormData] = useState({
     full_name: '',
     date_of_birth: '',
     gender: '' as Gender | '',
     height_cm: '',
   });
+  const [goalsData, setGoalsData] = useState({
+    steps: DEFAULT_GOALS.steps.toString(),
+    water_ml: DEFAULT_GOALS.water_ml.toString(),
+    sleep_hours: DEFAULT_GOALS.sleep_hours.toString(),
+  });
 
   useEffect(() => {
     if (user) {
       loadProfile();
+      fetchGoals(user.id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // Sync goals data when goals are fetched
+  useEffect(() => {
+    setGoalsData({
+      steps: goals.steps.toString(),
+      water_ml: goals.water_ml.toString(),
+      sleep_hours: goals.sleep_hours.toString(),
+    });
+  }, [goals]);
 
   const loadProfile = async () => {
     if (!user) return;
@@ -274,6 +292,171 @@ export default function Settings() {
                 {saving ? 'Saving...' : 'Save Changes'}
               </motion.button>
             </form>
+          </div>
+
+          {/* Health Goals Section */}
+          <div 
+            className="p-8 rounded-xl"
+            style={{
+              background: 'rgba(29, 59, 83, 0.6)',
+              border: '1px solid rgba(127, 219, 202, 0.1)'
+            }}
+          >
+            <div className="flex items-center gap-4 mb-6">
+              <div 
+                className="w-12 h-12 rounded-xl flex items-center justify-center"
+                style={{ background: 'rgba(173, 219, 103, 0.15)' }}
+              >
+                <Target className="w-6 h-6" style={{ color: '#addb67' }} />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold" style={{ color: '#d6deeb' }}>
+                  Daily Health Goals
+                </h2>
+                <p className="text-sm" style={{ color: '#5f7e97' }}>
+                  Customize your personal health targets
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              {/* Steps Goal */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
+                  <Footprints className="w-4 h-4" style={{ color: '#7fdbca' }} />
+                  Daily Steps Goal
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    value={goalsData.steps}
+                    onChange={(e) => setGoalsData({ ...goalsData, steps: e.target.value })}
+                    className="flex-1 px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                    style={inputStyle}
+                    placeholder="10000"
+                    min="1000"
+                    max="50000"
+                    step="500"
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#7fdbca';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(127, 219, 202, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  />
+                  <span className="text-sm font-medium" style={{ color: '#5f7e97' }}>steps</span>
+                </div>
+              </div>
+
+              {/* Water Goal */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
+                  <Droplet className="w-4 h-4" style={{ color: '#82aaff' }} />
+                  Daily Water Goal
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    value={goalsData.water_ml}
+                    onChange={(e) => setGoalsData({ ...goalsData, water_ml: e.target.value })}
+                    className="flex-1 px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                    style={inputStyle}
+                    placeholder="2000"
+                    min="500"
+                    max="5000"
+                    step="100"
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#82aaff';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(130, 170, 255, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  />
+                  <span className="text-sm font-medium" style={{ color: '#5f7e97' }}>ml</span>
+                </div>
+              </div>
+
+              {/* Sleep Goal */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
+                  <Moon className="w-4 h-4" style={{ color: '#c792ea' }} />
+                  Daily Sleep Goal
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    value={goalsData.sleep_hours}
+                    onChange={(e) => setGoalsData({ ...goalsData, sleep_hours: e.target.value })}
+                    className="flex-1 px-4 py-3 rounded-xl outline-none transition-all duration-200"
+                    style={inputStyle}
+                    placeholder="8"
+                    min="4"
+                    max="12"
+                    step="0.5"
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = '#c792ea';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(199, 146, 234, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(127, 219, 202, 0.2)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  />
+                  <span className="text-sm font-medium" style={{ color: '#5f7e97' }}>hours</span>
+                </div>
+              </div>
+
+              {goalsMessage && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="px-4 py-3 rounded-xl text-sm font-medium"
+                  style={goalsMessage.includes('Error') ? {
+                    background: 'rgba(255, 88, 116, 0.1)',
+                    border: '1px solid rgba(255, 88, 116, 0.3)',
+                    color: '#ff5874'
+                  } : {
+                    background: 'rgba(173, 219, 103, 0.1)',
+                    border: '1px solid rgba(173, 219, 103, 0.3)',
+                    color: '#addb67'
+                  }}
+                >
+                  {goalsMessage}
+                </motion.div>
+              )}
+
+              <motion.button
+                type="button"
+                disabled={savingGoals}
+                onClick={async () => {
+                  if (!user) return;
+                  try {
+                    await updateGoals(user.id, {
+                      steps: parseInt(goalsData.steps) || DEFAULT_GOALS.steps,
+                      water_ml: parseInt(goalsData.water_ml) || DEFAULT_GOALS.water_ml,
+                      sleep_hours: parseFloat(goalsData.sleep_hours) || DEFAULT_GOALS.sleep_hours,
+                    });
+                    setGoalsMessage('Goals updated successfully!');
+                    setTimeout(() => setGoalsMessage(''), 3000);
+                  } catch {
+                    setGoalsMessage('Error updating goals');
+                  }
+                }}
+                className="w-full py-3 rounded-xl font-semibold transition-all duration-200 disabled:opacity-50"
+                style={{ 
+                  background: 'linear-gradient(135deg, #addb67 0%, #7fdbca 100%)',
+                  color: '#011627'
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {savingGoals ? 'Saving...' : 'Save Goals'}
+              </motion.button>
+            </div>
           </div>
         </motion.div>
 

@@ -1,28 +1,29 @@
 import { memo, useMemo } from 'react';
 import { Trophy, Target, Zap } from 'lucide-react';
-import { HealthMetric } from '../../types/database';
+import { HealthMetric, HealthGoals, DEFAULT_GOALS } from '../../types/database';
 
 interface TodaySummaryProps {
   todayMetric?: HealthMetric;
+  goals?: HealthGoals;
   isLoading?: boolean;
 }
 
-const TodaySummary = memo(function TodaySummary({ todayMetric, isLoading }: TodaySummaryProps) {
+const TodaySummary = memo(function TodaySummary({ todayMetric, goals = DEFAULT_GOALS, isLoading }: TodaySummaryProps) {
   const summary = useMemo(() => {
-    if (!todayMetric) return { score: 0, goalsCompleted: 0, totalGoals: 0, goals: [] };
+    if (!todayMetric) return { score: 0, goalsCompleted: 0, totalGoals: 0, goalsList: [] };
 
-    const goals = [
-      { met: (todayMetric.steps || 0) >= 10000, name: 'Steps' },
-      { met: (todayMetric.water_ml || 0) >= 2000, name: 'Water' },
-      { met: (todayMetric.sleep_hours || 0) >= 8, name: 'Sleep' },
+    const goalsList = [
+      { met: (todayMetric.steps || 0) >= goals.steps, name: 'Steps' },
+      { met: (todayMetric.water_ml || 0) >= goals.water_ml, name: 'Water' },
+      { met: (todayMetric.sleep_hours || 0) >= goals.sleep_hours, name: 'Sleep' },
     ];
 
-    const goalsCompleted = goals.filter(g => g.met).length;
-    const totalGoals = goals.length;
+    const goalsCompleted = goalsList.filter(g => g.met).length;
+    const totalGoals = goalsList.length;
     const score = Math.round((goalsCompleted / totalGoals) * 100);
 
-    return { score, goalsCompleted, totalGoals, goals };
-  }, [todayMetric]);
+    return { score, goalsCompleted, totalGoals, goalsList };
+  }, [todayMetric, goals]);
 
   if (isLoading) {
     return (
@@ -97,7 +98,7 @@ const TodaySummary = memo(function TodaySummary({ todayMetric, isLoading }: Toda
             </span>
             {summary.goalsCompleted > 0 && (
               <div className="flex gap-1">
-                {summary.goals.filter(g => g.met).map((_, idx) => (
+                {summary.goalsList.filter(g => g.met).map((_, idx) => (
                   <span key={idx} style={{ color: '#addb67' }}>✓</span>
                 ))}
               </div>

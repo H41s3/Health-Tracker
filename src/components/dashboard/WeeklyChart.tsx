@@ -1,6 +1,7 @@
 import { useState, memo, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { Activity, Droplet, Moon, TrendingUp, Target } from 'lucide-react';
+import { HealthGoals, DEFAULT_GOALS } from '../../types/database';
 
 interface WeeklyChartProps {
   data: Array<{
@@ -11,46 +12,48 @@ interface WeeklyChartProps {
     sleep: number;
     weight?: number;
   }>;
+  goals?: HealthGoals;
   isLoading?: boolean;
 }
 
 type MetricType = 'steps' | 'water' | 'sleep' | 'weight';
 
-const metricConfig = {
-  steps: {
-    label: 'Steps',
-    icon: Activity,
-    color: '#7fdbca',
-    goal: 10000,
-    formatter: (value: number) => value.toLocaleString(),
-  },
-  water: {
-    label: 'Water (L)',
-    icon: Droplet,
-    color: '#82aaff',
-    goal: 2,
-    formatter: (value: number) => `${value.toFixed(1)} L`,
-  },
-  sleep: {
-    label: 'Sleep (hrs)',
-    icon: Moon,
-    color: '#c792ea',
-    goal: 8,
-    formatter: (value: number) => `${value.toFixed(1)} hrs`,
-  },
-  weight: {
-    label: 'Weight (kg)',
-    icon: TrendingUp,
-    color: '#f78c6c',
-    goal: null,
-    formatter: (value: number) => `${value.toFixed(1)} kg`,
-  },
-};
-
-const WeeklyChart = memo(function WeeklyChart({ data, isLoading }: WeeklyChartProps) {
+const WeeklyChart = memo(function WeeklyChart({ data, goals = DEFAULT_GOALS, isLoading }: WeeklyChartProps) {
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('steps');
 
-  const currentConfig = useMemo(() => metricConfig[selectedMetric], [selectedMetric]);
+  // Dynamic metric config based on user goals
+  const metricConfig = useMemo(() => ({
+    steps: {
+      label: 'Steps',
+      icon: Activity,
+      color: '#7fdbca',
+      goal: goals.steps,
+      formatter: (value: number) => value.toLocaleString(),
+    },
+    water: {
+      label: 'Water (L)',
+      icon: Droplet,
+      color: '#82aaff',
+      goal: goals.water_ml / 1000, // Convert to liters for chart
+      formatter: (value: number) => `${value.toFixed(1)} L`,
+    },
+    sleep: {
+      label: 'Sleep (hrs)',
+      icon: Moon,
+      color: '#c792ea',
+      goal: goals.sleep_hours,
+      formatter: (value: number) => `${value.toFixed(1)} hrs`,
+    },
+    weight: {
+      label: 'Weight (kg)',
+      icon: TrendingUp,
+      color: '#f78c6c',
+      goal: null as number | null,
+      formatter: (value: number) => `${value.toFixed(1)} kg`,
+    },
+  }), [goals]);
+
+  const currentConfig = useMemo(() => metricConfig[selectedMetric], [selectedMetric, metricConfig]);
   
   const weeklyAverage = useMemo(() => {
     if (data.length === 0) return 0;

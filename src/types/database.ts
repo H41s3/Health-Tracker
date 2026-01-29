@@ -1,4 +1,18 @@
 export type Gender = 'male' | 'female' | 'other' | 'prefer_not_to_say';
+
+export interface HealthGoals {
+  steps: number;
+  water_ml: number;
+  sleep_hours: number;
+  calories: number | null;
+}
+
+export const DEFAULT_GOALS: HealthGoals = {
+  steps: 10000,
+  water_ml: 2000,
+  sleep_hours: 8,
+  calories: null,
+};
 export type FlowIntensity = 'light' | 'medium' | 'heavy';
 export type MetricType = 'number' | 'boolean' | 'text' | 'scale';
 export type ReminderType = 'hydration' | 'medication' | 'workout' | 'sleep' | 'custom';
