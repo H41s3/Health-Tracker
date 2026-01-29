@@ -1,19 +1,17 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
 import { User, Settings as SettingsIcon, Bell, Shield, HelpCircle, Cog, Target, Footprints, Droplet, Moon } from 'lucide-react';
-import { Profile, Gender, DEFAULT_GOALS } from '../types/database';
+import { Gender, DEFAULT_GOALS } from '../types/database';
 import { useGoalsStore } from '../stores/useGoalsStore';
+import { useProfileStore } from '../stores/useProfileStore';
 import PageWrapper from '../components/Layout/PageWrapper';
 import PageHeader from '../components/Layout/PageHeader';
 
 export default function Settings() {
   const { user } = useAuth();
   const { goals, fetchGoals, updateGoals, saving: savingGoals } = useGoalsStore();
-  const [, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const { profile, fetchProfile, updateProfile, saving: savingProfile, loading: loadingProfile } = useProfileStore();
   const [message, setMessage] = useState('');
   const [goalsMessage, setGoalsMessage] = useState('');
   const [formData, setFormData] = useState({
@@ -30,11 +28,23 @@ export default function Settings() {
 
   useEffect(() => {
     if (user) {
-      loadProfile();
+      fetchProfile(user.id);
       fetchGoals(user.id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // Sync form data when profile is fetched
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        full_name: profile.full_name || '',
+        date_of_birth: profile.date_of_birth || '',
+        gender: (profile.gender as Gender) || '',
+        height_cm: profile.height_cm?.toString() || '',
+      });
+    }
+  }, [profile]);
 
   // Sync goals data when goals are fetched
   useEffect(() => {
@@ -45,62 +55,28 @@ export default function Settings() {
     });
   }, [goals]);
 
-  const loadProfile = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
-
-      if (error) throw error;
-
-      if (data) {
-        setProfile(data);
-        setFormData({
-          full_name: data.full_name || '',
-          date_of_birth: data.date_of_birth || '',
-          gender: (data.gender as Gender) || '',
-          height_cm: data.height_cm?.toString() || '',
-        });
-      }
-    } catch (error) {
-      console.error('Error loading profile:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
-    setSaving(true);
     setMessage('');
 
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          full_name: formData.full_name || null,
-          date_of_birth: formData.date_of_birth || null,
-          gender: formData.gender || null,
-          height_cm: formData.height_cm ? parseFloat(formData.height_cm) : null,
-        });
+    const success = await updateProfile(user.id, {
+      full_name: formData.full_name || null,
+      date_of_birth: formData.date_of_birth || null,
+      gender: formData.gender || null,
+      height_cm: formData.height_cm ? parseFloat(formData.height_cm) : null,
+    });
 
-      if (error) throw error;
-
+    if (success) {
       setMessage('Profile updated successfully!');
       setTimeout(() => setMessage(''), 3000);
-    } catch (error) {
-      setMessage('Error updating profile: ' + (error instanceof Error ? error.message : 'An error occurred'));
-    } finally {
-      setSaving(false);
+    } else {
+      setMessage('Error updating profile. Please try again.');
     }
   };
+
+  const loading = loadingProfile;
 
   const inputStyle = {
     background: 'rgba(11, 41, 66, 0.8)',
@@ -280,7 +256,7 @@ export default function Settings() {
 
               <motion.button
                 type="submit"
-                disabled={saving}
+                disabled={savingProfile}
                 className="w-full py-3 rounded-xl font-semibold transition-all duration-200 disabled:opacity-50"
                 style={{ 
                   background: 'linear-gradient(135deg, #7fdbca 0%, #82aaff 100%)',
@@ -289,7 +265,7 @@ export default function Settings() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                {saving ? 'Saving...' : 'Save Changes'}
+                {savingProfile ? 'Saving...' : 'Save Changes'}
               </motion.button>
             </form>
           </div>
