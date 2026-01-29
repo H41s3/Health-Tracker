@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useHealthStore } from '../stores/useHealthStore';
 import { useGoalsStore } from '../stores/useGoalsStore';
+import { useProfileStore } from '../stores/useProfileStore';
 import { useToastStore } from '../stores/useToastStore';
 import { Activity, Droplet, Moon, TrendingUp, Heart } from 'lucide-react';
 import { format, subDays } from 'date-fns';
@@ -12,6 +13,7 @@ import WeeklyChart from '../components/dashboard/WeeklyChart';
 import QuickLog from '../components/dashboard/QuickLog';
 import ActivityTrends from '../components/dashboard/ActivityTrends';
 import TodaySummary from '../components/dashboard/TodaySummary';
+import BMICard from '../components/dashboard/BMICard';
 import PageWrapper from '../components/Layout/PageWrapper';
 import PageHeader from '../components/Layout/PageHeader';
 import AppProfiler from '../utils/Profiler';
@@ -20,6 +22,7 @@ export default function Dashboard() {
   const { user } = useAuth();
   const { metrics, fetchMetrics, addOrUpdateMetric, getMetricForDate, loading, isSaving } = useHealthStore();
   const { goals, fetchGoals } = useGoalsStore();
+  const { profile, fetchProfile } = useProfileStore();
   const { show } = useToastStore();
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
 
@@ -28,8 +31,9 @@ export default function Dashboard() {
       const startDate = format(subDays(new Date(), 30), 'yyyy-MM-dd');
       fetchMetrics(user.id, startDate);
       fetchGoals(user.id);
+      fetchProfile(user.id);
     }
-  }, [user, fetchMetrics, fetchGoals]);
+  }, [user, fetchMetrics, fetchGoals, fetchProfile]);
 
 
   // persist last-selected date
@@ -157,10 +161,16 @@ export default function Dashboard() {
         </div>
       </AppProfiler>
 
-      {/* Streak Widget */}
+      {/* Streak Widget and BMI Card */}
       <AppProfiler id="StreakWidget">
-        <div className="grid-cards">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <StreakWidget metrics={metrics} isLoading={loading} />
+          <BMICard 
+            heightCm={profile?.height_cm ?? null}
+            currentWeight={todayMetric?.weight_kg ?? null}
+            previousWeight={previousDayMetric?.weight_kg ?? null}
+            isLoading={loading}
+          />
         </div>
       </AppProfiler>
 
