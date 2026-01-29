@@ -57,69 +57,79 @@ export default function PillPackVisualization({ pillLogs, packSize = 28 }: PillP
       <div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h4 className="text-lg font-semibold text-gray-900">
+            <h4 className="text-lg font-semibold" style={{ color: '#d6deeb' }}>
               {packSize}-Day Pill Pack
             </h4>
-            <p className="text-sm text-gray-600">Current cycle visualization</p>
+            <p className="text-sm" style={{ color: '#5f7e97' }}>Current cycle visualization</p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-gray-900">{stats.adherence}%</div>
-            <div className="text-xs text-gray-600">Adherence</div>
+            <div className="text-2xl font-bold" style={{ color: '#7fdbca' }}>{stats.adherence}%</div>
+            <div className="text-xs" style={{ color: '#5f7e97' }}>Adherence</div>
           </div>
         </div>
 
         {/* Legend */}
         <div className="flex flex-wrap gap-3 mb-4 text-xs">
           <div className="flex items-center gap-1">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
-              <Check className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#addb67' }}>
+              <Check className="w-4 h-4" style={{ color: '#011627' }} />
             </div>
-            <span className="text-gray-700 font-medium">Taken</span>
+            <span className="font-medium" style={{ color: '#d6deeb' }}>Taken</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-8 h-8 rounded-lg bg-red-500 flex items-center justify-center">
-              <X className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#ff5874' }}>
+              <X className="w-4 h-4" style={{ color: '#011627' }} />
             </div>
-            <span className="text-gray-700 font-medium">Missed</span>
+            <span className="font-medium" style={{ color: '#d6deeb' }}>Missed</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center">
-              <Circle className="w-4 h-4 text-gray-400" />
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(95, 126, 151, 0.3)' }}>
+              <Circle className="w-4 h-4" style={{ color: '#5f7e97' }} />
             </div>
-            <span className="text-gray-700 font-medium">Not Logged</span>
+            <span className="font-medium" style={{ color: '#d6deeb' }}>Not Logged</span>
           </div>
           {packSize === 28 && (
             <div className="flex items-center gap-1">
-              <div className="w-8 h-8 rounded-lg bg-gray-100 border-2 border-dashed border-gray-300" />
-              <span className="text-gray-700 font-medium">Placebo</span>
+              <div className="w-8 h-8 rounded-lg border-2 border-dashed" style={{ background: 'rgba(11, 41, 66, 0.3)', borderColor: 'rgba(95, 126, 151, 0.5)' }} />
+              <span className="font-medium" style={{ color: '#d6deeb' }}>Placebo</span>
             </div>
           )}
         </div>
 
         {/* Pill Pack Grid */}
-        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border-2 border-purple-200">
+        <div 
+          className="rounded-xl p-6"
+          style={{ 
+            background: 'linear-gradient(135deg, rgba(199, 146, 234, 0.1), rgba(255, 88, 116, 0.1))',
+            border: '1px solid rgba(199, 146, 234, 0.2)'
+          }}
+        >
           <div className="grid grid-cols-7 gap-2">
             {pillPack.map((pill) => {
-              let bgClass = 'bg-gray-200';
+              let bgStyle: React.CSSProperties = { background: 'rgba(95, 126, 151, 0.3)' };
               let icon = null;
-              let borderClass = '';
+              let ringStyle = '';
 
               if (pill.isPlacebo) {
-                bgClass = 'bg-gray-100 border-2 border-dashed border-gray-300';
+                bgStyle = { 
+                  background: 'rgba(11, 41, 66, 0.3)', 
+                  border: '2px dashed rgba(95, 126, 151, 0.5)' 
+                };
               } else if (pill.log?.taken) {
-                bgClass = 'bg-emerald-500';
-                icon = <Check className="w-5 h-5 text-white" />;
+                bgStyle = { background: '#addb67' };
+                icon = <Check className="w-5 h-5" style={{ color: '#011627' }} />;
               } else if (pill.log?.missed) {
-                bgClass = 'bg-red-500';
-                icon = <X className="w-5 h-5 text-white" />;
+                bgStyle = { background: '#ff5874' };
+                icon = <X className="w-5 h-5" style={{ color: '#011627' }} />;
               } else {
-                bgClass = 'bg-white border-2 border-gray-300';
-                icon = <Circle className="w-4 h-4 text-gray-400" />;
+                bgStyle = { 
+                  background: 'rgba(29, 59, 83, 0.8)', 
+                  border: '2px solid rgba(95, 126, 151, 0.3)' 
+                };
+                icon = <Circle className="w-4 h-4" style={{ color: '#5f7e97' }} />;
               }
 
-              if (pill.isToday) {
-                borderClass = 'ring-4 ring-purple-500 scale-110';
-              }
+              const isToday = pill.isToday;
 
               return (
                 <div
@@ -128,13 +138,16 @@ export default function PillPackVisualization({ pillLogs, packSize = 28 }: PillP
                   title={format(pill.date, 'MMM dd, yyyy')}
                 >
                   <div
-                    className={`
-                      aspect-square rounded-lg flex flex-col items-center justify-center
-                      transition-all duration-200 hover:scale-105 cursor-pointer
-                      ${bgClass} ${borderClass}
-                    `}
+                    className={`aspect-square rounded-lg flex flex-col items-center justify-center transition-all duration-200 hover:scale-105 cursor-pointer ${isToday ? 'ring-4 ring-c792ea scale-110' : ''}`}
+                    style={{
+                      ...bgStyle,
+                      ...(isToday ? { boxShadow: '0 0 0 4px #c792ea' } : {})
+                    }}
                   >
-                    <div className="text-xs font-bold text-gray-900 mb-1">
+                    <div 
+                      className="text-xs font-bold mb-1"
+                      style={{ color: pill.log?.taken || pill.log?.missed ? '#011627' : '#d6deeb' }}
+                    >
                       {pill.dayNum}
                     </div>
                     <div className="flex items-center justify-center">
@@ -144,7 +157,10 @@ export default function PillPackVisualization({ pillLogs, packSize = 28 }: PillP
                   
                   {/* Tooltip on hover */}
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                    <div className="bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
+                    <div 
+                      className="text-xs rounded px-2 py-1 whitespace-nowrap"
+                      style={{ background: '#1d3b53', color: '#d6deeb', border: '1px solid rgba(127, 219, 202, 0.2)' }}
+                    >
                       {format(pill.date, 'MMM dd')}
                       {pill.isToday && ' (Today)'}
                     </div>
@@ -158,38 +174,58 @@ export default function PillPackVisualization({ pillLogs, packSize = 28 }: PillP
 
       {/* Summary Stats */}
       <div className="grid grid-cols-4 gap-3">
-        <div className="bg-white rounded-xl p-4 border border-gray-200 text-center">
-          <div className="text-2xl font-bold text-emerald-600">{stats.taken}</div>
-          <div className="text-xs text-gray-600 mt-1 font-medium">Taken</div>
+        <div 
+          className="rounded-xl p-4 text-center"
+          style={{ background: 'rgba(11, 41, 66, 0.5)', border: '1px solid rgba(127, 219, 202, 0.1)' }}
+        >
+          <div className="text-2xl font-bold" style={{ color: '#addb67' }}>{stats.taken}</div>
+          <div className="text-xs mt-1 font-medium" style={{ color: '#5f7e97' }}>Taken</div>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-gray-200 text-center">
-          <div className="text-2xl font-bold text-red-600">{stats.missed}</div>
-          <div className="text-xs text-gray-600 mt-1 font-medium">Missed</div>
+        <div 
+          className="rounded-xl p-4 text-center"
+          style={{ background: 'rgba(11, 41, 66, 0.5)', border: '1px solid rgba(127, 219, 202, 0.1)' }}
+        >
+          <div className="text-2xl font-bold" style={{ color: '#ff5874' }}>{stats.missed}</div>
+          <div className="text-xs mt-1 font-medium" style={{ color: '#5f7e97' }}>Missed</div>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-gray-200 text-center">
-          <div className="text-2xl font-bold text-gray-900">{stats.logged}</div>
-          <div className="text-xs text-gray-600 mt-1 font-medium">Logged</div>
+        <div 
+          className="rounded-xl p-4 text-center"
+          style={{ background: 'rgba(11, 41, 66, 0.5)', border: '1px solid rgba(127, 219, 202, 0.1)' }}
+        >
+          <div className="text-2xl font-bold" style={{ color: '#d6deeb' }}>{stats.logged}</div>
+          <div className="text-xs mt-1 font-medium" style={{ color: '#5f7e97' }}>Logged</div>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-gray-200 text-center">
-          <div className="text-2xl font-bold text-purple-600">{stats.adherence}%</div>
-          <div className="text-xs text-gray-600 mt-1 font-medium">Score</div>
+        <div 
+          className="rounded-xl p-4 text-center"
+          style={{ background: 'rgba(11, 41, 66, 0.5)', border: '1px solid rgba(127, 219, 202, 0.1)' }}
+        >
+          <div className="text-2xl font-bold" style={{ color: '#c792ea' }}>{stats.adherence}%</div>
+          <div className="text-xs mt-1 font-medium" style={{ color: '#5f7e97' }}>Score</div>
         </div>
       </div>
 
       {/* Adherence Progress Bar */}
-      <div className="bg-white rounded-xl p-4 border border-gray-200">
+      <div 
+        className="rounded-xl p-4"
+        style={{ background: 'rgba(11, 41, 66, 0.5)', border: '1px solid rgba(127, 219, 202, 0.1)' }}
+      >
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">Pack Progress</span>
-          <span className="text-sm text-gray-600">{stats.logged} / {stats.total} days logged</span>
+          <span className="text-sm font-medium" style={{ color: '#d6deeb' }}>Pack Progress</span>
+          <span className="text-sm" style={{ color: '#5f7e97' }}>{stats.logged} / {stats.total} days logged</span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+        <div 
+          className="w-full rounded-full h-3 overflow-hidden"
+          style={{ background: 'rgba(95, 126, 151, 0.3)' }}
+        >
           <div
-            className="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-full transition-all duration-500"
-            style={{ width: `${(stats.logged / stats.total) * 100}%` }}
+            className="h-full rounded-full transition-all duration-500"
+            style={{ 
+              width: `${(stats.logged / stats.total) * 100}%`,
+              background: 'linear-gradient(90deg, #7fdbca 0%, #addb67 100%)'
+            }}
           />
         </div>
       </div>
     </div>
   );
 }
-

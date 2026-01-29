@@ -70,13 +70,16 @@ export default function BirthControlManager() {
   const selectedOption = birthControlOptions.find(opt => opt.value === formData.type);
 
   return (
-    <div className="card p-6">
+    <div 
+      className="p-6 rounded-xl"
+      style={{ background: 'rgba(29, 59, 83, 0.6)', border: '1px solid rgba(127, 219, 202, 0.1)' }}
+    >
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl">
-            <Pill className="w-5 h-5 text-purple-600" />
+          <div className="p-2 rounded-xl" style={{ background: 'rgba(199, 146, 234, 0.15)' }}>
+            <Pill className="w-5 h-5" style={{ color: '#c792ea' }} />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900">Birth Control</h3>
+          <h3 className="text-xl font-semibold" style={{ color: '#d6deeb' }}>Birth Control</h3>
         </div>
         
         {!activeBirthControl && !showForm && (
@@ -92,7 +95,13 @@ export default function BirthControlManager() {
 
       {activeBirthControl && !showForm && (
         <div className="space-y-4">
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
+          <div 
+            className="rounded-xl p-4"
+            style={{ 
+              background: 'linear-gradient(135deg, rgba(199, 146, 234, 0.15), rgba(255, 88, 116, 0.15))',
+              border: '1px solid rgba(199, 146, 234, 0.2)'
+            }}
+          >
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
@@ -100,30 +109,33 @@ export default function BirthControlManager() {
                     const option = birthControlOptions.find(opt => opt.value === activeBirthControl.type);
                     const Icon = option?.icon || Pill;
                     return (
-                      <div className="p-2 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl">
-                        <Icon className="w-6 h-6 text-purple-700" />
+                      <div className="p-2 rounded-xl" style={{ background: 'rgba(199, 146, 234, 0.2)' }}>
+                        <Icon className="w-6 h-6" style={{ color: '#c792ea' }} />
                       </div>
                     );
                   })()}
                   <div>
-                    <h4 className="text-lg font-semibold text-gray-900">
+                    <h4 className="text-lg font-semibold" style={{ color: '#d6deeb' }}>
                       {activeBirthControl.brand_name || birthControlOptions.find(opt => opt.value === activeBirthControl.type)?.label}
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm" style={{ color: '#5f7e97' }}>
                       Since {format(new Date(activeBirthControl.start_date), 'MMM dd, yyyy')}
                     </p>
                   </div>
                 </div>
 
                 {activeBirthControl.type === 'pill' && activeBirthControl.reminder_time && (
-                  <div className="flex items-center gap-2 mt-3 text-gray-700">
-                    <Clock className="w-4 h-4" />
+                  <div className="flex items-center gap-2 mt-3" style={{ color: '#d6deeb' }}>
+                    <Clock className="w-4 h-4" style={{ color: '#5f7e97' }} />
                     <span className="text-sm font-medium">Daily reminder at {activeBirthControl.reminder_time}</span>
                   </div>
                 )}
 
                 {activeBirthControl.notes && (
-                  <p className="mt-3 text-sm text-gray-600 italic bg-purple-50 p-2 rounded">
+                  <p 
+                    className="mt-3 text-sm italic p-2 rounded"
+                    style={{ background: 'rgba(199, 146, 234, 0.1)', color: '#c792ea' }}
+                  >
                     {activeBirthControl.notes}
                   </p>
                 )}
@@ -131,7 +143,8 @@ export default function BirthControlManager() {
 
               <button
                 onClick={handleDeactivate}
-                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
+                className="p-2 rounded-xl transition-all duration-200"
+                style={{ color: '#5f7e97' }}
                 title="Stop tracking"
               >
                 <X className="w-5 h-5" />
@@ -139,9 +152,12 @@ export default function BirthControlManager() {
             </div>
 
             {activeBirthControl.type === 'pill' && (
-              <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-center gap-2 text-gray-700">
-                  <AlertCircle className="w-4 h-4 text-blue-600" />
+              <div 
+                className="mt-4 p-3 rounded-lg"
+                style={{ background: 'rgba(130, 170, 255, 0.1)', border: '1px solid rgba(130, 170, 255, 0.2)' }}
+              >
+                <div className="flex items-center gap-2" style={{ color: '#82aaff' }}>
+                  <AlertCircle className="w-4 h-4" />
                   <span className="text-sm font-medium">Daily pill tracking available in the cycle view below</span>
                 </div>
               </div>
@@ -153,25 +169,31 @@ export default function BirthControlManager() {
       {showForm && (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
               Method Type
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {birthControlOptions.map((option) => {
                 const Icon = option.icon;
+                const isSelected = formData.type === option.value;
                 return (
                   <button
                     key={option.value}
                     type="button"
                     onClick={() => setFormData({ ...formData, type: option.value })}
-                    className={`group relative p-4 rounded-xl border-2 transition-all duration-300 overflow-hidden ${
-                      formData.type === option.value
-                        ? 'border-purple-400 bg-gradient-to-br from-purple-500/30 to-pink-500/30 text-white shadow-xl scale-105'
-                        : 'border-gray-300 hover:border-purple-400 hover:bg-purple-50 text-gray-700'
-                    }`}
+                    className="group relative p-4 rounded-xl border-2 transition-all duration-300 overflow-hidden"
+                    style={isSelected ? {
+                      background: 'linear-gradient(135deg, rgba(199, 146, 234, 0.2), rgba(255, 88, 116, 0.2))',
+                      borderColor: '#c792ea',
+                      color: '#d6deeb'
+                    } : {
+                      background: 'rgba(11, 41, 66, 0.5)',
+                      borderColor: 'rgba(127, 219, 202, 0.2)',
+                      color: '#5f7e97'
+                    }}
                   >
-                    <Icon className={`w-6 h-6 mx-auto mb-2 ${formData.type === option.value ? 'text-white' : 'text-gray-600'}`} strokeWidth={2} />
-                    <div className="text-xs font-semibold">{option.label}</div>
+                    <Icon className="w-6 h-6 mx-auto mb-2" style={{ color: isSelected ? '#c792ea' : '#5f7e97' }} strokeWidth={2} />
+                    <div className="text-xs font-semibold" style={{ color: isSelected ? '#d6deeb' : '#5f7e97' }}>{option.label}</div>
                   </button>
                 );
               })}
@@ -179,7 +201,7 @@ export default function BirthControlManager() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
               Brand Name (Optional)
             </label>
             <input
@@ -192,7 +214,7 @@ export default function BirthControlManager() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
               Start Date
             </label>
             <input
@@ -206,7 +228,7 @@ export default function BirthControlManager() {
 
           {selectedOption?.needsReminder && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
                 Daily Reminder Time
               </label>
               <input
@@ -219,7 +241,7 @@ export default function BirthControlManager() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
               Notes (Optional)
             </label>
             <textarea
@@ -239,7 +261,11 @@ export default function BirthControlManager() {
             <button
               type="button"
               onClick={resetForm}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors duration-200 font-medium"
+              className="px-4 py-2 rounded-xl transition-colors duration-200 font-medium"
+              style={{ 
+                background: 'rgba(95, 126, 151, 0.2)', 
+                color: '#d6deeb' 
+              }}
             >
               Cancel
             </button>
@@ -249,10 +275,13 @@ export default function BirthControlManager() {
 
       {!activeBirthControl && !showForm && (
         <div className="text-center py-8">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center">
-            <Pill className="w-8 h-8 text-purple-600" />
+          <div 
+            className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
+            style={{ background: 'rgba(199, 146, 234, 0.15)' }}
+          >
+            <Pill className="w-8 h-8" style={{ color: '#c792ea' }} />
           </div>
-          <p className="text-gray-600 mb-4 font-medium">No birth control method tracked</p>
+          <p className="mb-4 font-medium" style={{ color: '#5f7e97' }}>No birth control method tracked</p>
           <button
             onClick={() => setShowForm(true)}
             className="btn-primary inline-flex items-center gap-2"

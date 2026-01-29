@@ -72,16 +72,19 @@ export default function CycleAnalytics({ cycles }: CycleAnalyticsProps) {
 
   if (!analytics) {
     return (
-      <div className="card p-6">
+      <div 
+        className="p-6 rounded-xl"
+        style={{ background: 'rgba(29, 59, 83, 0.6)', border: '1px solid rgba(127, 219, 202, 0.1)' }}
+      >
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-gradient-to-br from-blue-100/20 to-violet-100/20 rounded-xl">
-            <TrendingUp className="w-5 h-5 text-blue-400" />
+          <div className="p-2 rounded-xl" style={{ background: 'rgba(130, 170, 255, 0.15)' }}>
+            <TrendingUp className="w-5 h-5" style={{ color: '#82aaff' }} />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900">Cycle Analytics</h3>
+          <h3 className="text-xl font-semibold" style={{ color: '#d6deeb' }}>Cycle Analytics</h3>
         </div>
         <div className="text-center py-8">
-          <AlertCircle className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-          <p className="text-gray-600 font-medium">
+          <AlertCircle className="w-12 h-12 mx-auto mb-3" style={{ color: '#5f7e97' }} />
+          <p className="font-medium" style={{ color: '#5f7e97' }}>
             Log at least 2 complete cycles to see analytics
           </p>
         </div>
@@ -90,74 +93,89 @@ export default function CycleAnalytics({ cycles }: CycleAnalyticsProps) {
   }
 
   const regularityConfig = {
-    very_regular: { label: 'Very Regular', color: 'text-emerald-400', bg: 'bg-emerald-500/20' },
-    regular: { label: 'Regular', color: 'text-blue-400', bg: 'bg-blue-500/20' },
-    irregular: { label: 'Irregular', color: 'text-orange-400', bg: 'bg-orange-500/20' },
+    very_regular: { label: 'Very Regular', color: '#addb67' },
+    regular: { label: 'Regular', color: '#82aaff' },
+    irregular: { label: 'Irregular', color: '#f78c6c' },
   };
 
   const regConfig = regularityConfig[analytics.regularity];
 
   return (
-    <div className="card p-6">
+    <div 
+      className="p-6 rounded-xl"
+      style={{ background: 'rgba(29, 59, 83, 0.6)', border: '1px solid rgba(127, 219, 202, 0.1)' }}
+    >
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-gradient-to-br from-blue-100/20 to-violet-100/20 rounded-xl">
-          <TrendingUp className="w-5 h-5 text-blue-400" />
+        <div className="p-2 rounded-xl" style={{ background: 'rgba(130, 170, 255, 0.15)' }}>
+          <TrendingUp className="w-5 h-5" style={{ color: '#82aaff' }} />
         </div>
-        <h3 className="text-xl font-semibold text-gray-900">Cycle Analytics</h3>
+        <h3 className="text-xl font-semibold" style={{ color: '#d6deeb' }}>Cycle Analytics</h3>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {/* Average Cycle Length */}
-        <div className="bg-gray-50 rounded-xl p-4">
+        <div 
+          className="rounded-xl p-4"
+          style={{ background: 'rgba(11, 41, 66, 0.5)' }}
+        >
           <div className="flex items-center gap-2 mb-2">
-            <Calendar className="w-4 h-4 text-gray-600" />
-            <span className="text-xs text-gray-700 font-medium">Avg Cycle</span>
+            <Calendar className="w-4 h-4" style={{ color: '#5f7e97' }} />
+            <span className="text-xs font-medium" style={{ color: '#5f7e97' }}>Avg Cycle</span>
           </div>
-          <div className="text-2xl font-bold text-gray-900">{analytics.avgLength}</div>
-          <div className="text-xs text-gray-600">days</div>
+          <div className="text-2xl font-bold" style={{ color: '#d6deeb' }}>{analytics.avgLength}</div>
+          <div className="text-xs" style={{ color: '#5f7e97' }}>days</div>
         </div>
 
         {/* Regularity */}
-        <div className="bg-gray-50 rounded-xl p-4">
+        <div 
+          className="rounded-xl p-4"
+          style={{ background: 'rgba(11, 41, 66, 0.5)' }}
+        >
           <div className="flex items-center gap-2 mb-2">
-            <Activity className="w-4 h-4 text-gray-600" />
-            <span className="text-xs text-gray-700 font-medium">Regularity</span>
+            <Activity className="w-4 h-4" style={{ color: '#5f7e97' }} />
+            <span className="text-xs font-medium" style={{ color: '#5f7e97' }}>Regularity</span>
           </div>
-          <div className={`text-sm font-bold ${regConfig.color}`}>
+          <div className="text-sm font-bold" style={{ color: regConfig.color }}>
             {regConfig.label}
           </div>
-          <div className="text-xs text-gray-600">±{analytics.stdDev} days</div>
+          <div className="text-xs" style={{ color: '#5f7e97' }}>±{analytics.stdDev} days</div>
         </div>
 
         {/* Range */}
-        <div className="bg-gray-50 rounded-xl p-4">
+        <div 
+          className="rounded-xl p-4"
+          style={{ background: 'rgba(11, 41, 66, 0.5)' }}
+        >
           <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="w-4 h-4 text-gray-600" />
-            <span className="text-xs text-gray-700 font-medium">Range</span>
+            <TrendingUp className="w-4 h-4" style={{ color: '#5f7e97' }} />
+            <span className="text-xs font-medium" style={{ color: '#5f7e97' }}>Range</span>
           </div>
-          <div className="text-lg font-bold text-gray-900">
+          <div className="text-lg font-bold" style={{ color: '#d6deeb' }}>
             {analytics.minLength}-{analytics.maxLength}
           </div>
-          <div className="text-xs text-gray-600">days</div>
+          <div className="text-xs" style={{ color: '#5f7e97' }}>days</div>
         </div>
 
         {/* Period Length */}
-        <div className="bg-gray-50 rounded-xl p-4">
+        <div 
+          className="rounded-xl p-4"
+          style={{ background: 'rgba(11, 41, 66, 0.5)' }}
+        >
           <div className="flex items-center gap-2 mb-2">
-            <Calendar className="w-4 h-4 text-gray-600" />
-            <span className="text-xs text-gray-700 font-medium">Avg Period</span>
+            <Calendar className="w-4 h-4" style={{ color: '#5f7e97' }} />
+            <span className="text-xs font-medium" style={{ color: '#5f7e97' }}>Avg Period</span>
           </div>
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold" style={{ color: '#d6deeb' }}>
             {analytics.avgPeriodLength || '—'}
           </div>
-          <div className="text-xs text-gray-600">days</div>
+          <div className="text-xs" style={{ color: '#5f7e97' }}>days</div>
         </div>
       </div>
 
       {/* Top Symptoms */}
       {analytics.topSymptoms.length > 0 && (
         <div>
-          <h4 className="text-sm font-semibold text-gray-700 mb-3">Most Common Symptoms</h4>
+          <h4 className="text-sm font-semibold mb-3" style={{ color: '#d6deeb' }}>Most Common Symptoms</h4>
           <div className="space-y-2">
             {analytics.topSymptoms.map(({ symptom, count }) => {
               const percentage = Math.round((count / analytics.totalCycles) * 100);
@@ -165,15 +183,21 @@ export default function CycleAnalytics({ cycles }: CycleAnalyticsProps) {
                 <div key={symptom} className="flex items-center gap-3">
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm text-gray-900 font-medium">{symptom}</span>
-                      <span className="text-xs text-gray-600">
+                      <span className="text-sm font-medium" style={{ color: '#d6deeb' }}>{symptom}</span>
+                      <span className="text-xs" style={{ color: '#5f7e97' }}>
                         {count}/{analytics.totalCycles} cycles
                       </span>
                     </div>
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-2 rounded-full overflow-hidden"
+                      style={{ background: 'rgba(95, 126, 151, 0.3)' }}
+                    >
                       <div
-                        className="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full transition-all duration-300"
-                        style={{ width: `${percentage}%` }}
+                        className="h-full rounded-full transition-all duration-300"
+                        style={{ 
+                          width: `${percentage}%`,
+                          background: 'linear-gradient(90deg, #c792ea 0%, #ff5874 100%)'
+                        }}
                       />
                     </div>
                   </div>

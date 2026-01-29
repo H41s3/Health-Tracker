@@ -238,15 +238,16 @@ export default function CycleTracker() {
             animate={prefersReducedMotion ? undefined : { opacity: 1, height: 'auto' }}
             exit={prefersReducedMotion ? undefined : { opacity: 0, height: 0 }}
             transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2 }}
-            className="card p-8 mb-8"
+            className="p-8 mb-8 rounded-xl"
+            style={{ background: 'rgba(29, 59, 83, 0.6)', border: '1px solid rgba(199, 146, 234, 0.2)' }}
           >
-            <h2 className="text-2xl font-semibold text-purple-900 mb-6">
+            <h2 className="text-2xl font-semibold mb-6" style={{ color: '#d6deeb' }}>
               {editingCycle ? 'Edit Cycle' : 'New Cycle Entry'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-purple-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#c792ea' }}>
                     Period Start Date
                   </label>
                   <input
@@ -258,7 +259,7 @@ export default function CycleTracker() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-purple-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#c792ea' }}>
                     Period End Date (Optional)
                   </label>
                   <input
@@ -272,18 +273,23 @@ export default function CycleTracker() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-purple-700 mb-3">Flow Intensity</label>
+                <label className="block text-sm font-medium mb-3" style={{ color: '#c792ea' }}>Flow Intensity</label>
                 <div className="flex gap-3">
                   {(['light', 'medium', 'heavy'] as FlowIntensity[]).map((intensity) => (
                     <motion.button
                       key={intensity}
                       type="button"
                       onClick={() => setFormData({ ...formData, flow_intensity: intensity })}
-                      className={`flex-1 py-3 px-4 rounded-xl border-2 capitalize transition-all duration-200 ${
-                                                  formData.flow_intensity === intensity
-                          ? 'border-rose-500 bg-gradient-to-r from-rose-50 to-pink-50 text-rose-700 shadow-sm'
-                          : 'border-purple-200 hover:border-purple-300 hover:bg-purple-50 text-purple-700'
-                      }`}
+                      className="flex-1 py-3 px-4 rounded-xl border-2 capitalize transition-all duration-200"
+                      style={formData.flow_intensity === intensity ? {
+                        background: 'linear-gradient(135deg, rgba(255, 88, 116, 0.2), rgba(199, 146, 234, 0.2))',
+                        borderColor: '#ff5874',
+                        color: '#ff5874'
+                      } : {
+                        background: 'rgba(11, 41, 66, 0.5)',
+                        borderColor: 'rgba(199, 146, 234, 0.2)',
+                        color: '#c792ea'
+                      }}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -294,7 +300,7 @@ export default function CycleTracker() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-purple-700 mb-3">Symptoms</label>
+                <label className="block text-sm font-medium mb-3" style={{ color: '#c792ea' }}>Symptoms</label>
                 
                 {/* Quick Symptom Presets */}
                 <div className="mb-6">
@@ -314,18 +320,23 @@ export default function CycleTracker() {
                 <div className="space-y-4">
                   {Object.entries(symptomCategories).map(([key, category]) => (
                     <div key={key}>
-                      <h4 className="text-xs font-semibold text-purple-600 mb-2">{category.label}</h4>
+                      <h4 className="text-xs font-semibold mb-2" style={{ color: '#c792ea' }}>{category.label}</h4>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                         {category.symptoms.map((symptom) => (
                           <button
                             key={symptom}
                             type="button"
                             onClick={() => toggleSymptom(symptom)}
-                            className={`py-2 px-3 rounded-xl border text-xs transition-all duration-200 ${
-                              formData.symptoms.includes(symptom)
-                                ? 'border-rose-500 bg-gradient-to-r from-rose-50 to-pink-50 text-rose-700 shadow-sm'
-                                : 'border-purple-200 hover:border-purple-300 hover:bg-purple-50 text-purple-700'
-                            }`}
+                            className="py-2 px-3 rounded-xl border text-xs transition-all duration-200"
+                            style={formData.symptoms.includes(symptom) ? {
+                              background: 'rgba(255, 88, 116, 0.15)',
+                              borderColor: '#ff5874',
+                              color: '#ff5874'
+                            } : {
+                              background: 'rgba(11, 41, 66, 0.5)',
+                              borderColor: 'rgba(199, 146, 234, 0.2)',
+                              color: '#c792ea'
+                            }}
                           >
                             {symptom}
                           </button>
@@ -337,7 +348,7 @@ export default function CycleTracker() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-purple-700 mb-2">Notes</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: '#c792ea' }}>Notes</label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -375,9 +386,10 @@ export default function CycleTracker() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
-        className="card p-8"
+        className="p-8 rounded-xl"
+        style={{ background: 'rgba(29, 59, 83, 0.6)', border: '1px solid rgba(199, 146, 234, 0.2)' }}
       >
-        <h2 className="text-2xl font-semibold text-purple-900 mb-6">Cycle History</h2>
+        <h2 className="text-2xl font-semibold mb-6" style={{ color: '#d6deeb' }}>Cycle History</h2>
         {cycles.length === 0 ? (
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
@@ -385,10 +397,10 @@ export default function CycleTracker() {
             transition={{ duration: 0.5 }}
             className="text-center py-12"
           >
-            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-rose-100 to-pink-100 rounded-2xl flex items-center justify-center">
-              <Calendar className="w-8 h-8 text-rose-600" />
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(199, 146, 234, 0.15)' }}>
+              <Calendar className="w-8 h-8" style={{ color: '#c792ea' }} />
             </div>
-            <p className="text-purple-600 text-lg font-medium">No cycles recorded yet. Start tracking your cycle!</p>
+            <p className="text-lg font-medium" style={{ color: '#c792ea' }}>No cycles recorded yet. Start tracking your cycle!</p>
           </motion.div>
         ) : (
           <div className="space-y-4">
@@ -398,40 +410,41 @@ export default function CycleTracker() {
                 initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
                 animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
                 transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2, delay: Math.min(index * 0.05, 0.3) }}
-                className="card p-6 hover:shadow-lg transition-all duration-300 group"
+                className="p-6 rounded-xl transition-all duration-300 group"
+                style={{ background: 'rgba(11, 41, 66, 0.5)', border: '1px solid rgba(199, 146, 234, 0.1)' }}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
-                      <span className="text-lg font-semibold text-purple-900">
+                      <span className="text-lg font-semibold" style={{ color: '#d6deeb' }}>
                         {format(new Date(cycle.period_start_date), 'MMM dd, yyyy')}
                       </span>
                       {cycle.period_end_date && (
-                        <span className="text-sm text-purple-600">
+                        <span className="text-sm" style={{ color: '#c792ea' }}>
                           to {format(new Date(cycle.period_end_date), 'MMM dd, yyyy')}
                         </span>
                       )}
                       {cycle.cycle_length_days && (
-                        <span className="px-3 py-1 bg-gradient-to-r from-rose-100 to-pink-100 text-rose-700 text-sm font-medium rounded-full">
+                        <span className="px-3 py-1 text-sm font-medium rounded-full" style={{ background: 'rgba(255, 88, 116, 0.15)', color: '#ff5874' }}>
                           {cycle.cycle_length_days} days
                         </span>
                       )}
                     </div>
-                    <div className="space-y-2 text-sm text-purple-700">
+                    <div className="space-y-2 text-sm" style={{ color: '#5f7e97' }}>
                       {cycle.flow_intensity && (
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">Flow:</span>
-                          <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded-lg text-xs font-medium">
+                          <span className="font-medium" style={{ color: '#d6deeb' }}>Flow:</span>
+                          <span className="px-2 py-1 rounded-lg text-xs font-medium" style={{ background: 'rgba(199, 146, 234, 0.15)', color: '#c792ea' }}>
                             {cycle.flow_intensity}
                           </span>
                         </div>
                       )}
                       {cycle.symptoms && cycle.symptoms.length > 0 && (
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">Symptoms:</span>
+                          <span className="font-medium" style={{ color: '#d6deeb' }}>Symptoms:</span>
                           <div className="flex flex-wrap gap-1">
                             {cycle.symptoms.map((symptom) => (
-                              <span key={symptom} className="px-2 py-1 bg-violet-100 text-violet-700 rounded text-xs">
+                              <span key={symptom} className="px-2 py-1 rounded text-xs" style={{ background: 'rgba(130, 170, 255, 0.15)', color: '#82aaff' }}>
                                 {symptom}
                               </span>
                             ))}
@@ -439,7 +452,7 @@ export default function CycleTracker() {
                         </div>
                       )}
                       {cycle.notes && (
-                        <p className="text-purple-600 italic bg-purple-50 p-3 rounded-lg">
+                        <p className="italic p-3 rounded-lg" style={{ background: 'rgba(199, 146, 234, 0.1)', color: '#c792ea' }}>
                           {cycle.notes}
                         </p>
                       )}
@@ -448,16 +461,18 @@ export default function CycleTracker() {
                   <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <motion.button
                       onClick={() => handleEdit(cycle)}
-                      className="p-2 text-purple-600 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all duration-200"
-                      whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
+                      className="p-2 rounded-xl transition-all duration-200"
+                      style={{ color: '#c792ea' }}
+                      whileHover={prefersReducedMotion ? undefined : { scale: 1.05, backgroundColor: 'rgba(199, 146, 234, 0.15)' }}
                       whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                     >
                       <Edit2 className="w-4 h-4" />
                     </motion.button>
                     <motion.button
                       onClick={() => handleDelete(cycle.id)}
-                      className="p-2 text-purple-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
-                      whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
+                      className="p-2 rounded-xl transition-all duration-200"
+                      style={{ color: '#ff5874' }}
+                      whileHover={prefersReducedMotion ? undefined : { scale: 1.05, backgroundColor: 'rgba(255, 88, 116, 0.15)' }}
                       whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                     >
                       <Trash2 className="w-4 h-4" />

@@ -72,8 +72,8 @@ export default function QuickSymptomPresets({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h4 className="text-sm font-semibold text-gray-900">Quick Presets</h4>
-          <p className="text-xs text-gray-600">Select common symptom combinations</p>
+          <h4 className="text-sm font-semibold" style={{ color: '#d6deeb' }}>Quick Presets</h4>
+          <p className="text-xs" style={{ color: '#5f7e97' }}>Select common symptom combinations</p>
         </div>
       </div>
 
@@ -88,23 +88,26 @@ export default function QuickSymptomPresets({
             <div key={preset.id} className="relative">
               <button
                 onClick={() => handlePresetClick(preset)}
-                className={`
-                  w-full p-4 rounded-xl border-2 transition-all duration-300 text-left
-                  ${hasMatches
-                    ? `bg-gradient-to-br ${preset.gradient} border-transparent text-white shadow-lg scale-105`
-                    : 'bg-white border-gray-200 hover:border-purple-300 hover:shadow-md'
-                  }
-                `}
+                className="w-full p-4 rounded-xl border-2 transition-all duration-300 text-left"
+                style={hasMatches ? {
+                  background: `linear-gradient(135deg, rgba(199, 146, 234, 0.3), rgba(255, 88, 116, 0.3))`,
+                  borderColor: '#c792ea',
+                  color: '#d6deeb'
+                } : {
+                  background: 'rgba(11, 41, 66, 0.5)',
+                  borderColor: 'rgba(199, 146, 234, 0.2)',
+                  color: '#d6deeb'
+                }}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-2xl">{preset.emoji}</span>
-                  <Icon className={`w-4 h-4 ${hasMatches ? 'text-white' : 'text-gray-600'}`} />
+                  <Icon className="w-4 h-4" style={{ color: hasMatches ? '#d6deeb' : '#5f7e97' }} />
                 </div>
-                <div className={`text-sm font-semibold ${hasMatches ? 'text-white' : 'text-gray-900'}`}>
+                <div className="text-sm font-semibold">
                   {preset.name}
                 </div>
                 {hasMatches && (
-                  <div className="mt-2 text-xs text-white/80 font-medium">
+                  <div className="mt-2 text-xs font-medium" style={{ color: 'rgba(214, 222, 235, 0.8)' }}>
                     {matchCount}/{preset.symptoms.length} selected
                   </div>
                 )}
@@ -112,17 +115,25 @@ export default function QuickSymptomPresets({
 
               {/* Expanded view with individual symptoms */}
               {isExpanded && (
-                <div className="absolute top-full left-0 right-0 mt-2 z-10 bg-white rounded-xl border-2 border-purple-300 shadow-2xl p-4 animate-in">
+                <div 
+                  className="absolute top-full left-0 right-0 mt-2 z-10 rounded-xl border-2 p-4 animate-in"
+                  style={{ 
+                    background: 'rgba(29, 59, 83, 0.95)', 
+                    borderColor: '#c792ea',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+                  }}
+                >
                   <div className="flex items-center justify-between mb-3">
-                    <h5 className="font-semibold text-gray-900 text-sm">{preset.name}</h5>
+                    <h5 className="font-semibold text-sm" style={{ color: '#d6deeb' }}>{preset.name}</h5>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setExpandedPreset(null);
                       }}
-                      className="p-1 hover:bg-gray-100 rounded transition-colors"
+                      className="p-1 rounded transition-colors"
+                      style={{ color: '#5f7e97' }}
                     >
-                      <X className="w-4 h-4 text-gray-600" />
+                      <X className="w-4 h-4" />
                     </button>
                   </div>
                   <div className="space-y-2">
@@ -135,19 +146,20 @@ export default function QuickSymptomPresets({
                             e.stopPropagation();
                             onToggleSymptom(symptom);
                           }}
-                          className={`
-                            w-full text-left px-3 py-2 rounded-lg text-sm transition-all
-                            ${isSelected
-                              ? 'bg-purple-100 text-purple-700 font-medium'
-                              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                            }
-                          `}
+                          className="w-full text-left px-3 py-2 rounded-lg text-sm transition-all"
+                          style={isSelected ? {
+                            background: 'rgba(199, 146, 234, 0.2)',
+                            color: '#c792ea'
+                          } : {
+                            background: 'rgba(11, 41, 66, 0.5)',
+                            color: '#d6deeb'
+                          }}
                         >
                           <div className="flex items-center justify-between">
                             <span>{symptom}</span>
                             {isSelected && (
-                              <div className="w-4 h-4 rounded-full bg-purple-500 flex items-center justify-center">
-                                <Plus className="w-3 h-3 text-white rotate-45" />
+                              <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ background: '#c792ea' }}>
+                                <Plus className="w-3 h-3 rotate-45" style={{ color: '#011627' }} />
                               </div>
                             )}
                           </div>
@@ -160,7 +172,11 @@ export default function QuickSymptomPresets({
                       e.stopPropagation();
                       handleApplyPreset(preset);
                     }}
-                    className="w-full mt-3 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all"
+                    className="w-full mt-3 py-2 font-semibold rounded-lg transition-all"
+                    style={{ 
+                      background: 'linear-gradient(135deg, #c792ea 0%, #ff5874 100%)',
+                      color: '#011627'
+                    }}
                   >
                     Apply All
                   </button>
@@ -172,13 +188,20 @@ export default function QuickSymptomPresets({
       </div>
 
       {selectedSymptoms.length > 0 && (
-        <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200">
-          <span className="text-sm font-medium text-purple-900">
+        <div 
+          className="flex items-center justify-between p-3 rounded-lg"
+          style={{ 
+            background: 'rgba(199, 146, 234, 0.1)', 
+            border: '1px solid rgba(199, 146, 234, 0.2)' 
+          }}
+        >
+          <span className="text-sm font-medium" style={{ color: '#d6deeb' }}>
             {selectedSymptoms.length} symptom{selectedSymptoms.length !== 1 ? 's' : ''} selected
           </span>
           <button
             onClick={() => selectedSymptoms.forEach(s => onToggleSymptom(s))}
-            className="text-sm font-medium text-purple-700 hover:text-purple-900 transition-colors"
+            className="text-sm font-medium transition-colors"
+            style={{ color: '#c792ea' }}
           >
             Clear all
           </button>
@@ -187,4 +210,3 @@ export default function QuickSymptomPresets({
     </div>
   );
 }
-

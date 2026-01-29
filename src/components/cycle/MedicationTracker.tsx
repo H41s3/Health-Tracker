@@ -60,13 +60,16 @@ export default function MedicationTracker() {
   }), []);
 
   return (
-    <div className="card p-6">
+    <div 
+      className="p-6 rounded-xl"
+      style={{ background: 'rgba(29, 59, 83, 0.6)', border: '1px solid rgba(127, 219, 202, 0.1)' }}
+    >
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-br from-amber-100/20 to-orange-100/20 rounded-xl">
-            <Pill className="w-5 h-5 text-amber-400" />
+          <div className="p-2 rounded-xl" style={{ background: 'rgba(247, 140, 108, 0.15)' }}>
+            <Pill className="w-5 h-5" style={{ color: '#f78c6c' }} />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900">Medications</h3>
+          <h3 className="text-xl font-semibold" style={{ color: '#d6deeb' }}>Medications</h3>
         </div>
         
         {!showForm && (
@@ -81,9 +84,13 @@ export default function MedicationTracker() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="space-y-4 mb-6 p-4 bg-gray-50 rounded-xl">
+        <form 
+          onSubmit={handleSubmit} 
+          className="space-y-4 mb-6 p-4 rounded-xl"
+          style={{ background: 'rgba(11, 41, 66, 0.5)', border: '1px solid rgba(127, 219, 202, 0.1)' }}
+        >
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
               Medication Name
             </label>
             <input
@@ -98,7 +105,7 @@ export default function MedicationTracker() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
                 Dosage
               </label>
               <input
@@ -111,7 +118,7 @@ export default function MedicationTracker() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
                 Frequency
               </label>
               <select
@@ -130,7 +137,7 @@ export default function MedicationTracker() {
 
           {formData.frequency !== 'as_needed' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
                 Time of Day
               </label>
               <input
@@ -143,7 +150,7 @@ export default function MedicationTracker() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: '#5f7e97' }}>
               Notes (Optional)
             </label>
             <textarea
@@ -163,7 +170,8 @@ export default function MedicationTracker() {
             <button
               type="button"
               onClick={resetForm}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors duration-200 font-medium"
+              className="px-4 py-2 rounded-xl transition-colors duration-200 font-medium"
+              style={{ background: 'rgba(95, 126, 151, 0.2)', color: '#d6deeb' }}
             >
               Cancel
             </button>
@@ -173,8 +181,8 @@ export default function MedicationTracker() {
 
       {medications.length === 0 && !showForm ? (
         <div className="text-center py-8">
-          <Pill className="w-12 h-12 text-gray-400 mx-auto mb-3 opacity-50" />
-          <p className="text-gray-600 font-medium">No active medications</p>
+          <Pill className="w-12 h-12 mx-auto mb-3 opacity-50" style={{ color: '#5f7e97' }} />
+          <p className="font-medium" style={{ color: '#5f7e97' }}>No active medications</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -183,15 +191,16 @@ export default function MedicationTracker() {
             return (
               <div
                 key={med.id}
-                className="p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all duration-200"
+                className="p-4 rounded-xl transition-all duration-200"
+                style={{ background: 'rgba(11, 41, 66, 0.5)', border: '1px solid rgba(127, 219, 202, 0.1)' }}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-900">{med.name}</h4>
+                    <h4 className="text-lg font-semibold" style={{ color: '#d6deeb' }}>{med.name}</h4>
                     {med.dosage && (
-                      <p className="text-sm text-gray-700">{med.dosage}</p>
+                      <p className="text-sm" style={{ color: '#5f7e97' }}>{med.dosage}</p>
                     )}
-                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-600">
+                    <div className="flex items-center gap-3 mt-2 text-xs" style={{ color: '#5f7e97' }}>
                       <span className="font-medium">📅 {frequencyLabels[med.frequency]}</span>
                       {med.time_of_day && (
                         <span className="flex items-center gap-1 font-medium">
@@ -203,7 +212,8 @@ export default function MedicationTracker() {
                   </div>
                   <button
                     onClick={() => deactivateMedication(med.id)}
-                    className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
+                    className="p-2 rounded-xl transition-all duration-200"
+                    style={{ color: '#5f7e97' }}
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -214,22 +224,32 @@ export default function MedicationTracker() {
                   <button
                     onClick={() => handleLog(med.id, true)}
                     disabled={todaysLog?.taken}
-                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      todaysLog?.taken
-                        ? 'bg-emerald-500 text-white cursor-default'
-                        : 'bg-emerald-100 hover:bg-emerald-200 text-emerald-700'
-                    }`}
+                    className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200"
+                    style={todaysLog?.taken ? {
+                      background: '#addb67',
+                      color: '#011627',
+                      cursor: 'default'
+                    } : {
+                      background: 'rgba(173, 219, 103, 0.15)',
+                      color: '#addb67',
+                      border: '1px solid rgba(173, 219, 103, 0.3)'
+                    }}
                   >
                     {todaysLog?.taken ? '✓ Taken' : 'Mark as Taken'}
                   </button>
                   <button
                     onClick={() => handleLog(med.id, false)}
                     disabled={todaysLog?.skipped}
-                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      todaysLog?.skipped
-                        ? 'bg-gray-400 text-white cursor-default'
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                    }`}
+                    className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200"
+                    style={todaysLog?.skipped ? {
+                      background: '#5f7e97',
+                      color: '#011627',
+                      cursor: 'default'
+                    } : {
+                      background: 'rgba(95, 126, 151, 0.15)',
+                      color: '#5f7e97',
+                      border: '1px solid rgba(95, 126, 151, 0.3)'
+                    }}
                   >
                     {todaysLog?.skipped ? 'Skipped' : 'Skip Today'}
                   </button>

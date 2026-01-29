@@ -13,6 +13,7 @@ interface AnimatedButtonProps {
 /**
  * Optimized animated button using hardware-accelerated transforms
  * Prevents layout thrashing and ensures 60fps animations
+ * Night Owl themed
  */
 export default function AnimatedButton({
   children,
@@ -22,11 +23,23 @@ export default function AnimatedButton({
   className = '',
   isLoading = false,
 }: AnimatedButtonProps) {
-  const variantClasses = {
-    primary: 'bg-violet-600 hover:bg-violet-700 text-white',
-    secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800',
-    success: 'bg-emerald-600 hover:bg-emerald-700 text-white',
-    danger: 'bg-red-600 hover:bg-red-700 text-white',
+  const variantStyles = {
+    primary: {
+      background: 'linear-gradient(135deg, #7fdbca 0%, #82aaff 100%)',
+      color: '#011627',
+    },
+    secondary: {
+      background: 'rgba(95, 126, 151, 0.2)',
+      color: '#d6deeb',
+    },
+    success: {
+      background: '#addb67',
+      color: '#011627',
+    },
+    danger: {
+      background: '#ff5874',
+      color: '#011627',
+    },
   };
 
   return (
@@ -37,13 +50,14 @@ export default function AnimatedButton({
         relative px-4 py-2 rounded-lg font-medium
         transition-colors duration-200
         disabled:opacity-50 disabled:cursor-not-allowed
-        ${variantClasses[variant]}
         ${className}
       `}
+      style={{
+        ...variantStyles[variant],
+        willChange: 'transform',
+      }}
       whileHover={!disabled && !isLoading ? { scale: 1.02 } : undefined}
       whileTap={!disabled && !isLoading ? { scale: 0.98 } : undefined}
-      // Use transform for better performance
-      style={{ willChange: 'transform' }}
     >
       {isLoading ? (
         <span className="flex items-center gap-2">
