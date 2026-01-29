@@ -57,22 +57,32 @@ export default function Settings() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user) {
+      setMessage('Error: Not logged in. Please refresh and try again.');
+      return;
+    }
 
     setMessage('');
 
-    const success = await updateProfile(user.id, {
+    const profileData = {
       full_name: formData.full_name || null,
       date_of_birth: formData.date_of_birth || null,
       gender: formData.gender || null,
       height_cm: formData.height_cm ? parseFloat(formData.height_cm) : null,
-    });
+    };
+
+    console.log('Saving profile for user:', user.id);
+    console.log('Profile data:', profileData);
+
+    const success = await updateProfile(user.id, profileData);
 
     if (success) {
+      console.log('Profile saved successfully!');
       setMessage('Profile updated successfully!');
       setTimeout(() => setMessage(''), 3000);
     } else {
-      setMessage('Error updating profile. Please try again.');
+      console.error('Profile save failed - check useProfileStore error');
+      setMessage('Error updating profile. Check console for details.');
     }
   };
 

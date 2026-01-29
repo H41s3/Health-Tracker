@@ -52,16 +52,26 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     });
 
     try {
+      console.log('updateProfile called for userId:', userId);
+      console.log('Data to save:', data);
+
       // First check if profile exists
-      const { data: existingProfile } = await supabase
+      const { data: existingProfile, error: fetchError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
 
+      if (fetchError) {
+        console.error('Error checking existing profile:', fetchError);
+      }
+
+      console.log('Existing profile:', existingProfile);
+
       let result;
       
       if (existingProfile) {
+        console.log('Updating existing profile...');
         // Update existing profile
         result = await supabase
           .from('profiles')
@@ -71,6 +81,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
           })
           .eq('id', userId);
       } else {
+        console.log('Creating new profile...');
         // Insert new profile
         result = await supabase
           .from('profiles')
@@ -81,6 +92,8 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
             updated_at: new Date().toISOString(),
           });
       }
+
+      console.log('Save result:', result);
 
       if (result.error) {
         console.error('Profile save error:', result.error);
