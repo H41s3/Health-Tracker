@@ -45,29 +45,54 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     const prevProfile = get().profile;
     
     // Optimistic update
-    if (prevProfile) {
-      set({ 
-        profile: { ...prevProfile, ...data } as Profile,
-        saving: true, 
-        error: null 
-      });
-    }
+    set({ 
+      profile: prevProfile ? { ...prevProfile, ...data } as Profile : { id: userId, ...data } as Profile,
+      saving: true, 
+      error: null 
+    });
 
     try {
-      const { error } = await supabase
+      // First check if profile exists
+      const { data: existingProfile } = await supabase
         .from('profiles')
-        .upsert({
-          id: userId,
-          ...data,
-        });
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
 
-      if (error) throw error;
+      let result;
+      
+      if (existingProfile) {
+        // Update existing profile
+        result = await supabase
+          .from('profiles')
+          .update({
+            ...data,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', userId);
+      } else {
+        // Insert new profile
+        result = await supabase
+          .from('profiles')
+          .insert({
+            id: userId,
+            ...data,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+      }
+
+      if (result.error) {
+        console.error('Profile save error:', result.error);
+        throw result.error;
+      }
       
       // Refetch to get the complete updated profile
       await get().fetchProfile(userId);
       set({ saving: false });
       return true;
     } catch (error) {
+      console.error('Profile update failed:', error);
       // Revert on failure
       set({ profile: prevProfile, saving: false, error: getErrorMessage(error) });
       return false;
