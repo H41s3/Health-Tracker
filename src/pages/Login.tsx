@@ -515,7 +515,7 @@ export default function Login() {
 
               <button
                 type="submit"
-                disabled={loading || (isSignUp && passwordStrength && passwordStrength.score < 2)}
+                disabled={loading || (isSignUp && !!passwordStrength && passwordStrength.score < 2)}
                 className="w-full font-semibold py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 style={{ 
                   background: 'linear-gradient(135deg, #7fdbca 0%, #82aaff 100%)',
