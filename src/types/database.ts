@@ -25,6 +25,9 @@ export interface Profile {
   gender: Gender | null;
   height_cm: number | null;
   preferences: Record<string, any>;
+  totp_secret: string | null;
+  totp_enabled: boolean;
+  totp_backup_codes: string[] | null;
   created_at: string;
   updated_at: string;
 }

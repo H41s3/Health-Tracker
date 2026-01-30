@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import BaymaxLogo from '../components/BaymaxLogo';
 import EmailConfirmation from './EmailConfirmation';
+import TwoFactorVerify from '../components/auth/TwoFactorVerify';
 import { signUpSchema, signInSchema, resetPasswordSchema, validateForm, getPasswordStrength } from '../utils/validation';
 import { getErrorMessage } from '../utils/errorHandler';
 import { Eye, EyeOff, Shield, CheckCircle, AlertCircle, Mail } from 'lucide-react';
@@ -21,7 +22,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
 
-  const { signIn, signUp, resetPassword } = useAuth();
+  const { signIn, signUp, resetPassword, twoFactorPending, complete2FASignIn, cancel2FASignIn } = useAuth();
 
   // Calculate password strength for sign-up
   const passwordStrength = useMemo(() => {
@@ -74,10 +75,12 @@ export default function Login() {
           return;
         }
 
-        const { error } = await signIn(email, password);
-        if (error) {
-          setError(getErrorMessage(error));
+        const result = await signIn(email, password);
+        if (result.error) {
+          setError(getErrorMessage(result.error));
         }
+        // If requires2FA is true, the twoFactorPending state will be set by AuthContext
+        // and we'll show the 2FA verification screen
       }
     } catch (err) {
       setError(getErrorMessage(err));
@@ -105,6 +108,69 @@ export default function Login() {
 
   if (showConfirmation) {
     return <EmailConfirmation />;
+  }
+
+  // Show 2FA verification screen if needed
+  if (twoFactorPending) {
+    return (
+      <div 
+        className="min-h-screen flex items-center justify-center px-4 py-8"
+        style={{ 
+          background: '#011627',
+          backgroundImage: `
+            radial-gradient(ellipse at 20% 0%, rgba(130, 170, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 100%, rgba(199, 146, 234, 0.08) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 50%, rgba(127, 219, 202, 0.05) 0%, transparent 70%)
+          `
+        }}
+      >
+        <div className="max-w-md w-full animate-fade-in">
+          {/* Logo Section */}
+          <div className="text-center mb-8">
+            <div 
+              className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-4 overflow-hidden"
+              style={{ 
+                background: 'linear-gradient(135deg, #7fdbca 0%, #82aaff 50%, #c792ea 100%)',
+                boxShadow: '0 8px 32px rgba(127, 219, 202, 0.3)'
+              }}
+            >
+              <BaymaxLogo className="w-16 h-16" />
+            </div>
+            <h1 className="text-3xl font-bold mb-2" style={{ color: '#d6deeb' }}>Health Tracker</h1>
+            <p style={{ color: '#5f7e97' }}>Your personal healthcare companion</p>
+          </div>
+
+          {/* 2FA Card */}
+          <div 
+            className="rounded-2xl p-8"
+            style={{
+              background: 'rgba(29, 59, 83, 0.6)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(127, 219, 202, 0.1)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+            }}
+          >
+            <TwoFactorVerify
+              userId={twoFactorPending.id}
+              userEmail={twoFactorPending.email}
+              onSuccess={complete2FASignIn}
+              onCancel={() => {
+                cancel2FASignIn();
+                setPassword('');
+              }}
+            />
+          </div>
+
+          {/* Security footer */}
+          <div className="mt-6 text-center text-xs" style={{ color: '#5f7e97' }}>
+            <div className="flex items-center justify-center gap-1">
+              <Shield className="w-3 h-3" />
+              Your data is encrypted and secure
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const inputBaseStyle = {

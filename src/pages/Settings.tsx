@@ -1,19 +1,26 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import { User, Settings as SettingsIcon, Bell, Shield, HelpCircle, Cog, Target, Footprints, Droplet, Moon } from 'lucide-react';
+import { User, Settings as SettingsIcon, Bell, Shield, HelpCircle, Cog, Target, Footprints, Droplet, Moon, Smartphone, ShieldCheck, ShieldOff, AlertTriangle } from 'lucide-react';
 import { Gender, DEFAULT_GOALS } from '../types/database';
 import { useGoalsStore } from '../stores/useGoalsStore';
 import { useProfileStore } from '../stores/useProfileStore';
+import { useTwoFactorStore } from '../stores/useTwoFactorStore';
 import PageWrapper from '../components/Layout/PageWrapper';
 import PageHeader from '../components/Layout/PageHeader';
+import TwoFactorSetup from '../components/auth/TwoFactorSetup';
 
 export default function Settings() {
   const { user } = useAuth();
   const { goals, fetchGoals, updateGoals, saving: savingGoals } = useGoalsStore();
   const { profile, fetchProfile, updateProfile, saving: savingProfile, loading: loadingProfile } = useProfileStore();
+  const { isEnabled: is2FAEnabled, checkTwoFactorStatus, disableTwoFactor, loading: twoFactorLoading } = useTwoFactorStore();
   const [message, setMessage] = useState('');
   const [goalsMessage, setGoalsMessage] = useState('');
+  const [twoFactorMessage, setTwoFactorMessage] = useState('');
+  const [showTwoFactorSetup, setShowTwoFactorSetup] = useState(false);
+  const [showDisable2FA, setShowDisable2FA] = useState(false);
+  const [disableCode, setDisableCode] = useState('');
   const [formData, setFormData] = useState({
     full_name: '',
     date_of_birth: '',
@@ -30,6 +37,7 @@ export default function Settings() {
     if (user) {
       fetchProfile(user.id);
       fetchGoals(user.id);
+      checkTwoFactorStatus(user.id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
@@ -87,6 +95,20 @@ export default function Settings() {
   };
 
   const loading = loadingProfile;
+
+  const handleDisable2FA = async () => {
+    if (!user || !disableCode) return;
+    
+    const success = await disableTwoFactor(user.id, disableCode, user.email || '');
+    if (success) {
+      setTwoFactorMessage('Two-factor authentication has been disabled.');
+      setShowDisable2FA(false);
+      setDisableCode('');
+      setTimeout(() => setTwoFactorMessage(''), 3000);
+    } else {
+      setTwoFactorMessage('Invalid verification code. Please try again.');
+    }
+  };
 
   const inputStyle = {
     background: 'rgba(11, 41, 66, 0.8)',
@@ -444,6 +466,196 @@ export default function Settings() {
               </motion.button>
             </div>
           </div>
+
+          {/* Security Section - Two-Factor Authentication */}
+          <div 
+            className="p-8 rounded-xl"
+            style={{
+              background: 'rgba(29, 59, 83, 0.6)',
+              border: '1px solid rgba(127, 219, 202, 0.1)'
+            }}
+          >
+            <div className="flex items-center gap-4 mb-6">
+              <div 
+                className="w-12 h-12 rounded-xl flex items-center justify-center"
+                style={{ background: 'rgba(130, 170, 255, 0.15)' }}
+              >
+                <Shield className="w-6 h-6" style={{ color: '#82aaff' }} />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold" style={{ color: '#d6deeb' }}>
+                  Account Security
+                </h2>
+                <p className="text-sm" style={{ color: '#5f7e97' }}>
+                  Protect your account with two-factor authentication
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {/* 2FA Status */}
+              <div 
+                className="p-4 rounded-xl flex items-center justify-between"
+                style={{ background: 'rgba(11, 41, 66, 0.5)' }}
+              >
+                <div className="flex items-center gap-4">
+                  <div 
+                    className="w-10 h-10 rounded-lg flex items-center justify-center"
+                    style={{ 
+                      background: is2FAEnabled 
+                        ? 'rgba(173, 219, 103, 0.15)' 
+                        : 'rgba(95, 126, 151, 0.15)' 
+                    }}
+                  >
+                    {is2FAEnabled ? (
+                      <ShieldCheck className="w-5 h-5" style={{ color: '#addb67' }} />
+                    ) : (
+                      <Smartphone className="w-5 h-5" style={{ color: '#5f7e97' }} />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-medium" style={{ color: '#d6deeb' }}>
+                      Two-Factor Authentication
+                    </p>
+                    <p className="text-sm" style={{ color: '#5f7e97' }}>
+                      {is2FAEnabled 
+                        ? 'Your account is protected with 2FA' 
+                        : 'Add an extra layer of security to your account'
+                      }
+                    </p>
+                  </div>
+                </div>
+                <div 
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    is2FAEnabled ? '' : ''
+                  }`}
+                  style={{
+                    background: is2FAEnabled 
+                      ? 'rgba(173, 219, 103, 0.15)' 
+                      : 'rgba(95, 126, 151, 0.15)',
+                    color: is2FAEnabled ? '#addb67' : '#5f7e97'
+                  }}
+                >
+                  {is2FAEnabled ? 'Enabled' : 'Disabled'}
+                </div>
+              </div>
+
+              {/* Disable 2FA Form */}
+              {showDisable2FA && is2FAEnabled && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="p-4 rounded-xl"
+                  style={{ 
+                    background: 'rgba(255, 88, 116, 0.05)',
+                    border: '1px solid rgba(255, 88, 116, 0.2)'
+                  }}
+                >
+                  <div className="flex items-start gap-3 mb-4">
+                    <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#ff5874' }} />
+                    <div>
+                      <p className="font-medium" style={{ color: '#ff5874' }}>
+                        Disable Two-Factor Authentication?
+                      </p>
+                      <p className="text-sm mt-1" style={{ color: '#5f7e97' }}>
+                        This will make your account less secure. Enter your verification code to confirm.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      value={disableCode}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                        setDisableCode(value);
+                      }}
+                      placeholder="000000"
+                      maxLength={6}
+                      className="flex-1 px-4 py-2 rounded-xl text-center font-mono tracking-wider outline-none"
+                      style={inputStyle}
+                    />
+                    <button
+                      onClick={handleDisable2FA}
+                      disabled={disableCode.length !== 6 || twoFactorLoading}
+                      className="px-4 py-2 rounded-xl font-medium transition-colors disabled:opacity-50"
+                      style={{ 
+                        background: 'rgba(255, 88, 116, 0.2)',
+                        color: '#ff5874'
+                      }}
+                    >
+                      Disable
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowDisable2FA(false);
+                        setDisableCode('');
+                      }}
+                      className="px-4 py-2 rounded-xl font-medium transition-colors"
+                      style={{ 
+                        background: 'rgba(95, 126, 151, 0.2)',
+                        color: '#d6deeb'
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {twoFactorMessage && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="px-4 py-3 rounded-xl text-sm font-medium"
+                  style={twoFactorMessage.includes('disabled') ? {
+                    background: 'rgba(173, 219, 103, 0.1)',
+                    border: '1px solid rgba(173, 219, 103, 0.3)',
+                    color: '#addb67'
+                  } : {
+                    background: 'rgba(255, 88, 116, 0.1)',
+                    border: '1px solid rgba(255, 88, 116, 0.3)',
+                    color: '#ff5874'
+                  }}
+                >
+                  {twoFactorMessage}
+                </motion.div>
+              )}
+
+              {is2FAEnabled ? (
+                <motion.button
+                  type="button"
+                  onClick={() => setShowDisable2FA(!showDisable2FA)}
+                  className="w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                  style={{ 
+                    background: 'rgba(95, 126, 151, 0.2)',
+                    color: '#d6deeb'
+                  }}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                >
+                  <ShieldOff className="w-4 h-4" />
+                  Disable Two-Factor Authentication
+                </motion.button>
+              ) : (
+                <motion.button
+                  type="button"
+                  onClick={() => setShowTwoFactorSetup(true)}
+                  className="w-full py-3 rounded-xl font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  style={{ 
+                    background: 'linear-gradient(135deg, #82aaff 0%, #c792ea 100%)',
+                    color: '#011627'
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Shield className="w-4 h-4" />
+                  Enable Two-Factor Authentication
+                </motion.button>
+              )}
+            </div>
+          </div>
         </motion.div>
 
         {/* Settings Menu */}
@@ -558,6 +770,20 @@ export default function Settings() {
         </motion.div>
       </div>
       </div>
+
+      {/* 2FA Setup Modal */}
+      {showTwoFactorSetup && user && (
+        <TwoFactorSetup
+          userId={user.id}
+          userEmail={user.email || ''}
+          onClose={() => setShowTwoFactorSetup(false)}
+          onSuccess={() => {
+            checkTwoFactorStatus(user.id);
+            setTwoFactorMessage('Two-factor authentication is now enabled!');
+            setTimeout(() => setTwoFactorMessage(''), 3000);
+          }}
+        />
+      )}
     </PageWrapper>
   );
 }

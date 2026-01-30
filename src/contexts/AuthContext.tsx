@@ -2,12 +2,26 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
+interface TwoFactorPendingUser {
+  id: string;
+  email: string;
+}
+
+interface SignInResult {
+  error: AuthError | null;
+  requires2FA?: boolean;
+  pendingUser?: TwoFactorPendingUser;
+}
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  twoFactorPending: TwoFactorPendingUser | null;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: AuthError | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signIn: (email: string, password: string) => Promise<SignInResult>;
+  complete2FASignIn: () => void;
+  cancel2FASignIn: () => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
 }
@@ -18,22 +32,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [twoFactorPending, setTwoFactorPending] = useState<TwoFactorPendingUser | null>(null);
+  // Store session temporarily during 2FA verification
+  const [pendingSession, setPendingSession] = useState<Session | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+      // Only set session/user if we're not in 2FA pending state
+      if (!twoFactorPending) {
+        setSession(session);
+        setUser(session?.user ?? null);
+      }
       setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+      // Only update if we're not in 2FA pending state
+      if (!twoFactorPending) {
+        setSession(session);
+        setUser(session?.user ?? null);
+      }
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [twoFactorPending]);
 
   const signUp = async (email: string, password: string, fullName: string) => {
     const { data, error } = await supabase.auth.signUp({
@@ -68,19 +91,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error };
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string): Promise<SignInResult> => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    // If login successful, ensure profile exists
-    if (!error && data.user) {
+    // If login successful, check for 2FA
+    if (!error && data.user && data.session) {
       try {
-        // Check if profile exists
-        const { error: profileError } = await supabase
+        // Check if profile exists and if 2FA is enabled
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('id')
+          .select('id, totp_enabled')
           .eq('id', data.user.id)
           .single();
 
@@ -92,6 +115,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             full_name: fullName,
           });
         }
+
+        // Check if 2FA is enabled
+        if (profileData?.totp_enabled) {
+          // Store session temporarily and require 2FA verification
+          setPendingSession(data.session);
+          setTwoFactorPending({
+            id: data.user.id,
+            email: data.user.email || email,
+          });
+          
+          // Sign out temporarily until 2FA is verified
+          // But keep the session in memory
+          await supabase.auth.signOut();
+          
+          return { 
+            error: null, 
+            requires2FA: true,
+            pendingUser: {
+              id: data.user.id,
+              email: data.user.email || email,
+            }
+          };
+        }
       } catch (profileError) {
         console.error('Profile check/creation failed:', profileError);
         // Don't block login if profile operations fail
@@ -99,6 +145,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return { error };
+  };
+
+  const complete2FASignIn = () => {
+    // 2FA verification successful - re-authenticate with stored session
+    if (pendingSession) {
+      setSession(pendingSession);
+      setUser(pendingSession.user);
+    }
+    setTwoFactorPending(null);
+    setPendingSession(null);
+  };
+
+  const cancel2FASignIn = async () => {
+    setTwoFactorPending(null);
+    setPendingSession(null);
   };
 
   const signOut = async () => {
@@ -115,8 +176,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user, 
       session, 
       loading, 
+      twoFactorPending,
       signUp, 
       signIn, 
+      complete2FASignIn,
+      cancel2FASignIn,
       signOut, 
       resetPassword 
     }}>
