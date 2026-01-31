@@ -33,8 +33,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [twoFactorPending, setTwoFactorPending] = useState<TwoFactorPendingUser | null>(null);
-  // Store session temporarily during 2FA verification
+  // Store session and user temporarily during 2FA verification (don't sign out)
   const [pendingSession, setPendingSession] = useState<Session | null>(null);
+  const [pendingUser, setPendingUser] = useState<User | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -118,16 +119,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Check if 2FA is enabled
         if (profileData?.totp_enabled) {
-          // Store session temporarily and require 2FA verification
+          // Store session and user temporarily - DON'T sign out
+          // The session stays valid, we just block the UI until 2FA is verified
           setPendingSession(data.session);
+          setPendingUser(data.user);
           setTwoFactorPending({
             id: data.user.id,
             email: data.user.email || email,
           });
           
-          // Sign out temporarily until 2FA is verified
-          // But keep the session in memory
-          await supabase.auth.signOut();
+          // Don't set user/session in main state yet - this blocks app access
+          // until 2FA verification completes
           
           return { 
             error: null, 
@@ -148,18 +150,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const complete2FASignIn = () => {
-    // 2FA verification successful - re-authenticate with stored session
-    if (pendingSession) {
+    // 2FA verification successful - activate the stored session
+    if (pendingSession && pendingUser) {
       setSession(pendingSession);
-      setUser(pendingSession.user);
+      setUser(pendingUser);
     }
     setTwoFactorPending(null);
     setPendingSession(null);
+    setPendingUser(null);
   };
 
   const cancel2FASignIn = async () => {
+    // User cancelled 2FA - sign out the pending session
+    if (pendingSession) {
+      await supabase.auth.signOut();
+    }
     setTwoFactorPending(null);
     setPendingSession(null);
+    setPendingUser(null);
   };
 
   const signOut = async () => {
