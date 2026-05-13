@@ -74,7 +74,7 @@ export default function Reminders() {
     show('Reminder completed! Great job! 🎉', 'success');
   };
 
-  const handleSnooze = (id: string, minutes: number) => {
+  const handleSnooze = (_id: string, minutes: number) => {
     show(`Reminder snoozed for ${minutes} minutes`, 'success');
   };
 
