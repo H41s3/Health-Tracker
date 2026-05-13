@@ -11,7 +11,6 @@ export default function BirthControlManager() {
     activeBirthControl,
     fetchBirthControls,
     addBirthControl,
-    updateBirthControl,
     deactivateBirthControl,
   } = useBirthControlStore();
 
