@@ -39,7 +39,7 @@ export function usePillReminder() {
     const schedule = async () => {
       // Request notification permission once
       if ('Notification' in window && Notification.permission === 'default') {
-        try { await Notification.requestPermission(); } catch {}
+        try { await Notification.requestPermission(); } catch { /* permission denied, proceed without notifications */ }
       }
 
       const reminderAt = parseTimeToToday(activeBirthControl.reminder_time as unknown as string);
@@ -66,7 +66,7 @@ export function usePillReminder() {
         show(body, shouldLateAlert ? 'error' : 'info');
         // System notification
         if ('Notification' in window && Notification.permission === 'granted') {
-          try { new Notification('Pill reminder', { body }); } catch {}
+          try { new Notification('Pill reminder', { body }); } catch { /* notification blocked */ }
         }
 
         // Reschedule for tomorrow
