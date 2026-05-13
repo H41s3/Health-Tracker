@@ -1,4 +1,4 @@
-import { differenceInDays, addDays } from 'date-fns';
+import { addDays } from 'date-fns';
 
 export interface CycleSample {
   period_start_date: string; // yyyy-MM-dd
