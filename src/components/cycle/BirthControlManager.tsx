@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useBirthControlStore } from '../../stores/useBirthControlStore';
 import { useAuth } from '../../contexts/AuthContext';
 import { Pill, Plus, AlertCircle, Check, X, Clock, Circle, Shield, Activity } from 'lucide-react';
