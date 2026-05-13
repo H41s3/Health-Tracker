@@ -52,9 +52,6 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     });
 
     try {
-      console.log('updateProfile called for userId:', userId);
-      console.log('Data to save:', data);
-
       // First check if profile exists
       const { data: existingProfile, error: fetchError } = await supabase
         .from('profiles')
@@ -62,17 +59,11 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         .eq('id', userId)
         .maybeSingle();
 
-      if (fetchError) {
-        console.error('Error checking existing profile:', fetchError);
-      }
-
-      console.log('Existing profile:', existingProfile);
+      if (fetchError) throw fetchError;
 
       let result;
-      
+
       if (existingProfile) {
-        console.log('Updating existing profile...');
-        // Update existing profile
         result = await supabase
           .from('profiles')
           .update({
@@ -81,8 +72,6 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
           })
           .eq('id', userId);
       } else {
-        console.log('Creating new profile...');
-        // Insert new profile
         result = await supabase
           .from('profiles')
           .insert({
@@ -93,20 +82,13 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
           });
       }
 
-      console.log('Save result:', result);
-
-      if (result.error) {
-        console.error('Profile save error:', result.error);
-        throw result.error;
-      }
+      if (result.error) throw result.error;
       
       // Refetch to get the complete updated profile
       await get().fetchProfile(userId);
       set({ saving: false });
       return true;
     } catch (error) {
-      console.error('Profile update failed:', error);
-      // Revert on failure
       set({ profile: prevProfile, saving: false, error: getErrorMessage(error) });
       return false;
     }
