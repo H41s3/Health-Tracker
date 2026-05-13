@@ -66,15 +66,13 @@ export const useBirthControlStore = create<BirthControlState>((set, get) => ({
 
       if (updateError) throw updateError;
 
-      const { data: newBC, error } = await supabase
+      const { error } = await supabase
         .from('birth_control')
-        .insert({ 
-          user_id: userId, 
+        .insert({
+          user_id: userId,
           is_active: true,
-          ...data 
-        })
-        .select()
-        .single();
+          ...data
+        });
 
       if (error) throw error;
       
