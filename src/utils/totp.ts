@@ -86,45 +86,41 @@ export function formatSecretForDisplay(secret: string): string {
 }
 
 /**
- * Generate backup codes
+ * Generate backup codes using cryptographically secure random values
  */
 export function generateBackupCodes(count: number = 8): string[] {
   const codes: string[] = [];
-  const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Excluding similar chars
-  
+  const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const randomValues = new Uint8Array(count * 8);
+  crypto.getRandomValues(randomValues);
+
   for (let i = 0; i < count; i++) {
     let code = '';
     for (let j = 0; j < 8; j++) {
-      code += characters.charAt(Math.floor(Math.random() * characters.length));
+      code += characters[randomValues[i * 8 + j] % characters.length];
     }
-    // Format as XXXX-XXXX
     codes.push(code.slice(0, 4) + '-' + code.slice(4));
   }
-  
+
   return codes;
 }
 
 /**
- * Hash a backup code for storage (simple hash for demo)
- * In production, use a proper hashing library like bcrypt
+ * Hash a backup code using SHA-256 (Web Crypto API)
  */
-export function hashBackupCode(code: string): string {
-  // Remove dash and uppercase
+export async function hashBackupCode(code: string): Promise<string> {
   const normalized = code.replace('-', '').toUpperCase();
-  // Simple hash for demo - in production use bcrypt
-  let hash = 0;
-  for (let i = 0; i < normalized.length; i++) {
-    const char = normalized.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return Math.abs(hash).toString(36) + normalized.length;
+  const encoder = new TextEncoder();
+  const data = encoder.encode(normalized);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 /**
  * Verify a backup code against stored hashes
  */
-export function verifyBackupCode(code: string, hashedCodes: string[]): number {
-  const hash = hashBackupCode(code);
+export async function verifyBackupCode(code: string, hashedCodes: string[]): Promise<number> {
+  const hash = await hashBackupCode(code);
   return hashedCodes.findIndex(h => h === hash);
 }
