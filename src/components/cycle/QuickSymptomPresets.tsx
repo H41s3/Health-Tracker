@@ -45,7 +45,6 @@ const presets = [
 export default function QuickSymptomPresets({
   selectedSymptoms,
   onToggleSymptom,
-  onApplyPreset,
 }: QuickSymptomPresetsProps) {
   const [expandedPreset, setExpandedPreset] = useState<string | null>(null);
 
