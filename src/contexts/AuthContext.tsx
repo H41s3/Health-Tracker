@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, ReactNode } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 
@@ -37,10 +37,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [pendingSession, setPendingSession] = useState<Session | null>(null);
   const [pendingUser, setPendingUser] = useState<User | null>(null);
 
+  // Use a ref so the auth subscription callback always reads the latest value
+  // without needing to re-subscribe every time twoFactorPending changes
+  const twoFactorPendingRef = useRef(twoFactorPending);
+  useEffect(() => {
+    twoFactorPendingRef.current = twoFactorPending;
+  }, [twoFactorPending]);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      // Only set session/user if we're not in 2FA pending state
-      if (!twoFactorPending) {
+      if (!twoFactorPendingRef.current) {
         setSession(session);
         setUser(session?.user ?? null);
       }
@@ -48,8 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      // Only update if we're not in 2FA pending state
-      if (!twoFactorPending) {
+      if (!twoFactorPendingRef.current) {
         setSession(session);
         setUser(session?.user ?? null);
       }
@@ -57,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, [twoFactorPending]);
+  }, []);
 
   const signUp = async (email: string, password: string, fullName: string) => {
     const { data, error } = await supabase.auth.signUp({
@@ -72,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (!error && data.user) {
       // Store email for confirmation page
-      localStorage.setItem('pendingEmail', email);
+      sessionStorage.setItem('pendingEmail', email);
       
       // Only try to create profile if user is confirmed (or if email confirmation is disabled)
       // The profile will be auto-created on first login if not created here
