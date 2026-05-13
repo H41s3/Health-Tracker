@@ -108,7 +108,6 @@ export default function PillPackVisualization({ pillLogs, packSize = 28 }: PillP
             {pillPack.map((pill) => {
               let bgStyle: React.CSSProperties = { background: 'rgba(95, 126, 151, 0.3)' };
               let icon = null;
-              let ringStyle = '';
 
               if (pill.isPlacebo) {
                 bgStyle = { 
