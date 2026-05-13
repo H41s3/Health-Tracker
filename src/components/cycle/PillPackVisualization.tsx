@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { format, subDays, isSameDay, startOfMonth } from 'date-fns';
+import { format, subDays, isSameDay } from 'date-fns';
 import { Check, X, Circle } from 'lucide-react';
 
 interface PillPackVisualizationProps {
