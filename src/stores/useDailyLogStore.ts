@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
-import { DailyLog, MoodLevel, EnergyLevel } from '../types/database';
+import { DailyLog } from '../types/database';
 import { format } from 'date-fns';
 
 interface DailyLogState {
