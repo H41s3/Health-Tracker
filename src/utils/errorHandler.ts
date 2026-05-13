@@ -50,10 +50,8 @@ export function getErrorMessage(error: unknown): string {
         }
       }
       
-      // Return the error message if it's user-friendly
-      if (authError.message.length < 100) {
-        return authError.message;
-      }
+      // Don't expose raw server error messages to the UI
+      return 'An unexpected error occurred. Please try again.';
     }
   }
 
