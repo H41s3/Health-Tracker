@@ -41,7 +41,7 @@ function AppContent() {
 
   // Check if user needs email confirmation
   // Note: Supabase uses 'confirmed_at', not 'email_confirmed_at'
-  if (user && !user.confirmed_at && localStorage.getItem('pendingEmail')) {
+  if (user && !user.confirmed_at && sessionStorage.getItem('pendingEmail')) {
     return <EmailConfirmation />;
   }
 
