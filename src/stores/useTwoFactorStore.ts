@@ -113,7 +113,7 @@ export const useTwoFactorStore = create<TwoFactorState>((set, get) => ({
       }
 
       // Hash backup codes for storage
-      const hashedBackupCodes = setupData.backupCodes.map(hashBackupCode);
+      const hashedBackupCodes = await Promise.all(setupData.backupCodes.map(hashBackupCode));
 
       // Store the secret and backup codes in the database
       const { error } = await supabase
@@ -181,24 +181,26 @@ export const useTwoFactorStore = create<TwoFactorState>((set, get) => ({
       if (error) throw error;
       
       const backupCodes = data?.totp_backup_codes || [];
-      const codeIndex = verifyBackupCode(code, backupCodes);
-      
+      const codeIndex = await verifyBackupCode(code, backupCodes);
+
       if (codeIndex === -1) {
         set({ error: 'Invalid backup code', isVerifying: false });
         return false;
       }
 
-      // Remove the used backup code
+      // Remove the used backup code immediately before DB update to prevent reuse
       const updatedCodes = [...backupCodes];
       updatedCodes.splice(codeIndex, 1);
 
-      await supabase
+      const { error: updateError } = await supabase
         .from('profiles')
         .update({
           totp_backup_codes: updatedCodes,
           updated_at: new Date().toISOString(),
         })
         .eq('id', userId);
+
+      if (updateError) throw updateError;
 
       set({ isVerifying: false });
       return true;
