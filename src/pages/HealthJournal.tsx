@@ -19,6 +19,7 @@ export default function HealthJournal() {
   const { user } = useAuth();
   const { notes, fetchNotes, addNote, updateNote, deleteNote } = useNotesStore();
   const { show } = useToastStore();
+  const [submitting, setSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingNote, setEditingNote] = useState<HealthNote | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,13 +40,14 @@ export default function HealthJournal() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
-    
+    if (!user || submitting) return;
+
     if (!formData.title.trim()) {
       show('Please enter a title', 'error');
       return;
     }
 
+    setSubmitting(true);
     try {
       const noteData = {
         date: formData.date,
@@ -65,6 +67,8 @@ export default function HealthJournal() {
       resetForm();
     } catch {
       show('Failed to save note. Please try again.', 'error');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -358,15 +362,16 @@ export default function HealthJournal() {
               <div className="flex gap-3 pt-4">
                 <motion.button
                   type="submit"
-                  className="px-6 py-3 rounded-xl font-semibold transition-all duration-200"
-                  style={{ 
+                  disabled={submitting}
+                  className="px-6 py-3 rounded-xl font-semibold transition-all duration-200 disabled:opacity-50"
+                  style={{
                     background: 'linear-gradient(135deg, #c792ea 0%, #82aaff 100%)',
                     color: '#011627'
                   }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {editingNote ? 'Update' : 'Save'} Note
+                  {submitting ? 'Saving…' : `${editingNote ? 'Update' : 'Save'} Note`}
                 </motion.button>
                 <motion.button
                   type="button"
