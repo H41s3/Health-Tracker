@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { Medication, MedicationLog } from '../types/database';
 import { format } from 'date-fns';
+import { getErrorMessage } from '../utils/errorHandler';
 
 interface MedicationState {
   medications: Medication[];
@@ -37,8 +38,8 @@ export const useMedicationStore = create<MedicationState>((set, get) => ({
 
       if (error) throw error;
       set({ medications: data || [], loading: false });
-    } catch (error: any) {
-      set({ error: error.message, loading: false });
+    } catch (error) {
+      set({ error: getErrorMessage(error), loading: false });
     }
   },
 
@@ -54,8 +55,8 @@ export const useMedicationStore = create<MedicationState>((set, get) => ({
 
       if (error) throw error;
       await get().fetchMedications(userId);
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -73,8 +74,8 @@ export const useMedicationStore = create<MedicationState>((set, get) => ({
       if (med) {
         await get().fetchMedications(med.user_id);
       }
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -93,8 +94,8 @@ export const useMedicationStore = create<MedicationState>((set, get) => ({
       set({ 
         medications: get().medications.filter(m => m.id !== id)
       });
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -113,8 +114,8 @@ export const useMedicationStore = create<MedicationState>((set, get) => ({
 
       if (error) throw error;
       set({ medicationLogs: data || [] });
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -136,8 +137,8 @@ export const useMedicationStore = create<MedicationState>((set, get) => ({
 
       if (error) throw error;
       await get().fetchMedicationLogs(medicationId);
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
