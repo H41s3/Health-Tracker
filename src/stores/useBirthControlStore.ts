@@ -30,6 +30,7 @@ export const useBirthControlStore = create<BirthControlState>((set, get) => ({
   error: null,
 
   fetchBirthControls: async (userId: string) => {
+    if (get().loading) return;
     set({ loading: true, error: null });
     try {
       const { data, error } = await supabase
@@ -41,16 +42,15 @@ export const useBirthControlStore = create<BirthControlState>((set, get) => ({
       if (error) throw error;
       
       const active = data?.find(bc => bc.is_active) || null;
-      set({ 
-        birthControls: data || [], 
-        activeBirthControl: active,
-        loading: false 
-      });
-      
-      // If there's an active birth control, fetch its pill logs
+      set({ birthControls: data || [], activeBirthControl: active });
+
+      // Fetch pill logs before clearing loading so a concurrent fetchBirthControls
+      // call can't slip in mid-cascade and create duplicate requests.
       if (active && active.type === 'pill') {
         await get().fetchPillLogs(active.id);
       }
+
+      set({ loading: false });
     } catch (error) {
       set({ error: getErrorMessage(error), loading: false });
     }
