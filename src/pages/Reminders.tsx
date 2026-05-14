@@ -22,6 +22,7 @@ export default function Reminders() {
   const { reminders, fetchReminders, addReminder, updateReminder, deleteReminder, toggleReminder } =
     useRemindersStore();
   const { show } = useToastStore();
+  const [submitting, setSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [completedToday, setCompletedToday] = useState<string[]>([]);
@@ -50,8 +51,9 @@ export default function Reminders() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || submitting) return;
 
+    setSubmitting(true);
     try {
       if (editingReminder) {
         await updateReminder(editingReminder.id, formData);
@@ -63,6 +65,8 @@ export default function Reminders() {
       resetForm();
     } catch {
       show('Failed to save reminder', 'error');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -382,13 +386,14 @@ export default function Reminders() {
             <div className="flex gap-3 pt-4">
               <button
                 type="submit"
-                className="px-6 py-3 rounded-xl font-semibold transition-all duration-200"
-                style={{ 
+                disabled={submitting}
+                className="px-6 py-3 rounded-xl font-semibold transition-all duration-200 disabled:opacity-50"
+                style={{
                   background: 'linear-gradient(135deg, #7fdbca 0%, #82aaff 100%)',
                   color: '#011627'
                 }}
               >
-                {editingReminder ? 'Update' : 'Create'} Reminder
+                {submitting ? 'Saving…' : `${editingReminder ? 'Update' : 'Create'} Reminder`}
               </button>
               <button
                 type="button"
