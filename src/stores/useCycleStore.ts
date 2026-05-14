@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { CycleTracking } from '../types/database';
 import { predictNextPeriod as predictUtil, PredictionResult } from '../utils/cyclePrediction';
+import { getErrorMessage } from '../utils/errorHandler';
 
 interface CycleState {
   cycles: CycleTracking[];
@@ -35,9 +36,8 @@ export const useCycleStore = create<CycleState>((set, get) => ({
 
       if (error) throw error;
       set({ cycles: data || [], loading: false });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Failed to fetch cycles';
-      set({ error: message, loading: false });
+    } catch (error) {
+      set({ error: getErrorMessage(error), loading: false });
     }
   },
 
@@ -49,9 +49,8 @@ export const useCycleStore = create<CycleState>((set, get) => ({
 
       if (error) throw error;
       await get().fetchCycles(userId);
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Failed to add cycle';
-      set({ error: message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -69,9 +68,8 @@ export const useCycleStore = create<CycleState>((set, get) => ({
       if (cycle) {
         await get().fetchCycles(cycle.user_id);
       }
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Failed to update cycle';
-      set({ error: message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -85,9 +83,8 @@ export const useCycleStore = create<CycleState>((set, get) => ({
       if (error) throw error;
 
       set({ cycles: get().cycles.filter((c) => c.id !== id) });
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Failed to delete cycle';
-      set({ error: message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
