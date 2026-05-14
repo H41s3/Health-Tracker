@@ -23,7 +23,8 @@ interface TwoFactorState {
   setupData: TwoFactorSetupData | null;
   loading: boolean;
   error: string | null;
-  
+  _usedBackupCodeHashes: Set<string>;
+
   // Check if 2FA is enabled for a user
   checkTwoFactorStatus: (userId: string) => Promise<boolean>;
   
@@ -52,6 +53,7 @@ export const useTwoFactorStore = create<TwoFactorState>((set, get) => ({
   setupData: null,
   loading: false,
   error: null,
+  _usedBackupCodeHashes: new Set<string>(),
 
   checkTwoFactorStatus: async (userId: string) => {
     set({ loading: true, error: null });
@@ -171,7 +173,14 @@ export const useTwoFactorStore = create<TwoFactorState>((set, get) => ({
   verifyWithBackupCode: async (userId: string, code: string) => {
     set({ isVerifying: true, error: null });
     try {
-      // Fetch stored backup codes
+      const codeHash = await hashBackupCode(code);
+
+      // Reject codes already used in this session before hitting the DB
+      if (get()._usedBackupCodeHashes.has(codeHash)) {
+        set({ error: 'Backup code already used', isVerifying: false });
+        return false;
+      }
+
       const { data, error } = await supabase
         .from('profiles')
         .select('totp_backup_codes')
@@ -179,16 +188,20 @@ export const useTwoFactorStore = create<TwoFactorState>((set, get) => ({
         .single();
 
       if (error) throw error;
-      
+
       const backupCodes = data?.totp_backup_codes || [];
-      const codeIndex = await verifyBackupCode(code, backupCodes);
+      const codeIndex = backupCodes.findIndex((h: string) => h === codeHash);
 
       if (codeIndex === -1) {
         set({ error: 'Invalid backup code', isVerifying: false });
         return false;
       }
 
-      // Remove the used backup code immediately before DB update to prevent reuse
+      // Mark as used in session immediately so concurrent/retry attempts can't reuse it
+      const updated = new Set(get()._usedBackupCodeHashes);
+      updated.add(codeHash);
+      set({ _usedBackupCodeHashes: updated });
+
       const updatedCodes = [...backupCodes];
       updatedCodes.splice(codeIndex, 1);
 
