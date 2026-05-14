@@ -20,6 +20,7 @@ export const useDailyLogStore = create<DailyLogState>((set, get) => ({
   error: null,
 
   fetchDailyLogs: async (userId: string, startDate?: string, endDate?: string) => {
+    if (get().loading) return;
     set({ loading: true, error: null });
     try {
       let query = supabase

@@ -27,6 +27,7 @@ export const useMedicationStore = create<MedicationState>((set, get) => ({
   error: null,
 
   fetchMedications: async (userId: string) => {
+    if (get().loading) return;
     set({ loading: true, error: null });
     try {
       const { data, error } = await supabase
