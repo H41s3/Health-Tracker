@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { BirthControl, PillLog } from '../types/database';
 import { format } from 'date-fns';
+import { getErrorMessage } from '../utils/errorHandler';
 
 interface BirthControlState {
   birthControls: BirthControl[];
@@ -50,8 +51,8 @@ export const useBirthControlStore = create<BirthControlState>((set, get) => ({
       if (active && active.type === 'pill') {
         await get().fetchPillLogs(active.id);
       }
-    } catch (error: any) {
-      set({ error: error.message, loading: false });
+    } catch (error) {
+      set({ error: getErrorMessage(error), loading: false });
     }
   },
 
@@ -77,8 +78,8 @@ export const useBirthControlStore = create<BirthControlState>((set, get) => ({
       if (error) throw error;
       
       await get().fetchBirthControls(userId);
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -96,8 +97,8 @@ export const useBirthControlStore = create<BirthControlState>((set, get) => ({
       if (bc) {
         await get().fetchBirthControls(bc.user_id);
       }
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -120,8 +121,8 @@ export const useBirthControlStore = create<BirthControlState>((set, get) => ({
         activeBirthControl: null,
         pillLogs: []
       });
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -140,8 +141,8 @@ export const useBirthControlStore = create<BirthControlState>((set, get) => ({
 
       if (error) throw error;
       set({ pillLogs: data || [] });
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
@@ -164,8 +165,8 @@ export const useBirthControlStore = create<BirthControlState>((set, get) => ({
       if (error) throw error;
       
       await get().fetchPillLogs(birthControlId);
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
