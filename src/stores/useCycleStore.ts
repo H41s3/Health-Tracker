@@ -26,6 +26,7 @@ export const useCycleStore = create<CycleState>((set, get) => ({
   setLutealLength: (days: number | null) => set({ lutealLength: days }),
 
   fetchCycles: async (userId: string) => {
+    if (get().loading) return;
     set({ loading: true, error: null });
     try {
       const { data, error } = await supabase
