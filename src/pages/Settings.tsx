@@ -72,11 +72,17 @@ export default function Settings() {
 
     setMessage('');
 
+    const heightVal = formData.height_cm ? parseFloat(formData.height_cm) : null;
+    if (heightVal !== null && (isNaN(heightVal) || heightVal < 50 || heightVal > 300)) {
+      setMessage('Error: Height must be between 50 and 300 cm.');
+      return;
+    }
+
     const profileData = {
       full_name: formData.full_name || null,
       date_of_birth: formData.date_of_birth || null,
       gender: formData.gender || null,
-      height_cm: formData.height_cm ? parseFloat(formData.height_cm) : null,
+      height_cm: heightVal,
     };
 
     console.log('Saving profile for user:', user.id);
@@ -442,11 +448,26 @@ export default function Settings() {
                 disabled={savingGoals}
                 onClick={async () => {
                   if (!user) return;
+                  const steps = parseInt(goalsData.steps);
+                  const water = parseInt(goalsData.water_ml);
+                  const sleep = parseFloat(goalsData.sleep_hours);
+                  if (isNaN(steps) || steps < 0 || steps > 100000) {
+                    setGoalsMessage('Error: Steps must be between 0 and 100,000.');
+                    return;
+                  }
+                  if (isNaN(water) || water < 0 || water > 10000) {
+                    setGoalsMessage('Error: Water must be between 0 and 10,000 ml.');
+                    return;
+                  }
+                  if (isNaN(sleep) || sleep < 0 || sleep > 24) {
+                    setGoalsMessage('Error: Sleep hours must be between 0 and 24.');
+                    return;
+                  }
                   try {
                     await updateGoals(user.id, {
-                      steps: parseInt(goalsData.steps) || DEFAULT_GOALS.steps,
-                      water_ml: parseInt(goalsData.water_ml) || DEFAULT_GOALS.water_ml,
-                      sleep_hours: parseFloat(goalsData.sleep_hours) || DEFAULT_GOALS.sleep_hours,
+                      steps: steps || DEFAULT_GOALS.steps,
+                      water_ml: water || DEFAULT_GOALS.water_ml,
+                      sleep_hours: sleep || DEFAULT_GOALS.sleep_hours,
                     });
                     setGoalsMessage('Goals updated successfully!');
                     setTimeout(() => setGoalsMessage(''), 3000);
