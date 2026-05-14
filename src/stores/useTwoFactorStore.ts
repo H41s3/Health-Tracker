@@ -117,7 +117,8 @@ export const useTwoFactorStore = create<TwoFactorState>((set, get) => ({
       // Hash backup codes for storage
       const hashedBackupCodes = await Promise.all(setupData.backupCodes.map(hashBackupCode));
 
-      // Store the secret and backup codes in the database
+      // NOTE: totp_secret is stored in plaintext. Full server-side encryption
+      // requires a Supabase Edge Function with a KMS-managed key; not yet implemented.
       const { error } = await supabase
         .from('profiles')
         .update({
