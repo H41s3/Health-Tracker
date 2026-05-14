@@ -20,6 +20,7 @@ export const useHealthStore = create<HealthState>((set, get) => ({
   error: null,
 
   fetchMetrics: async (userId: string, startDate?: string, endDate?: string) => {
+    if (get().loading) return;
     set({ loading: true, error: null });
     try {
       let query = supabase
