@@ -54,6 +54,7 @@ export function predictNextPeriod(
   const halfWindow = clamp(Math.round(Math.max(2, Math.min(6, sd))), 2, 6);
 
   const lastStart = new Date(cycles[0].period_start_date);
+  if (isNaN(lastStart.getTime())) return null;
   const nominal = addDays(lastStart, avg);
   const windowStart = addDays(nominal, -halfWindow);
   const windowEnd = addDays(nominal, halfWindow);
