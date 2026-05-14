@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { DailyLog } from '../types/database';
 import { format } from 'date-fns';
+import { getErrorMessage } from '../utils/errorHandler';
 
 interface DailyLogState {
   dailyLogs: DailyLog[];
@@ -34,8 +35,8 @@ export const useDailyLogStore = create<DailyLogState>((set, get) => ({
 
       if (error) throw error;
       set({ dailyLogs: data || [], loading: false });
-    } catch (error: any) {
-      set({ error: error.message, loading: false });
+    } catch (error) {
+      set({ error: getErrorMessage(error), loading: false });
     }
   },
 
@@ -55,8 +56,8 @@ export const useDailyLogStore = create<DailyLogState>((set, get) => ({
       if (error) throw error;
       
       await get().fetchDailyLogs(userId);
-    } catch (error: any) {
-      set({ error: error.message });
+    } catch (error) {
+      set({ error: getErrorMessage(error) });
     }
   },
 
